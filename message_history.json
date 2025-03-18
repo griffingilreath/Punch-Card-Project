@@ -11253,9 +11253,121 @@
       "content": "ROUTINE LOADING 16:33:06.",
       "generated_at": "2025-03-18T16:33:06.813319",
       "source": "Serial: MSG174233358656455",
+      "last_displayed": "2025-03-18T16:33:48.022630",
+      "display_count": 1
+    },
+    {
+      "message_number": 1408,
+      "content": "EXECUTING JOB SAVING 16:33:56.",
+      "generated_at": "2025-03-18T16:33:56.540611",
+      "source": "Serial: MSG174233363656455",
+      "last_displayed": "2025-03-18T16:34:37.641947",
+      "display_count": 1
+    },
+    {
+      "message_number": 1409,
+      "content": "INITIALIZED TASK LOADING PROGRAM.",
+      "generated_at": "2025-03-18T16:34:46.181803",
+      "source": "Serial: MSG174233368656455",
+      "last_displayed": "2025-03-18T16:35:27.284312",
+      "display_count": 1
+    },
+    {
+      "message_number": 1410,
+      "content": "DEBUG PROCESSING ROUTINE 16:35:35.",
+      "generated_at": "2025-03-18T16:35:35.822534",
+      "source": "Serial: MSG174233373556455",
+      "last_displayed": "2025-03-18T16:36:16.976179",
+      "display_count": 1
+    },
+    {
+      "message_number": 1411,
+      "content": "PROCESSING JOB COMPILING ROUTINE.",
+      "generated_at": "2025-03-18T16:36:25.540856",
+      "source": "Serial: MSG174233378556455",
+      "last_displayed": "2025-03-18T16:37:06.460827",
+      "display_count": 1
+    },
+    {
+      "message_number": 1412,
+      "content": "PROCESSING SYSTEM DATA 28%.",
+      "generated_at": "2025-03-18T16:37:14.957982",
+      "source": "Serial: MSG174233383456455",
+      "last_displayed": "2025-03-18T16:37:55.911431",
+      "display_count": 1
+    },
+    {
+      "message_number": 1413,
+      "content": "ABORTED.",
+      "generated_at": "2025-03-18T16:38:04.427396",
+      "source": "Serial: MSG174233388456455",
+      "last_displayed": "2025-03-18T16:38:45.360546",
+      "display_count": 1
+    },
+    {
+      "message_number": 1414,
+      "content": "TAPE LOADING RECORD 2759 16:38:53.",
+      "generated_at": "2025-03-18T16:38:53.927087",
+      "source": "Serial: MSG174233393356455",
+      "last_displayed": "2025-03-18T16:39:35.090483",
+      "display_count": 1
+    },
+    {
+      "message_number": 1415,
+      "content": "EXECUTING LOADING.",
+      "generated_at": "2025-03-18T16:39:43.630237",
+      "source": "Serial: MSG174233398356455",
+      "last_displayed": "2025-03-18T16:40:24.846235",
+      "display_count": 1
+    },
+    {
+      "message_number": 1416,
+      "content": "ABORTED RUNNING.",
+      "generated_at": "2025-03-18T16:40:33.465497",
+      "source": "Serial: MSG174233403356455",
+      "last_displayed": "2025-03-18T16:41:15.051722",
+      "display_count": 1
+    },
+    {
+      "message_number": 1417,
+      "content": "WAITING COMPILING PROGRAM 16:41:23.",
+      "generated_at": "2025-03-18T16:41:23.682856",
+      "source": "Serial: MSG174233408356455",
+      "last_displayed": "2025-03-18T16:42:05.217564",
+      "display_count": 1
+    },
+    {
+      "message_number": 1418,
+      "content": "READER PROGRAM 16:42:13.",
+      "generated_at": "2025-03-18T16:42:13.853557",
+      "source": "Serial: MSG174233413356455",
+      "last_displayed": "2025-03-18T16:42:55.017860",
+      "display_count": 1
+    },
+    {
+      "message_number": 1419,
+      "content": "RUNNING TASK SAVING ROUTINE 16:43:03.",
+      "generated_at": "2025-03-18T16:43:03.561513",
+      "source": "Serial: MSG174233418356455",
+      "last_displayed": "2025-03-18T16:43:44.892337",
+      "display_count": 1
+    },
+    {
+      "message_number": 1420,
+      "content": "READY PROCESSING.",
+      "generated_at": "2025-03-18T16:43:53.485676",
+      "source": "Serial: MSG174233423356455",
+      "last_displayed": "2025-03-18T16:44:34.897306",
+      "display_count": 1
+    },
+    {
+      "message_number": 1421,
+      "content": "ERROR SAVING RECORD 16:44:43.",
+      "generated_at": "2025-03-18T16:44:43.490577",
+      "source": "Serial: MSG174233428356455",
       "last_displayed": null,
       "display_count": 0
     }
   ],
-  "current_message_number": 1407
+  "current_message_number": 1421
 }
