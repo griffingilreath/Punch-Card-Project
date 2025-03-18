@@ -23,7 +23,6 @@
 
 *A sophisticated terminal-based simulator of an 80-column punch card display system, featuring LED grid visualization and message processing capabilities with historical accuracy and modern integrations.*
 
-> "In the digital age, we've created clouds of abstraction that obscure the physical foundations of computing. This project is my attempt to reconnect with that tangible history." — Griffin Gilreath
 
 ![IBM Punch Card](https://placeholder-for-punch-card-image.png)
 
@@ -46,25 +45,6 @@ IBM's 80-column punch cards were a revolutionary data storage medium that domina
 - A clipped corner for orientation (typically upper-left on IBM cards)
 - Rectangular holes (~1mm × 3mm) introduced in 1928 for tighter spacing
 
-```
-   ┌───────────────── IBM 80-COLUMN CARD LAYOUT ─────────────────┐
-   │                                                              │
-12 │   ┌┐  ┌┐  ┌┐  ┌┐  ┌┐  ┌┐  ┌┐  ┌┐    ...    ┌┐  ┌┐  ┌┐  ┌┐   │
-11 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 0 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 1 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 2 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 3 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 4 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 5 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 6 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 7 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 8 │   ││  ││  ││  ││  ││  ││  ││  ││    ...    ││  ││  ││  ││   │
- 9 │   └┘  └┘  └┘  └┘  └┘  └┘  └┘  └┘    ...    └┘  └┘  └┘  └┘   │
-   │                                                              │
-   │    1   2   3   4   5   6   7   8    ...    73  74  75  76   │
-   └──────────────────────────────────────────────────────────────┘
-```
 
 Each character was encoded using specific hole patterns (Hollerith code), with:
 - Letters A-I: Zone punch in row 12 + digit rows 1-9
@@ -254,7 +234,7 @@ The project is designed to integrate with a physical 12×80 LED grid that matche
 │  ┌─┐ ┌─┐ ┌─┐ ┌─┐     ┌─┐ │
 │  │ │ │ │ │ │ │ │     │ │ │  Row 1
 │  └─┘ └─┘ └─┘ └─┘     └─┘ │
-│          ...              │  ...
+│          ...             │  ...
 │  ┌─┐ ┌─┐ ┌─┐ ┌─┐     ┌─┐ │
 │  │ │ │ │ │ │ │ │     │ │ │  Row 11
 │  └─┘ └─┘ └─┘ └─┘     └─┘ │
@@ -287,14 +267,6 @@ See the [Web Integration Example](docs/technical/WEB_INTEGRATION_EXAMPLE.py) for
 - [Punch Card Encoding](docs/research/PUNCH_CARD_ENCODING.md) - Historical encoding specifications
 - [LED Implementation](docs/research/LED_IMPLEMENTATION.md) - Hardware implementation details
 - [Sociological Aspects](docs/research/SOCIOLOGICAL_ASPECTS.md) - Cultural impact analysis
-
-## 💬 Artist's Statement
-
-This project exists at the intersection of computing history, artistic expression, and functional software. By recreating the IBM punch card experience in a modern context, I'm exploring how our relationship with data has evolved.
-
-The physical punch card—a tangible, manipulable object—has become an abstraction. This project seeks to reintroduce the materiality of data through LED visualization, while acknowledging the limitations and quirks of early computing systems.
-
-Each message displayed represents a bridge between past and present, carrying forward the aesthetics of computing history while enabling new forms of expression through contemporary technology.
 
 ## 📜 License
 
@@ -343,6 +315,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 D O   N O T   F O L D   S P I N D L E   O R   M U T I L A T E
 ```
 
-*Made with ❤️ and vintage computing nostalgia by Griffin Gilreath*
+*Made with ❤️ by Griffin Gilreath*
 
 </div> 
