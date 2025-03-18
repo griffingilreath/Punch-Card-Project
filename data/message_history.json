@@ -11365,9 +11365,385 @@
       "content": "ERROR SAVING RECORD 16:44:43.",
       "generated_at": "2025-03-18T16:44:43.490577",
       "source": "Serial: MSG174233428356455",
+      "last_displayed": "2025-03-18T16:45:24.720455",
+      "display_count": 1
+    },
+    {
+      "message_number": 1422,
+      "content": "RUNNING RUNNING MODULE 16:45:33.",
+      "generated_at": "2025-03-18T16:45:33.294867",
+      "source": "Serial: MSG174233433356455",
+      "last_displayed": "2025-03-18T16:46:14.674985",
+      "display_count": 1
+    },
+    {
+      "message_number": 1423,
+      "content": "EXECUTING EXECUTING.",
+      "generated_at": "2025-03-18T16:46:23.178106",
+      "source": "Serial: MSG174233438356455",
+      "last_displayed": "2025-03-18T16:47:04.588945",
+      "display_count": 1
+    },
+    {
+      "message_number": 1424,
+      "content": "QUEUED TASK PROCESSING.",
+      "generated_at": "2025-03-18T16:47:13.178049",
+      "source": "Serial: MSG174233443356455",
+      "last_displayed": "2025-03-18T16:47:54.733373",
+      "display_count": 1
+    },
+    {
+      "message_number": 1425,
+      "content": "COMPLETE SYSTEM PROGRAM.",
+      "generated_at": "2025-03-18T16:48:03.321589",
+      "source": "Serial: MSG174233448356455",
+      "last_displayed": "2025-03-18T16:48:44.715090",
+      "display_count": 1
+    },
+    {
+      "message_number": 1426,
+      "content": "SCHEDULED SYSTEM LOADING.",
+      "generated_at": "2025-03-18T16:48:53.254816",
+      "source": "Serial: MSG174233453356455",
+      "last_displayed": "2025-03-18T16:49:34.585447",
+      "display_count": 1
+    },
+    {
+      "message_number": 1427,
+      "content": "COMPUTER PROCESSING.",
+      "generated_at": "2025-03-18T16:49:43.168004",
+      "source": "Serial: MSG174233458356455",
+      "last_displayed": "2025-03-18T16:50:24.494825",
+      "display_count": 1
+    },
+    {
+      "message_number": 1428,
+      "content": "MEMORY PROCESSING DATA.",
+      "generated_at": "2025-03-18T16:50:33.049653",
+      "source": "Serial: MSG174233463356455",
+      "last_displayed": "2025-03-18T16:51:14.390734",
+      "display_count": 1
+    },
+    {
+      "message_number": 1429,
+      "content": "INITIALIZED JOB LOADING 1069.",
+      "generated_at": "2025-03-18T16:51:22.991812",
+      "source": "Serial: MSG174233468256455",
+      "last_displayed": "2025-03-18T16:52:04.347915",
+      "display_count": 1
+    },
+    {
+      "message_number": 1430,
+      "content": "SCHEDULED PROCESSING 16:52:12.",
+      "generated_at": "2025-03-18T16:52:12.956306",
+      "source": "Serial: MSG174233473256455",
+      "last_displayed": "2025-03-18T16:52:54.285379",
+      "display_count": 1
+    },
+    {
+      "message_number": 1431,
+      "content": "WAITING SYSTEM EXECUTING.",
+      "generated_at": "2025-03-18T16:53:02.847247",
+      "source": "Serial: MSG174233478256455",
+      "last_displayed": "2025-03-18T16:53:44.232961",
+      "display_count": 1
+    },
+    {
+      "message_number": 1432,
+      "content": "SUBROUTINE PROCESSING DATA.",
+      "generated_at": "2025-03-18T16:53:52.811646",
+      "source": "Serial: MSG174233483256455",
+      "last_displayed": "2025-03-18T16:54:34.270650",
+      "display_count": 1
+    },
+    {
+      "message_number": 1433,
+      "content": "CONSOLE PROCESSING 16:54:42.",
+      "generated_at": "2025-03-18T16:54:42.854134",
+      "source": "Serial: MSG174233488256455",
+      "last_displayed": "2025-03-18T16:55:24.236461",
+      "display_count": 1
+    },
+    {
+      "message_number": 1434,
+      "content": "READY RUNNING 2546 16:55:32.",
+      "generated_at": "2025-03-18T16:55:32.900821",
+      "source": "Serial: MSG174233493256455",
+      "last_displayed": "2025-03-18T16:56:14.367803",
+      "display_count": 1
+    },
+    {
+      "message_number": 1435,
+      "content": "INITIALIZED RUNNING.",
+      "generated_at": "2025-03-18T16:56:23.083293",
+      "source": "Serial: MSG174233498356455",
+      "last_displayed": "2025-03-18T16:57:04.573412",
+      "display_count": 1
+    },
+    {
+      "message_number": 1436,
+      "content": "JOB SAVING RECORD 39%.",
+      "generated_at": "2025-03-18T16:57:13.279423",
+      "source": "Serial: MSG174233503356455",
+      "last_displayed": "2025-03-18T16:57:54.721439",
+      "display_count": 1
+    },
+    {
+      "message_number": 1437,
+      "content": "LOADED RUNNING ROUTINE 16:58:03.",
+      "generated_at": "2025-03-18T16:58:03.421246",
+      "source": "Serial: MSG174233508356455",
+      "last_displayed": "2025-03-18T16:58:44.710207",
+      "display_count": 1
+    },
+    {
+      "message_number": 1438,
+      "content": "TERMINATED SAVING 7030 16:58:53.",
+      "generated_at": "2025-03-18T16:58:53.362432",
+      "source": "Serial: MSG174233513356455",
+      "last_displayed": "2025-03-18T16:59:34.920052",
+      "display_count": 1
+    },
+    {
+      "message_number": 1439,
+      "content": "DEBUG EXECUTING PROGRAM 68% 16:59:43.",
+      "generated_at": "2025-03-18T16:59:43.621992",
+      "source": "Serial: MSG174233518356455",
+      "last_displayed": "2025-03-18T17:00:25.025909",
+      "display_count": 1
+    },
+    {
+      "message_number": 1440,
+      "content": "PAUSED PROCESSING ROUTINE 17:00:33.",
+      "generated_at": "2025-03-18T17:00:33.579962",
+      "source": "Serial: MSG174233523356455",
+      "last_displayed": "2025-03-18T17:01:14.864054",
+      "display_count": 1
+    },
+    {
+      "message_number": 1441,
+      "content": "PROCESSOR LOADING PROGRAM 3494 17:01:23.",
+      "generated_at": "2025-03-18T17:01:23.427574",
+      "source": "Serial: MSG174233528356455",
+      "last_displayed": "2025-03-18T17:02:04.621585",
+      "display_count": 1
+    },
+    {
+      "message_number": 1442,
+      "content": "DUMP RECORD.",
+      "generated_at": "2025-03-18T17:02:13.268887",
+      "source": "Serial: MSG174233533356455",
+      "last_displayed": "2025-03-18T17:02:54.629360",
+      "display_count": 1
+    },
+    {
+      "message_number": 1443,
+      "content": "BUFFER RECORD 5253.",
+      "generated_at": "2025-03-18T17:03:03.359829",
+      "source": "Serial: MSG174233538356455",
+      "last_displayed": "2025-03-18T17:03:44.791567",
+      "display_count": 1
+    },
+    {
+      "message_number": 1444,
+      "content": "INITIALIZED LOADING ROUTINE 17:03:53.",
+      "generated_at": "2025-03-18T17:03:53.481388",
+      "source": "Serial: MSG174233543356455",
+      "last_displayed": "2025-03-18T17:04:34.828224",
+      "display_count": 1
+    },
+    {
+      "message_number": 1445,
+      "content": "COMPLETE SAVING ROUTINE.",
+      "generated_at": "2025-03-18T17:04:43.536447",
+      "source": "Serial: MSG174233548356455",
+      "last_displayed": "2025-03-18T17:05:25.030573",
+      "display_count": 1
+    },
+    {
+      "message_number": 1446,
+      "content": "EXECUTING SYSTEM SAVING 8754.",
+      "generated_at": "2025-03-18T17:05:33.684549",
+      "source": "Serial: MSG174233553356455",
+      "last_displayed": "2025-03-18T17:06:15.139159",
+      "display_count": 1
+    },
+    {
+      "message_number": 1447,
+      "content": "QUEUED PROCESSING.",
+      "generated_at": "2025-03-18T17:06:23.811153",
+      "source": "Serial: MSG174233558356455",
+      "last_displayed": "2025-03-18T17:07:05.141916",
+      "display_count": 1
+    },
+    {
+      "message_number": 1448,
+      "content": "WAITING COMPILING MODULE 17:07:13.",
+      "generated_at": "2025-03-18T17:07:13.664539",
+      "source": "Serial: MSG174233563356455",
+      "last_displayed": "2025-03-18T17:07:55.085274",
+      "display_count": 1
+    },
+    {
+      "message_number": 1449,
+      "content": "PROCESSING SYSTEM RUNNING 17:08:03.",
+      "generated_at": "2025-03-18T17:08:03.857911",
+      "source": "Serial: MSG174233568356455",
+      "last_displayed": "2025-03-18T17:08:45.220432",
+      "display_count": 1
+    },
+    {
+      "message_number": 1450,
+      "content": "PAUSED TASK LOADING FILE 78%.",
+      "generated_at": "2025-03-18T17:08:53.893383",
+      "source": "Serial: MSG174233573356455",
+      "last_displayed": "2025-03-18T17:09:35.302151",
+      "display_count": 1
+    },
+    {
+      "message_number": 1451,
+      "content": "COMPLETE JOB EXECUTING DATA.",
+      "generated_at": "2025-03-18T17:09:44.018187",
+      "source": "Serial: MSG174233578456455",
+      "last_displayed": "2025-03-18T17:10:25.491561",
+      "display_count": 1
+    },
+    {
+      "message_number": 1452,
+      "content": "QUEUED PROGRAM 97%.",
+      "generated_at": "2025-03-18T17:10:34.166911",
+      "source": "Serial: MSG174233583456455",
+      "last_displayed": "2025-03-18T17:11:15.626283",
+      "display_count": 1
+    },
+    {
+      "message_number": 1453,
+      "content": "WAITING COMPILING 73%.",
+      "generated_at": "2025-03-18T17:11:24.336056",
+      "source": "Serial: MSG174233588456455",
+      "last_displayed": "2025-03-18T17:12:05.673667",
+      "display_count": 1
+    },
+    {
+      "message_number": 1454,
+      "content": "PAUSED JOB FILE.",
+      "generated_at": "2025-03-18T17:12:14.194141",
+      "source": "Serial: MSG174233593456455",
+      "last_displayed": "2025-03-18T17:12:55.403804",
+      "display_count": 1
+    },
+    {
+      "message_number": 1455,
+      "content": "COMPLETE.",
+      "generated_at": "2025-03-18T17:13:04.000855",
+      "source": "Serial: MSG174233598356455",
+      "last_displayed": "2025-03-18T17:13:45.414186",
+      "display_count": 1
+    },
+    {
+      "message_number": 1456,
+      "content": "CONSOLE SAVING 9755 17:13:53.",
+      "generated_at": "2025-03-18T17:13:53.952118",
+      "source": "Serial: MSG174233603356455",
+      "last_displayed": "2025-03-18T17:14:35.206836",
+      "display_count": 1
+    },
+    {
+      "message_number": 1457,
+      "content": "READY TASK EXECUTING ROUTINE.",
+      "generated_at": "2025-03-18T17:14:43.775819",
+      "source": "Serial: MSG174233608356455",
+      "last_displayed": "2025-03-18T17:15:24.970145",
+      "display_count": 1
+    },
+    {
+      "message_number": 1458,
+      "content": "TAPE 0%.",
+      "generated_at": "2025-03-18T17:15:33.585965",
+      "source": "Serial: MSG174233613356455",
+      "last_displayed": "2025-03-18T17:16:15.005969",
+      "display_count": 1
+    },
+    {
+      "message_number": 1459,
+      "content": "QUEUED TASK SAVING MODULE 17:16:23.",
+      "generated_at": "2025-03-18T17:16:23.617559",
+      "source": "Serial: MSG174233618356455",
+      "last_displayed": "2025-03-18T17:17:04.762944",
+      "display_count": 1
+    },
+    {
+      "message_number": 1460,
+      "content": "LOADED SYSTEM COMPILING.",
+      "generated_at": "2025-03-18T17:17:13.306468",
+      "source": "Serial: MSG174233623356455",
+      "last_displayed": "2025-03-18T17:17:54.484826",
+      "display_count": 1
+    },
+    {
+      "message_number": 1461,
+      "content": "TAPE SAVING DATA 7386.",
+      "generated_at": "2025-03-18T17:18:03.050557",
+      "source": "Serial: MSG174233628356455",
+      "last_displayed": "2025-03-18T17:18:44.172734",
+      "display_count": 1
+    },
+    {
+      "message_number": 1462,
+      "content": "EXECUTING 17:18:52.",
+      "generated_at": "2025-03-18T17:18:52.722434",
+      "source": "Serial: MSG174233633256455",
+      "last_displayed": "2025-03-18T17:19:33.907149",
+      "display_count": 1
+    },
+    {
+      "message_number": 1463,
+      "content": "TERMINATED PROCESSING DATA.",
+      "generated_at": "2025-03-18T17:19:42.523155",
+      "source": "Serial: MSG174233638256455",
+      "last_displayed": "2025-03-18T17:20:23.792847",
+      "display_count": 1
+    },
+    {
+      "message_number": 1464,
+      "content": "CORE RECORD 6717.",
+      "generated_at": "2025-03-18T17:20:32.450394",
+      "source": "Serial: MSG174233643256455",
+      "last_displayed": "2025-03-18T17:21:13.888849",
+      "display_count": 1
+    },
+    {
+      "message_number": 1465,
+      "content": "READY COMPILING PROGRAM.",
+      "generated_at": "2025-03-18T17:21:22.502502",
+      "source": "Serial: MSG174233648256455",
+      "last_displayed": "2025-03-18T17:22:03.957838",
+      "display_count": 1
+    },
+    {
+      "message_number": 1466,
+      "content": "ABORTED TASK RUNNING 8069.",
+      "generated_at": "2025-03-18T17:22:12.601222",
+      "source": "Serial: MSG174233653256455",
+      "last_displayed": "2025-03-18T17:22:53.800713",
+      "display_count": 1
+    },
+    {
+      "message_number": 1467,
+      "content": "COMPILE COMPILING 17:23:02.",
+      "generated_at": "2025-03-18T17:23:02.327040",
+      "source": "Serial: MSG174233658256455",
+      "last_displayed": "2025-03-18T17:23:43.498394",
+      "display_count": 1
+    },
+    {
+      "message_number": 1468,
+      "content": "TERMINATED DATA.",
+      "generated_at": "2025-03-18T17:23:52.049198",
+      "source": "Serial: MSG174233663256455",
       "last_displayed": null,
       "display_count": 0
     }
   ],
-  "current_message_number": 1421
+  "current_message_number": 1468
 }
