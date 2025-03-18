@@ -1,0 +1,1333 @@
+{
+  "messages": [
+    {
+      "message_number": 1,
+      "content": "INITIALIZED TASK MODULE.",
+      "generated_at": "2025-03-17T12:53:15.891992",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 2,
+      "content": "DEBUG PROCESSING.",
+      "generated_at": "2025-03-17T12:53:30.664315",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 3,
+      "content": "CONSOLE PROCESSING RECORD 36% 12:53:46.",
+      "generated_at": "2025-03-17T12:53:46.376972",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T12:54:27.796007",
+      "display_count": 1
+    },
+    {
+      "message_number": 4,
+      "content": "ROUTINE LOADING 12:54:52.",
+      "generated_at": "2025-03-17T12:54:52.374832",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T12:55:33.865386",
+      "display_count": 1
+    },
+    {
+      "message_number": 5,
+      "content": "READY JOB SAVING PROGRAM.",
+      "generated_at": "2025-03-17T12:55:58.635566",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T12:56:40.213015",
+      "display_count": 1
+    },
+    {
+      "message_number": 6,
+      "content": "CONFIGURED JOB [12:57:04]",
+      "generated_at": "2025-03-17T12:57:04.879754",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 7,
+      "content": "SCHEDULED COMPILING.",
+      "generated_at": "2025-03-17T12:57:26.073813",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T12:58:07.345518",
+      "display_count": 1
+    },
+    {
+      "message_number": 8,
+      "content": "PROCESSOR PROCESSING.",
+      "generated_at": "2025-03-17T12:58:14.450195",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 9,
+      "content": "EXECUTING LOADING 12:58:16.",
+      "generated_at": "2025-03-17T12:58:16.331341",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T12:58:57.744420",
+      "display_count": 1
+    },
+    {
+      "message_number": 10,
+      "content": "COMPLETE MODULE 9994.",
+      "generated_at": "2025-03-17T12:59:05.106934",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T12:59:46.602045",
+      "display_count": 1
+    },
+    {
+      "message_number": 11,
+      "content": "READY SAVING ROUTINE.",
+      "generated_at": "2025-03-17T12:59:54.330972",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:00:35.920992",
+      "display_count": 1
+    },
+    {
+      "message_number": 12,
+      "content": "PRINTER LOADING DATA 3430.",
+      "generated_at": "2025-03-17T13:00:42.795613",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:01:24.232493",
+      "display_count": 1
+    },
+    {
+      "message_number": 13,
+      "content": "ABORTED JOB DATA.",
+      "generated_at": "2025-03-17T13:01:51.356045",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:02:32.934683",
+      "display_count": 1
+    },
+    {
+      "message_number": 14,
+      "content": "WAITING LOADING 2975.",
+      "generated_at": "2025-03-17T13:03:00.175892",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:03:41.774551",
+      "display_count": 1
+    },
+    {
+      "message_number": 15,
+      "content": "COMPLETE TASK [13:04:09]",
+      "generated_at": "2025-03-17T13:04:09.124880",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 16,
+      "content": "DISK.",
+      "generated_at": "2025-03-17T13:07:09.121212",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:07:50.649318",
+      "display_count": 1
+    },
+    {
+      "message_number": 17,
+      "content": "ERROR EXECUTING 13:11:35.",
+      "generated_at": "2025-03-17T13:11:35.188684",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:12:16.636537",
+      "display_count": 1
+    },
+    {
+      "message_number": 18,
+      "content": "BUFFER RUNNING PROGRAM.",
+      "generated_at": "2025-03-17T13:20:26.924352",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:21:08.559524",
+      "display_count": 1
+    },
+    {
+      "message_number": 19,
+      "content": "MEMORY 8699.",
+      "generated_at": "2025-03-17T13:28:51.507626",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T13:29:33.045813",
+      "display_count": 1
+    },
+    {
+      "message_number": 20,
+      "content": "INITIALIZED RUNNING MODULE.",
+      "generated_at": "2025-03-17T13:43:54.575636",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 21,
+      "content": "LOADED COMPILING.",
+      "generated_at": "2025-03-17T13:52:56.054740",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 22,
+      "content": "HALTED 7716.",
+      "generated_at": "2025-03-17T13:54:37.707353",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 23,
+      "content": "INITIALIZED SAVING ROUTINE 801 13:55:44.",
+      "generated_at": "2025-03-17T13:55:44.593512",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 24,
+      "content": "BUFFER LOADING DATA 9%.",
+      "generated_at": "2025-03-17T13:56:51.285423",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 25,
+      "content": "TERMINATED TASK SAVING DATA.",
+      "generated_at": "2025-03-17T13:58:40.096398",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 26,
+      "content": "COMPILE RUNNING 14:00:07.",
+      "generated_at": "2025-03-17T14:00:07.379420",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 27,
+      "content": "PAUSED JOB 96%.",
+      "generated_at": "2025-03-17T14:01:40.214038",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 28,
+      "content": "WAITING.",
+      "generated_at": "2025-03-17T14:02:56.177202",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 29,
+      "content": "SCHEDULED LOADING RECORD.",
+      "generated_at": "2025-03-17T14:03:48.165985",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 30,
+      "content": "ABORTED JOB PROCESSING MODULE.",
+      "generated_at": "2025-03-17T14:07:25.485403",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 31,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T14:11:23.726085",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T14:12:05.098018",
+      "display_count": 1
+    },
+    {
+      "message_number": 32,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T14:15:03.040229",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 33,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T14:15:43.492151",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T14:16:24.991951",
+      "display_count": 1
+    },
+    {
+      "message_number": 34,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T14:20:03.697481",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 35,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T14:22:30.198014",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 36,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:29:53.144439",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T15:30:32.589476",
+      "display_count": 1
+    },
+    {
+      "message_number": 37,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:32:14.781820",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T15:32:56.296107",
+      "display_count": 1
+    },
+    {
+      "message_number": 38,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:37:50.101694",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 39,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:39:55.552249",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 40,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:42:39.093549",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 41,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:43:22.097553",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 42,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:45:23.954111",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 43,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:49:54.499759",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 44,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:51:57.563251",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 45,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:52:56.833010",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T15:53:38.353753",
+      "display_count": 1
+    },
+    {
+      "message_number": 46,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T15:54:58.587196",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T15:55:40.089361",
+      "display_count": 1
+    },
+    {
+      "message_number": 47,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:56:42.432415",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 48,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:57:36.300459",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 49,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T15:58:38.919842",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T15:59:20.360995",
+      "display_count": 1
+    },
+    {
+      "message_number": 50,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:00:22.848755",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:01:04.466777",
+      "display_count": 1
+    },
+    {
+      "message_number": 51,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:02:06.883672",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:02:48.409659",
+      "display_count": 1
+    },
+    {
+      "message_number": 52,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T16:03:50.834611",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:04:32.348638",
+      "display_count": 1
+    },
+    {
+      "message_number": 53,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:07:05.320641",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 54,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:08:22.711399",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:09:04.647134",
+      "display_count": 1
+    },
+    {
+      "message_number": 55,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:10:03.385327",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:10:45.387503",
+      "display_count": 1
+    },
+    {
+      "message_number": 56,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:11:44.006062",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 57,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:12:48.157819",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:13:30.162353",
+      "display_count": 1
+    },
+    {
+      "message_number": 58,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:14:24.536953",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 59,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:15:35.382222",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:16:17.392352",
+      "display_count": 1
+    },
+    {
+      "message_number": 60,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:17:27.914682",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:18:09.381385",
+      "display_count": 1
+    },
+    {
+      "message_number": 61,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:19:03.789845",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:19:45.216488",
+      "display_count": 1
+    },
+    {
+      "message_number": 62,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:20:39.695487",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 63,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:21:46.960369",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:22:28.439541",
+      "display_count": 1
+    },
+    {
+      "message_number": 64,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:23:22.970338",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 65,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:24:32.563678",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:25:14.009624",
+      "display_count": 1
+    },
+    {
+      "message_number": 66,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:26:08.963091",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 67,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:27:21.229608",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:27:46.727770",
+      "display_count": 1
+    },
+    {
+      "message_number": 68,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:28:32.209419",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:28:57.978465",
+      "display_count": 1
+    },
+    {
+      "message_number": 69,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:30:10.535339",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:30:36.059177",
+      "display_count": 1
+    },
+    {
+      "message_number": 70,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:31:22.867545",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:31:48.225740",
+      "display_count": 1
+    },
+    {
+      "message_number": 71,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:32:55.015768",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:33:20.492615",
+      "display_count": 1
+    },
+    {
+      "message_number": 72,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:34:07.231238",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:34:33.001900",
+      "display_count": 1
+    },
+    {
+      "message_number": 73,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:35:19.560042",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:35:44.899192",
+      "display_count": 1
+    },
+    {
+      "message_number": 74,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T16:36:31.369331",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:36:57.183703",
+      "display_count": 1
+    },
+    {
+      "message_number": 75,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:39:44.626522",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:40:10.039354",
+      "display_count": 1
+    },
+    {
+      "message_number": 76,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:40:58.146983",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:41:23.723940",
+      "display_count": 1
+    },
+    {
+      "message_number": 77,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:42:15.621220",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 78,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:42:59.758026",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:43:25.227915",
+      "display_count": 1
+    },
+    {
+      "message_number": 79,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:44:21.465826",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:44:47.124096",
+      "display_count": 1
+    },
+    {
+      "message_number": 80,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:45:47.825586",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:46:13.321637",
+      "display_count": 1
+    },
+    {
+      "message_number": 81,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T16:47:07.101211",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:47:32.649301",
+      "display_count": 1
+    },
+    {
+      "message_number": 82,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:48:16.982281",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:48:42.484880",
+      "display_count": 1
+    },
+    {
+      "message_number": 83,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:49:43.972290",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:50:09.466977",
+      "display_count": 1
+    },
+    {
+      "message_number": 84,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:50:55.861950",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:51:21.454715",
+      "display_count": 1
+    },
+    {
+      "message_number": 85,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:52:08.314781",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:52:34.188939",
+      "display_count": 1
+    },
+    {
+      "message_number": 86,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T16:53:21.066521",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:53:46.899716",
+      "display_count": 1
+    },
+    {
+      "message_number": 87,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:55:25.905604",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:55:51.408251",
+      "display_count": 1
+    },
+    {
+      "message_number": 88,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T16:56:45.111943",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:57:10.601001",
+      "display_count": 1
+    },
+    {
+      "message_number": 89,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T16:57:56.013423",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:58:21.412931",
+      "display_count": 1
+    },
+    {
+      "message_number": 90,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T16:59:06.710735",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T16:59:32.339100",
+      "display_count": 1
+    },
+    {
+      "message_number": 91,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T17:00:17.887611",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:00:43.435099",
+      "display_count": 1
+    },
+    {
+      "message_number": 92,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:02:32.814663",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:02:58.315845",
+      "display_count": 1
+    },
+    {
+      "message_number": 93,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:05:11.941288",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:05:29.434760",
+      "display_count": 1
+    },
+    {
+      "message_number": 94,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:06:05.758517",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:06:23.519750",
+      "display_count": 1
+    },
+    {
+      "message_number": 95,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:06:59.977399",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:07:17.587825",
+      "display_count": 1
+    },
+    {
+      "message_number": 96,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:08:13.961600",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:08:31.321430",
+      "display_count": 1
+    },
+    {
+      "message_number": 97,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:09:36.722324",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:09:54.193623",
+      "display_count": 1
+    },
+    {
+      "message_number": 98,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:10:26.317765",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:10:43.936249",
+      "display_count": 1
+    },
+    {
+      "message_number": 99,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:11:16.192354",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:11:33.846018",
+      "display_count": 1
+    },
+    {
+      "message_number": 100,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:12:18.354144",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:12:35.816838",
+      "display_count": 1
+    },
+    {
+      "message_number": 101,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:13:07.963446",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:13:25.435063",
+      "display_count": 1
+    },
+    {
+      "message_number": 102,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:14:55.481101",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:15:13.017154",
+      "display_count": 1
+    },
+    {
+      "message_number": 103,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:15:47.132897",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:16:04.796915",
+      "display_count": 1
+    },
+    {
+      "message_number": 104,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:16:38.910324",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:16:56.604693",
+      "display_count": 1
+    },
+    {
+      "message_number": 105,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T17:17:30.853140",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:17:48.443456",
+      "display_count": 1
+    },
+    {
+      "message_number": 106,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:21:32.039396",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:21:49.518501",
+      "display_count": 1
+    },
+    {
+      "message_number": 107,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:22:21.975008",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:22:39.352843",
+      "display_count": 1
+    },
+    {
+      "message_number": 108,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:23:11.787881",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:23:29.407931",
+      "display_count": 1
+    },
+    {
+      "message_number": 109,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T17:24:01.923164",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:24:19.710168",
+      "display_count": 1
+    },
+    {
+      "message_number": 110,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:27:09.770506",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:27:27.257722",
+      "display_count": 1
+    },
+    {
+      "message_number": 111,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:27:58.689723",
+      "source": "Generated",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 112,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:30:40.228389",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:31:05.696760",
+      "display_count": 1
+    },
+    {
+      "message_number": 113,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:31:40.786225",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:32:06.285905",
+      "display_count": 1
+    },
+    {
+      "message_number": 114,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:32:41.351433",
+      "source": "Generated",
+      "last_displayed": "2025-03-17T17:33:06.934097",
+      "display_count": 1
+    },
+    {
+      "message_number": 115,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:34:07.953279",
+      "source": "Serial: MSG174225084716255",
+      "last_displayed": "2025-03-17T17:34:33.433235",
+      "display_count": 1
+    },
+    {
+      "message_number": 116,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:35:08.514825",
+      "source": "Serial: MSG174225090816255",
+      "last_displayed": "2025-03-17T17:35:34.256970",
+      "display_count": 1
+    },
+    {
+      "message_number": 117,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:40:07.939041",
+      "source": "Serial: MSG174225120716818",
+      "last_displayed": "2025-03-17T17:40:33.439995",
+      "display_count": 1
+    },
+    {
+      "message_number": 118,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:40:41.511337",
+      "source": "Serial: MSG174225124116818",
+      "last_displayed": "2025-03-17T17:41:07.021686",
+      "display_count": 1
+    },
+    {
+      "message_number": 119,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:41:15.076105",
+      "source": "Serial: MSG174225127516818",
+      "last_displayed": "2025-03-17T17:41:40.565371",
+      "display_count": 1
+    },
+    {
+      "message_number": 120,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T17:41:48.626705",
+      "source": "Serial: MSG174225130816818",
+      "last_displayed": "2025-03-17T17:42:14.097582",
+      "display_count": 1
+    },
+    {
+      "message_number": 121,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T17:47:35.521298",
+      "source": "Serial: MSG174225165517855",
+      "last_displayed": "2025-03-17T17:48:00.959429",
+      "display_count": 1
+    },
+    {
+      "message_number": 122,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T17:48:09.030603",
+      "source": "Serial: MSG174225168917855",
+      "last_displayed": "2025-03-17T17:48:34.528205",
+      "display_count": 1
+    },
+    {
+      "message_number": 123,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T17:48:42.779030",
+      "source": "Serial: MSG174225172217855",
+      "last_displayed": "2025-03-17T17:49:08.230399",
+      "display_count": 1
+    },
+    {
+      "message_number": 124,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T17:49:16.285654",
+      "source": "Serial: MSG174225175617855",
+      "last_displayed": "2025-03-17T17:49:41.682117",
+      "display_count": 1
+    },
+    {
+      "message_number": 125,
+      "content": "DIAGNOSTIC system: hostname=Griffins-Mac-mini.local",
+      "generated_at": "2025-03-17T17:49:49.864507",
+      "source": "Serial: MSG174225178917855",
+      "last_displayed": "2025-03-17T17:50:15.297865",
+      "display_count": 1
+    },
+    {
+      "message_number": 126,
+      "content": "DIAGNOSTIC system: python_version=3.10.0 (v3.10.0:b494f5935c, Oct  4 2021, 14:59",
+      "generated_at": "2025-03-17T17:50:23.330338",
+      "source": "Serial: MSG174225182317855",
+      "last_displayed": "2025-03-17T17:50:48.731576",
+      "display_count": 1
+    },
+    {
+      "message_number": 127,
+      "content": "DIAGNOSTIC system: time=2025-03-17 17:49:49",
+      "generated_at": "2025-03-17T17:50:56.787992",
+      "source": "Serial: MSG174225185617855",
+      "last_displayed": "2025-03-17T17:51:22.199884",
+      "display_count": 1
+    },
+    {
+      "message_number": 128,
+      "content": "DIAGNOSTIC system: memory_usage=74.9% [17:51:30]",
+      "generated_at": "2025-03-17T17:51:30.313366",
+      "source": "Serial: MSG174225189017855",
+      "last_displayed": "2025-03-17T17:51:55.739690",
+      "display_count": 1
+    },
+    {
+      "message_number": 129,
+      "content": "DIAGNOSTIC system: cpu_usage=0.0%",
+      "generated_at": "2025-03-17T17:52:03.787651",
+      "source": "Serial: MSG174225192317855",
+      "last_displayed": "2025-03-17T17:52:29.354750",
+      "display_count": 1
+    },
+    {
+      "message_number": 130,
+      "content": "DIAGNOSTIC system: platform=macOS-15.4-arm64-arm-64bit [17:52:37]",
+      "generated_at": "2025-03-17T17:52:37.545608",
+      "source": "Serial: MSG174225195717855",
+      "last_displayed": "2025-03-17T17:53:03.256222",
+      "display_count": 1
+    },
+    {
+      "message_number": 131,
+      "content": "DIAGNOSTIC network: ip_addresses=['127.0.0.1', '192.168.4.146']",
+      "generated_at": "2025-03-17T17:53:11.422244",
+      "source": "Serial: MSG174225199117855",
+      "last_displayed": "2025-03-17T17:53:37.116340",
+      "display_count": 1
+    },
+    {
+      "message_number": 132,
+      "content": "SCHEDULED RUNNING PROGRAM 17:53:45.",
+      "generated_at": "2025-03-17T17:53:45.296734",
+      "source": "Serial: MSG174225202517855",
+      "last_displayed": "2025-03-17T17:54:10.998163",
+      "display_count": 1
+    },
+    {
+      "message_number": 133,
+      "content": "QUEUED SYSTEM LOADING RECORD.",
+      "generated_at": "2025-03-17T17:54:19.203943",
+      "source": "Serial: MSG174225205917855",
+      "last_displayed": "2025-03-17T17:54:44.882041",
+      "display_count": 1
+    },
+    {
+      "message_number": 134,
+      "content": "QUEUED SAVING DATA 1%.",
+      "generated_at": "2025-03-17T17:54:53.068345",
+      "source": "Serial: MSG174225209317855",
+      "last_displayed": "2025-03-17T17:55:18.672030",
+      "display_count": 1
+    },
+    {
+      "message_number": 135,
+      "content": "CARD LOADING PROGRAM 3667 17:55:26.",
+      "generated_at": "2025-03-17T17:55:26.816802",
+      "source": "Serial: MSG174225212617855",
+      "last_displayed": "2025-03-17T17:55:52.380537",
+      "display_count": 1
+    },
+    {
+      "message_number": 136,
+      "content": "ERROR TASK RUNNING MODULE.",
+      "generated_at": "2025-03-17T17:56:00.393008",
+      "source": "Serial: MSG174225216017855",
+      "last_displayed": "2025-03-17T17:56:25.853358",
+      "display_count": 1
+    },
+    {
+      "message_number": 137,
+      "content": "PAUSED EXECUTING 6350.",
+      "generated_at": "2025-03-17T17:56:33.907256",
+      "source": "Serial: MSG174225219317855",
+      "last_displayed": "2025-03-17T17:56:59.391619",
+      "display_count": 1
+    },
+    {
+      "message_number": 138,
+      "content": "TAPE PROCESSING 17:57:07.",
+      "generated_at": "2025-03-17T17:57:07.444933",
+      "source": "Serial: MSG174225222717855",
+      "last_displayed": "2025-03-17T17:57:32.957649",
+      "display_count": 1
+    },
+    {
+      "message_number": 139,
+      "content": "COMPLETE PROCESSING FILE.",
+      "generated_at": "2025-03-17T17:57:41.146219",
+      "source": "Serial: MSG174225226117855",
+      "last_displayed": "2025-03-17T17:58:06.929827",
+      "display_count": 1
+    },
+    {
+      "message_number": 140,
+      "content": "QUEUED JOB LOADING 74%.",
+      "generated_at": "2025-03-17T17:58:15.133243",
+      "source": "Serial: MSG174225229517855",
+      "last_displayed": "2025-03-17T17:58:40.741253",
+      "display_count": 1
+    },
+    {
+      "message_number": 141,
+      "content": "MEMORY RUNNING ROUTINE.",
+      "generated_at": "2025-03-17T17:58:48.662074",
+      "source": "Serial: MSG174225232817855",
+      "last_displayed": "2025-03-17T17:59:13.955043",
+      "display_count": 1
+    },
+    {
+      "message_number": 142,
+      "content": "CORE 17:59:21.",
+      "generated_at": "2025-03-17T17:59:21.926216",
+      "source": "Serial: MSG174225236117855",
+      "last_displayed": "2025-03-17T17:59:47.274956",
+      "display_count": 1
+    },
+    {
+      "message_number": 143,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T18:00:33.326941",
+      "source": "Serial: MSG174225243321219",
+      "last_displayed": "2025-03-17T18:00:59.078847",
+      "display_count": 1
+    },
+    {
+      "message_number": 144,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T18:01:07.254709",
+      "source": "Serial: MSG174225246721219",
+      "last_displayed": "2025-03-17T18:01:32.923743",
+      "display_count": 1
+    },
+    {
+      "message_number": 145,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T18:01:41.064958",
+      "source": "Serial: MSG174225250121219",
+      "last_displayed": "2025-03-17T18:02:06.580729",
+      "display_count": 1
+    },
+    {
+      "message_number": 146,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T18:02:14.609597",
+      "source": "Serial: MSG174225253421219",
+      "last_displayed": "2025-03-17T18:02:39.980779",
+      "display_count": 1
+    },
+    {
+      "message_number": 147,
+      "content": "DIAGNOSTIC system: hostname=Griffins-Mac-mini.local",
+      "generated_at": "2025-03-17T18:02:48.087086",
+      "source": "Serial: MSG174225256821219",
+      "last_displayed": "2025-03-17T18:03:13.542155",
+      "display_count": 1
+    },
+    {
+      "message_number": 148,
+      "content": "DIAGNOSTIC system: python_version=3.10.0 (v3.10.0:b494f5935c, Oct  4 2021, 14:59",
+      "generated_at": "2025-03-17T18:03:21.628867",
+      "source": "Serial: MSG174225260121219",
+      "last_displayed": "2025-03-17T18:03:47.217717",
+      "display_count": 1
+    },
+    {
+      "message_number": 149,
+      "content": "DIAGNOSTIC system: time=2025-03-17 18:02:48",
+      "generated_at": "2025-03-17T18:03:55.380388",
+      "source": "Serial: MSG174225263521219",
+      "last_displayed": "2025-03-17T18:04:20.981290",
+      "display_count": 1
+    },
+    {
+      "message_number": 150,
+      "content": "DIAGNOSTIC system: memory_usage=76.2% [18:04:29]",
+      "generated_at": "2025-03-17T18:04:29.112924",
+      "source": "Serial: MSG174225266921219",
+      "last_displayed": "2025-03-17T18:04:54.710491",
+      "display_count": 1
+    },
+    {
+      "message_number": 151,
+      "content": "DIAGNOSTIC system: cpu_usage=0.0%",
+      "generated_at": "2025-03-17T18:05:02.822287",
+      "source": "Serial: MSG174225270221219",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 152,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T18:05:56.855410",
+      "source": "Serial: MSG174225275622536",
+      "last_displayed": "2025-03-17T18:06:22.604815",
+      "display_count": 1
+    },
+    {
+      "message_number": 153,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T18:06:30.819405",
+      "source": "Serial: MSG174225279022536",
+      "last_displayed": "2025-03-17T18:06:56.447149",
+      "display_count": 1
+    },
+    {
+      "message_number": 154,
+      "content": "IBM PUNCH CARD SYSTEM READY",
+      "generated_at": "2025-03-17T18:07:04.489008",
+      "source": "Serial: MSG174225282422536",
+      "last_displayed": "2025-03-17T18:07:29.885305",
+      "display_count": 1
+    },
+    {
+      "message_number": 155,
+      "content": "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+      "generated_at": "2025-03-17T18:07:37.902675",
+      "source": "Serial: MSG174225285722536",
+      "last_displayed": "2025-03-17T18:08:03.508044",
+      "display_count": 1
+    },
+    {
+      "message_number": 156,
+      "content": "DIAGNOSTIC system: hostname=Griffins-Mac-mini.local",
+      "generated_at": "2025-03-17T18:08:11.653616",
+      "source": "Serial: MSG174225289122536",
+      "last_displayed": "2025-03-17T18:08:37.191239",
+      "display_count": 1
+    },
+    {
+      "message_number": 157,
+      "content": "DIAGNOSTIC system: python_version=3.10.0 (v3.10.0:b494f5935c, Oct  4 2021, 14:59",
+      "generated_at": "2025-03-17T18:08:45.275359",
+      "source": "Serial: MSG174225292522536",
+      "last_displayed": "2025-03-17T18:09:10.605638",
+      "display_count": 1
+    },
+    {
+      "message_number": 158,
+      "content": "DIAGNOSTIC system: time=2025-03-17 18:08:11",
+      "generated_at": "2025-03-17T18:09:18.622351",
+      "source": "Serial: MSG174225295822536",
+      "last_displayed": "2025-03-17T18:09:44.012419",
+      "display_count": 1
+    },
+    {
+      "message_number": 159,
+      "content": "DIAGNOSTIC system: memory_usage=76.4%",
+      "generated_at": "2025-03-17T18:09:51.977117",
+      "source": "Serial: MSG174225299122536",
+      "last_displayed": "2025-03-17T18:10:17.285330",
+      "display_count": 1
+    },
+    {
+      "message_number": 160,
+      "content": "DIAGNOSTIC system: cpu_usage=0.0%",
+      "generated_at": "2025-03-17T18:10:25.268801",
+      "source": "Serial: MSG174225302522536",
+      "last_displayed": "2025-03-17T18:10:50.607359",
+      "display_count": 1
+    },
+    {
+      "message_number": 161,
+      "content": "DIAGNOSTIC system: platform=macOS-15.4-arm64-arm-64bit",
+      "generated_at": "2025-03-17T18:10:58.595239",
+      "source": "Serial: MSG174225305822536",
+      "last_displayed": "2025-03-17T18:11:23.986676",
+      "display_count": 1
+    },
+    {
+      "message_number": 162,
+      "content": "DIAGNOSTIC network: ip_addresses=['127.0.0.1', '192.168.4.146']",
+      "generated_at": "2025-03-17T18:11:32.134661",
+      "source": "Serial: MSG174225309222536",
+      "last_displayed": "2025-03-17T18:11:57.707401",
+      "display_count": 1
+    },
+    {
+      "message_number": 163,
+      "content": "RUNNING RECORD 18:12:05.",
+      "generated_at": "2025-03-17T18:12:05.841995",
+      "source": "Serial: MSG174225312522536",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 164,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T18:17:47.842082",
+      "source": "Serial: MSG174225346724396",
+      "last_displayed": null,
+      "display_count": 0
+    },
+    {
+      "message_number": 165,
+      "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "generated_at": "2025-03-17T18:18:43.923247",
+      "source": "Serial: MSG174225352324702",
+      "last_displayed": "2025-03-17T18:19:09.636309",
+      "display_count": 1
+    },
+    {
+      "message_number": 166,
+      "content": "HELLO WORLD THIS IS A TEST MESSAGE",
+      "generated_at": "2025-03-17T18:19:17.836554",
+      "source": "Serial: MSG174225355724702",
+      "last_displayed": "2025-03-17T18:19:43.641126",
+      "display_count": 1
+    }
+  ],
+  "current_message_number": 166
+}

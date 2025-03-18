@@ -1,0 +1,50 @@
+Version: 0.1.0
+Date: 2024-03-18
+Description: First stable release of the Punch Card Display System
+
+Key Features:
+- Complete punch card display system with 80-column support
+- Hollerith/EBCDIC character encoding
+- Animated display transitions
+- Settings menu with configurable parameters
+- Message history and statistics tracking
+- Database integration for message storage
+- Splash screen with system information
+- Debug mode support
+
+Files Included:
+- src/punch_card.py: Main display system implementation
+- src/main.py: Program entry point
+- src/message_database.py: Database management
+- src/database.py: Core database functionality
+- src/message_generator.py: Message generation system
+- src/settings_menu.py: Settings interface
+- src/test_punch_card.py: Test suite
+- src/test_display.py: Display testing utilities
+- src/message_history.json: Message history data
+- src/punch_card_stats.json: System statistics
+- src/punch_card_settings.json: User settings
+- requirements.txt: Python dependencies
+- README.md: Project documentation
+
+Directory Structure:
+/versions/0.1.0/
+├── src/           # Source code files
+├── data/          # Data files and databases
+├── config/        # Configuration files
+├── tests/         # Test files
+├── requirements.txt
+├── README.md
+└── version_info.txt
+
+Dependencies:
+- Python 3.x
+- SQLite3 (built-in)
+- JSON (built-in)
+
+To Run:
+1. Ensure Python 3.x is installed
+2. Install dependencies: pip install -r requirements.txt
+3. Run main.py: python src/main.py
+
+Note: This version represents the first stable release with all core functionality implemented. 
