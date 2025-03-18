@@ -23,9 +23,6 @@
 
 *A sophisticated terminal-based simulator of an 80-column punch card display system, featuring LED grid visualization and message processing capabilities with historical accuracy and modern integrations.*
 
-
-![IBM Punch Card](https://placeholder-for-punch-card-image.png)
-
 ## 🔍 Overview
 
 This project recreates the iconic IBM 80-column punch card system in a digital format, combining historical computing preservation with modern LED display technology. It simulates the character-by-character display process of punch cards while providing an interface for message generation, processing, and visualization.
