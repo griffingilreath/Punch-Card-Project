@@ -18,7 +18,7 @@
        
   "Do not fold, spindle, or mutilate" - IBM Punch Card warning, circa 1950s
   
-  This module serves as the main entry point for the IBM Punch Card Display System.
+  This module serves as the main entry point for the Punch Card Project.
   It orchestrates the various components: database, message generation, and display rendering.
   
   Version: 0.1.0
