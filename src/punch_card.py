@@ -1,3 +1,42 @@
+"""
+ ___________________________________________________________________
+/\::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \
+\_|                                                                 |
+  |  +-----------+  IBM PUNCH CARD VISUALIZATION SYSTEM             |
+  |  |▓▓▓▓▓▓▓  ▓▓|                                                  |
+  |  |▓▓▓▓▓▓▓  ▓▓|  This module renders an authentic IBM 80-column  |
+  |  |▓▓    ▓▓ ▓▓|  punch card on the terminal screen or LED grid.  |
+  |  |▓▓▓▓▓▓▓  ▓▓|                                                  |
+  |  |▓▓       ▓▓|  It simulates the character-by-character         |
+  |  |▓▓       ▓▓|  display process using historically accurate     |
+  |  +-----------+  Hollerith encoding with EBCDIC compatibility.   |
+  |                                                                 |
+  |  * 80 columns x 12 rows (960 possible punches)                  |
+  |  * Authentic IBM 026/029 keypunch behavior                      |
+  |  * Character-by-character LED visualization                     |
+  |  * Support for multiple character sets                          |
+  |                                                                 |
+  |  Author: Griffin Gilreath                                       |
+  |  Updated: 2024-06-15                                            |
+  |_________________________________________________________________|
+
+Each card consists of 80 columns with the following rows:
+    ┌─────────────────────────────────────────────────┐
+12  │ Y     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Zone punch
+11  │ X     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Zone punch
+0   │ 0     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Zone punch
+1   │ 1     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+2   │ 2     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+3   │ 3     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+4   │ 4     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+5   │ 5     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+6   │ 6     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+7   │ 7     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+8   │ 8     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+9   │ 9     ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ │ Digit punch
+    │       1 2 3 4 5 6 7 8 9101112131415...        80│
+    └─────────────────────────────────────────────────┘
+"""
 import os
 import time
 import random
