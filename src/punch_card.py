@@ -51,7 +51,7 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass
 from datetime import datetime
 import shutil
-from message_database import MessageDatabase
+from src.message_database import MessageDatabase
 from pathlib import Path
 
 def get_version_info() -> Dict[str, str]:

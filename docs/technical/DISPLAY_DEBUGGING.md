@@ -253,3 +253,117 @@ After implementing the fix:
 1. Add permanent (but optional) metrics logging for display positioning
 2. Create automated tests for display positioning
 3. Periodically review to ensure no regression occurs as new features are added 
+
+## Terminal Display Improvements (v0.1.1)
+
+Version 0.1.1 includes significant improvements to the terminal display system, enhancing both the curses-based UI and adding a robust fallback console mode. These changes impact debugging and display functionality.
+
+### Character Set Support
+
+The terminal display now supports multiple character sets for LED visualization:
+
+| Character Set | On State | Off State | Use Case |
+|---------------|----------|-----------|----------|
+| `default`     | █ (block)| · (dot)   | General purpose, good contrast |
+| `block`       | █ (block)| (space)   | Maximum contrast, minimal visual noise |
+| `circle`      | ● (filled)| ○ (empty) | Matches physical LED appearance |
+| `star`        | ★ (filled)| ☆ (empty) | Higher visibility for demonstrations |
+| `ascii`       | # (hash) | . (dot)   | Maximum compatibility with all terminals |
+
+When debugging display issues, try switching between character sets to isolate potential rendering problems:
+
+```python
+from src.terminal_display import get_instance
+
+display = get_instance()
+display.set_character_set("ascii")  # Use ASCII for maximum compatibility
+```
+
+### Terminal Size Detection
+
+The display system now automatically detects terminal size and provides appropriate warnings:
+
+```python
+# In test_leds.py
+term_width, term_height = get_terminal_size()
+if term_width < 40 or term_height < 12:
+    print(f"Warning: Terminal size ({term_width}x{term_height}) is too small for UI. Need at least 40x12.")
+    print("Falling back to standard console output.")
+    # ... fallback handling ...
+```
+
+When debugging display issues:
+1. Check reported terminal dimensions against actual window size
+2. Ensure terminal size meets minimum requirements (40x12)
+3. Try setting explicit dimensions via environment variables: 
+   ```bash
+   LINES=24 COLUMNS=80 python test_leds.py --test hardware --use-ui
+   ```
+
+### Fallback Console Mode
+
+When curses initialization fails or terminal is too small, the system now provides a robust fallback mode:
+
+1. Grid representation with row/column coordinates
+2. LED state visualization using the selected character set
+3. Timestamped status and debug messages
+4. Rate-limited updates to prevent console flooding
+
+Example fallback output:
+```
+    0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+   +-------------------------------+
+ 0 | # . # . # . # . # . # . # . # . |
+ 1 | . # . # . # . # . # . # . # . # |
+ 2 | # . # . # . # . # . # . # . # . |
+ 3 | . # . # . # . # . # . # . # . # |
+   +-------------------------------+
+
+[INFO] 14:32:15 - Connected to hardware
+[DEBUG] 14:32:16 - Setting LED pattern: Checkerboard
+```
+
+### Error Handling and Debugging
+
+The improved terminal display includes comprehensive error handling:
+
+1. Graceful handling of curses initialization failures
+2. Recovery from terminal dimension issues
+3. Exception handling for window creation problems
+4. Thread-safe message processing
+
+When debugging curses-related issues:
+
+```python
+# Force fallback mode for debugging
+try:
+    raise ValueError("Forcing fallback mode for debugging")
+    # Terminal display will catch this and switch to fallback mode
+except Exception as e:
+    print(f"DEBUG: Forced fallback mode: {e}")
+```
+
+To trace message flow through the system:
+
+```python
+# Enable verbose mode
+display = get_instance(verbose=True)
+display.start()
+
+# Messages will now include all LED state changes
+```
+
+### Integration with Existing Display Debugging
+
+The new terminal display improvements complement the existing display positioning fixes by providing:
+
+1. More consistent error reporting
+2. Better visibility into LED state changes
+3. Graceful degradation when display conditions are suboptimal
+4. Multiple visualization options for different debugging scenarios
+
+When investigating both positioning and LED state issues, use the combination of:
+- Terminal size diagnostics from v0.1.1
+- Positioning diagnostics from the Display Positioning Investigation
+- Character set switching to isolate visual anomalies
+- Verbose mode to track all state changes 

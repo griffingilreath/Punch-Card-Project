@@ -1,4 +1,94 @@
 # 💾 Punch Card Project 💾
+
+This project implements a punch card display system with LED integration for both simulated and physical hardware.
+
+## Components
+
+The project is structured around the following key components:
+
+1. **LED State Manager** - Manages the state of LEDs in memory
+2. **Hardware Controller** - Controls physical or simulated hardware
+3. **Punch Card Display** - High-level API for displaying messages
+4. **Display Adapter** - Connects the punch card display to hardware
+5. **Terminal Display** - Provides terminal visualization of LED states
+
+## Terminal Display Features
+
+The terminal display provides visual feedback of LED states in two modes:
+
+1. **Curses-based UI** - A split-screen interface showing LED grid and debug messages
+2. **Fallback Console Mode** - ASCII representation of the LED grid with row/column indicators
+
+### Character Sets
+
+The terminal display supports multiple character sets for LED visualization:
+
+- `default`: Filled and empty circles (█, ·)
+- `block`: Filled blocks and spaces (█, space)
+- `circle`: Filled and empty circles (●, ○)
+- `star`: Filled and empty stars (★, ☆)
+- `ascii`: ASCII characters (#, .)
+
+You can select your preferred character set using the `--char-set` command-line argument.
+
+### Fallback Console Mode
+
+When the terminal window is too small or curses initialization fails, the system automatically falls back to console mode, providing:
+
+- Row and column numbered grid display
+- ASCII representation of the LED states using the selected character set
+- Detailed status and debug messages
+- Individual LED state change notifications (when verbose mode is enabled)
+
+### Usage
+
+```bash
+# Run hardware verification test with star character set
+python3 test_leds.py --test hardware --use-ui --char-set star
+
+# Run animations test with verbose output (showing individual LED changes)
+python3 test_leds.py --test animations --use-ui --verbose
+
+# Run minimal LED test with ascii character set
+python3 test_leds.py --test minimal --use-ui --char-set ascii
+
+# Run all tests with circle character set
+python3 test_leds.py --test all --use-ui --char-set circle
+```
+
+## Testing
+
+Various test modes are available:
+
+- `minimal`: A very simple test that verifies basic LED control
+- `simple`: A more comprehensive test of direct LED control
+- `hardware`: A test with distinctive patterns for verifying hardware visually
+- `direct`: Tests direct control of LEDs through the LED state manager
+- `integration`: Tests integration with the punch card display
+- `animations`: Tests playing animations from JSON files
+- `all`: Runs all tests in sequence
+
+### Command Line Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `--test` | Test to run (`direct`, `integration`, `simple`, `minimal`, `hardware`, `animations`, `all`) |
+| `--hardware-type` | Hardware type (`none`, `simulated`, `rpi`) |
+| `--timeout` | Maximum time in seconds before timing out a test |
+| `--use-ui` | Use the terminal UI with split-screen for LED display and debug messages |
+| `--term-width` | Terminal width (only used when auto-detection fails) |
+| `--term-height` | Terminal height (only used when auto-detection fails) |
+| `--char-set` | Character set for LED visualization (`default`, `block`, `circle`, `star`, `ascii`) |
+| `--verbose` | Print verbose output including individual LED state changes |
+
+## Contributing
+
+To contribute to this project:
+
+1. Ensure all tests pass with `python3 test_leds.py --test all`
+2. Add appropriate documentation for new features
+3. Follow the existing code style
+
 ```
  ___________________________________________________________________
 /\                                                                  \
@@ -47,7 +137,7 @@ IBM's 80-column punch cards were a revolutionary data storage medium that domina
 
 ```
              ┌────────────────────────────────────────────────────────────────────────────────┐
-          12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+          12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
           11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
            0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
            1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -81,68 +171,32 @@ Character codes varied slightly between systems (FORTRAN vs. Commercial/Symbolic
 punch_card_system/
 ├── src/                    # Source code
 │   ├── __init__.py
-│   ├── main.py             # Main application entry point
+│   ├── hardware_controller.py  # Hardware control abstraction layer
+│   ├── led_state_manager.py    # LED state management
 │   ├── punch_card.py       # Punch card visualization and processing
-│   ├── database.py         # Database operations
-│   ├── message_generator.py # Message generation (random & OpenAI)
-│   ├── settings_menu.py    # Settings configuration interface
-│   ├── message_database.py # Message storage and retrieval
-│   └── test_display.py     # Testing utilities
-├── scripts/                # Utility scripts
-│   ├── version_manager.py  # Version management utilities
-│   ├── punch_card_stats.py # Statistics processing script
-│   └── Punch Card Cursor Test V1.py # Legacy test script
+│   ├── terminal_display.py # Terminal visualization with curses UI
+│   └── display_adapter.py  # Adapter between punch card and hardware
+├── animations/            # Animation JSON files
+│   ├── splash.json         # Splash screen animation
+│   └── spinner.json        # Loading spinner animation
 ├── tests/                  # Test files
-│   ├── test_punch_card.py  # Punch card display tests
-│   ├── test_messages.py    # Message processing tests
-│   └── test_messages.txt   # Test message samples
-├── config/                 # Configuration files
-│   ├── config.yaml         # Main configuration
-│   └── credentials.yaml    # API credentials
-├── data/                   # Data storage
-│   ├── messages.db         # SQLite database
-│   ├── punchcard_messages.db # Legacy message database
-│   ├── message_history.json # Message history
-│   ├── punch_card_stats.json # System statistics
-│   ├── punch_card_stats.txt # Legacy statistics file
-│   ├── punch_card_settings.json # User settings
-│   └── concise_statements.txt # Thought-provoking one-liners for display
-├── docs/                   # Documentation
-│   ├── technical/          # Technical specifications and guides
-│   │   ├── NEOPIXEL_INTEGRATION.md # NeoPixel LED integration specifications
-│   │   ├── NEOPIXEL_PROTOTYPE.md   # NeoPixel prototype implementation
-│   │   ├── DISPLAY_DEBUGGING.md    # Display positioning and debugging guide
-│   │   ├── ROADMAP.md              # Project development roadmap
-│   │   ├── INTEGRATION_SUMMARY.md  # Integration overview
-│   │   └── WEB_INTEGRATION_EXAMPLE.py # Web API integration example
-│   └── research/           # Research documents and reference materials
-│       ├── PUNCH_CARD_ENCODING.md  # Detailed encoding specifications
-│       ├── LED_IMPLEMENTATION.md   # LED hardware implementation guide
-│       └── SOCIOLOGICAL_ASPECTS.md # Cultural impact analysis
-├── requirements.txt        # Python dependencies
-└── README.md               # This file
+│   └── test_leds.py        # LED testing and verification
+└── README.md              # This file
 ```
 
 ## ✨ Features
 
 - Terminal-based IBM 80-column punch card simulation with historical accuracy
-- LED grid visualization with character-by-character display
-- Message processing with authentic punch card encoding (Hollerith/EBCDIC)
-- Statistics tracking and display
-- Message generation:
-  - Random sentence generation
-  - OpenAI API integration for intelligent message generation
-  - Historical punch card statements
-- Diagnostic logging and system information display
-- SQLite database for message storage and retrieval
-- NeoPixel LED integration for physical display (planned)
-- Web interface for remote monitoring (planned)
-
-<details>
-<summary>🎲 Easter Egg: Find the hidden message in the LED sequence 🎲</summary>
-<br>
-If you watch the LED display patterns carefully, occasionally the sequence will form a special message in a subtle flicker pattern. The key is to look at every third LED when they first initialize!
-</details>
+- LED grid visualization in various display modes:
+  - Curses-based split-screen UI for detailed visualization
+  - Fallback console mode with ASCII grid representation
+  - Multiple character sets for different visual preferences
+- Hardware control abstraction layer supporting:
+  - Simulated hardware (for development and testing)
+  - Raspberry Pi GPIO (for physical LED matrix integration)
+- LED state management with animation capabilities
+- Error-resilient design with graceful fallbacks
+- Comprehensive testing modes for verifying system functionality
 
 ## 🔧 Installation
 
@@ -157,184 +211,87 @@ cd Punch-Card-Project
 pip install -r requirements.txt
 ```
 
-3. Configure credentials:
-   - Copy `config/credentials.yaml.example` to `config/credentials.yaml`
-   - Add your OpenAI API key to the credentials file
-
-## 🚀 Usage
-
-Run the program:
+3. Run the tests to verify functionality:
 ```bash
-python src/main.py
+python test_leds.py --test all
 ```
 
-Command line arguments:
-- `--test-message`: Custom test message
-- `--led-delay`: Delay between LED updates (milliseconds)
-- `--message-delay`: Delay between messages (seconds)
-- `--random-delay`: Enable random delays between messages
-- `--skip-splash`: Skip splash screen and startup sequence
+## 🚀 Usage Examples
 
-> 💡 **Pro tip**: Try `python src/main.py --test-message "Hello, world!" --led-delay 50` for a satisfying vintage computing experience.
+### Running Basic Tests
 
-## 📝 Message Processing
+```bash
+# Run a minimal test with ASCII character set
+python test_leds.py --test minimal --use-ui --char-set ascii
 
-The system processes messages in the following order:
-1. Test messages (if configured)
-2. System diagnostic information (IP address, etc.)
-3. Randomly generated sentences
-4. OpenAI-generated messages (if configured)
-5. Historical punch card statements (if enabled)
+# Run hardware verification with star characters and verbose output
+python test_leds.py --test hardware --use-ui --char-set star --verbose
 
-## 💽 Database Structure
-
-The SQLite database (`messages.db`) contains:
-- `messages` table: Stores all processed messages
-- `diagnostics` table: Stores system diagnostic information
-- `statistics` table: Stores usage statistics and system performance metrics
-
-## 🔢 Character Encoding
-
-The system uses IBM 026/029 style punch card encoding with support for multiple character sets:
-
-### FORTRAN Character Set
-- A-I: Zone punch in row 12 + digit rows 1-9
-- J-R: Zone punch in row 11 + digit rows 1-9
-- S-Z: Zone punch in row 0 + digit rows 2-9
-- 0-9: Single punch in respective rows
-- Limited special characters: +-*/=().,$
-
-### Example Punch Card Encoding
-Below is a visualization of how different characters would appear as punches on a card:
-
-```
-          Character:   A    B    C    1    2    /    +    ?    #
-             ┌─────────────────────────────────────────────────┐
-          12 │  ■    ■    ■                        ■           │
-          11 │                               ■                 │
-           0 │                               ■          ■      │
-           1 │  ■                 ■                ■           │
-           2 │       ■                 ■                       │
-           3 │            ■                                    │
-           4 │                                          ■      │
-           5 │                                                 │
-           6 │                                                 │
-           7 │                                                 │
-           8 │                                            ■    │
-           9 │                                                 │
-             └─────────────────────────────────────────────────┘
+# Run animation test with circle characters
+python test_leds.py --test animations --use-ui --char-set circle
 ```
 
-### Commercial/Symbolic Character Set
-- Includes all FORTRAN characters
-- Additional special characters: &!?#@%[]{}
+### Terminal UI vs Console Output
 
-### Extended Character Set (Modern)
-- Support for lowercase letters and additional symbols based on ANSI X3.26
+The system provides two display modes:
 
-<details>
-<summary>🎲 Easter Egg: Special "IBM Autocomplete" Mode 🎲</summary>
-<br>
-If you type the Konami code (<kbd>↑</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd><kbd>←</kbd><kbd>→</kbd><kbd>B</kbd><kbd>A</kbd>) while the program is idle, you'll activate the special "IBM Autocomplete" mode, which attempts to predict what you're about to type... but with the accuracy of 1960s computing!
-</details>
+1. **Terminal UI Mode** (requires a terminal at least 40x12 characters):
+   ```
+   ┌─ LED Display ─────────┐
+   │ . # . # . # . # . # . │
+   │ # . # . # . # . # . # │
+   │ . # . # . # . # . # . │
+   │ # . # . # . # . # . # │
+   └──────────────────────┘
+   ┌─ Debug Messages ─────────────────────┐
+   │ Connected to hardware                │
+   │ Setting LED pattern: Checkerboard    │
+   │ Pattern set successfully             │
+   │ LED test completed                   │
+   └───────────────────────────────────────┘
+   ```
+
+2. **Fallback Console Mode** (automatic when terminal is too small):
+   ```
+       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+      +-------------------------------+
+    0 | # . # . # . # . # . # . # . # . |
+    1 | . # . # . # . # . # . # . # . # |
+    2 | # . # . # . # . # . # . # . # . |
+    3 | . # . # . # . # . # . # . # . # |
+    4 | # . # . # . # . # . # . # . # . |
+    5 | . # . # . # . # . # . # . # . # |
+    6 | # . # . # . # . # . # . # . # . |
+    7 | . # . # . # . # . # . # . # . # |
+      +-------------------------------+
+   ```
 
 ## 🔌 Hardware Integration
 
-### Terminal Visualization vs. Real Punch Cards
-The project's terminal-based visualization accurately reproduces the layout and appearance of real IBM punch cards:
+### Simulated Hardware
 
-```
-   Terminal Visualization:                      
-             ┌────────────────────────────────────────────────────────────────────────────────┐
-          12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-          11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           5 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-             └────────────────────────────────────────────────────────────────────────────────┘
+By default, the system uses a simulated hardware controller for development and testing. This simulates the behavior of physical LEDs in the terminal.
+
+### Raspberry Pi GPIO Integration
+
+For physical LED matrix integration, the system includes a Raspberry Pi GPIO controller that maps LED states to physical pins:
+
+```bash
+# Run on Raspberry Pi with physical LEDs
+python test_leds.py --test hardware --hardware-type rpi
 ```
 
-The project simulates both the visual representation and the logical encoding of data that was used in vintage computing systems, bridging the gap between historical hardware and modern software.
-
-### LED Grid Specifications
-The project is designed to integrate with a physical 12×80 LED grid that matches the exact dimensions of an IBM punch card:
-
-- Grid: 12 rows × 80 columns (960 LEDs total)
-- LED Type: Individually addressable RGB LEDs (WS2812B/NeoPixels)
-- Power Requirements: 5V DC, ~20A (worst case)
-- Microcontroller: Teensy 4.0/4.1 or Raspberry Pi
-- Physical Dimensions: Spacing to match IBM card (~0.087" horizontal, ~0.25" vertical)
-
-```
-              +5V
-               │
-               ▼
-     ┌─────────────────────┐
-     │  Microcontroller    │
-     │  ┌──────────────┐   │
-     │  │ Punch Card   │   │
-     │  │ Software     │   │
-     │  └──────────────┘   │
-     └───┬──────┬──────┬───┘
-         │      │      │
-         ▼      ▼      ▼
-     ┌───────────────────┐
-     │  Level Shifter    │   3.3V → 5V logic
-     └───────┬───────────┘
-             │ Data (Din)
-┌────────────▼─────────────┐
-│  ┌─┐ ┌─┐ ┌─┐ ┌─┐ ... ┌─┐ │
-│  │ │ │ │ │ │ │ │     │ │ │  Row 0 (12x80 grid)
-│  └─┘ └─┘ └─┘ └─┘     └─┘ │
-│  ┌─┐ ┌─┐ ┌─┐ ┌─┐     ┌─┐ │
-│  │ │ │ │ │ │ │ │     │ │ │  Row 1
-│  └─┘ └─┘ └─┘ └─┘     └─┘ │
-│          ...             │  ...
-│  ┌─┐ ┌─┐ ┌─┐ ┌─┐     ┌─┐ │
-│  │ │ │ │ │ │ │ │     │ │ │  Row 11
-│  └─┘ └─┘ └─┘ └─┘     └─┘ │
-└──────────────────────────┘
-     NeoPixel LED Matrix
-```
-
-See the [NeoPixel Integration Guide](docs/technical/NEOPIXEL_INTEGRATION.md) for detailed hardware specifications and implementation plans.
-
-## 🌐 Web Integration
-
-The system features a web interface for:
-- Remote monitoring of punch card display
-- Historical statistics and message archiving
-- SVG-based punch card visualization
-- API for submitting new messages
-
-See the [Web Integration Example](docs/technical/WEB_INTEGRATION_EXAMPLE.py) for implementation details.
-
-## 📄 Documentation
-
-### Technical Documentation
-- [Project Roadmap](docs/technical/ROADMAP.md) - Development timeline and feature planning
-- [NeoPixel Integration](docs/technical/NEOPIXEL_INTEGRATION.md) - LED hardware integration specifications
-- [NeoPixel Prototype](docs/technical/NEOPIXEL_PROTOTYPE.md) - Prototype implementation guide
-- [Display Debugging](docs/technical/DISPLAY_DEBUGGING.md) - Troubleshooting guide for display issues
-- [Integration Summary](docs/technical/INTEGRATION_SUMMARY.md) - Overview of system integrations
-
-### Research Documentation
-- [Punch Card Encoding](docs/research/PUNCH_CARD_ENCODING.md) - Historical encoding specifications
-- [LED Implementation](docs/research/LED_IMPLEMENTATION.md) - Hardware implementation details
-- [Sociological Aspects](docs/research/SOCIOLOGICAL_ASPECTS.md) - Cultural impact analysis
-
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+See the `RPiHardwareController` class in `hardware_controller.py` for details on pin mapping and configuration.
 
 ## 🗓️ Version History
+
+- v0.1.1 (2024-08-12): **The Visualization Update**
+  - Enhanced terminal display with multiple character sets
+  - Improved fallback console mode with row/column indicators
+  - Added verbose mode for detailed LED state tracking
+  - Resolved synchronization issues between LED state manager and hardware controller
+  - Improved error handling and terminal size detection
+  - Added command-line arguments for customization
 
 - v0.1.0 (2024-06-15): **The Renaissance Update**
   - Improved project structure and documentation
@@ -342,14 +299,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
   - Enhanced hardware implementation guides
   - Consolidated technical specifications
   - *Secret feature: Message animation patterns*
-
-- v0.1.0 (2024-03-18): **The Enlightenment Release**
-  - Display synchronization improvements
-  - NeoPixel integration documentation
-  - Web integration example code
-  - Expanded project roadmap
-  - Documentation updates
-  - *Secret feature: Color theme selector*
 
 - v0.0.1 (2024-03-17): **The Primordial Release**
   - Basic punch card display
