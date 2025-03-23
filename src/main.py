@@ -30,6 +30,7 @@ import time
 import argparse
 import yaml
 import random
+import requests
 from typing import Optional, Dict
 from database import Database
 from message_generator import MessageGenerator
@@ -49,11 +50,31 @@ class PunchCardApplication:
             skip_splash=False,
             debug_mode=False
         )
+        self.api_status = "Unknown"
+        self._check_api_status()
         
     def _load_config(self, config_path: str) -> Dict:
         """Load configuration from YAML file"""
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
+            
+    def _check_api_status(self) -> None:
+        """Check the status of the OpenAI API"""
+        # Try to get API status from our deployed API service
+        try:
+            api_endpoint = self.config.get('api', {}).get('endpoint', 'https://punch-card-api-v3.fly.dev')
+            response = requests.get(f"{api_endpoint}/health", timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('api', {}).get('api_key_exists', False):
+                    self.api_status = "Connected"
+                else:
+                    self.api_status = "No API Key"
+            else:
+                self.api_status = "Error"
+        except Exception as e:
+            print(f"Error checking API status: {e}")
+            self.api_status = "Unavailable"
             
     def _generate_serial_number(self) -> str:
         """Generate a unique serial number for a message"""
@@ -77,8 +98,9 @@ class PunchCardApplication:
             # Use the generation_delay from the display settings
             next_message_delay = self.display.generation_delay
             
-        # Display message on LED grid
-        self.display.show_message(message, source=f"Serial: {serial_number}")
+        # Display message on LED grid with API status
+        status_display = f"API: {self.api_status} | Serial: {serial_number}"
+        self.display.show_message(message, source=status_display)
         
         # Wait for the next message with the appropriate delay
         time.sleep(next_message_delay)
@@ -100,6 +122,31 @@ class PunchCardApplication:
             'average_message_length': (current_stats['total_characters'] + len(message)) / (current_stats['total_messages'] + 1),
             'time_operating': int(time.time() - self.display.stats.stats['start_time'])
         })
+        
+    def _generate_api_message(self, prompt: str = "Generate a vintage computing message about punch cards") -> Optional[str]:
+        """Generate a message using the API"""
+        try:
+            api_endpoint = self.config.get('api', {}).get('endpoint', 'https://punch-card-api-v3.fly.dev')
+            response = requests.post(
+                f"{api_endpoint}/generate",
+                json={"prompt": prompt, "force_api": True},
+                timeout=10
+            )
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('source') == 'external_api':
+                    self.api_status = "Connected"
+                    return data.get('text')
+                else:
+                    self.api_status = "Fallback Mode"
+                    return None
+            else:
+                self.api_status = "Error"
+                return None
+        except Exception as e:
+            print(f"Error calling API: {e}")
+            self.api_status = "Unavailable"
+            return None
         
     def _run_test_messages(self) -> None:
         """Run through test messages if enabled"""
@@ -131,6 +178,9 @@ class PunchCardApplication:
                 'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
         }
+        
+        # Add API status to diagnostics
+        diagnostics['system']['api_status'] = self.api_status
         
         # Try to import psutil for system resources - gracefully handle if not available
         try:
@@ -173,10 +223,18 @@ class PunchCardApplication:
     def _generate_random_messages(self) -> None:
         """Generate and display random messages"""
         while True:
-            # Try OpenAI first if available
-            message = self.message_generator.generate_openai_message()
-            if not message:
-                message = self.message_generator.generate_random_sentence()
+            # First try to generate a message using the API
+            api_message = None
+            if self.config.get('api', {}).get('enabled', False):
+                api_message = self._generate_api_message()
+                
+            if api_message:
+                message = api_message
+            else:
+                # Try OpenAI locally if available
+                message = self.message_generator.generate_openai_message()
+                if not message:
+                    message = self.message_generator.generate_random_sentence()
                 
             self._process_message(message)
             
@@ -187,6 +245,10 @@ class PunchCardApplication:
         try:
             # Display splash screen
             self.display.show_splash_screen()
+            time.sleep(2)
+            
+            # Display API status
+            self._process_message(f"API STATUS: {self.api_status}")
             time.sleep(2)
             
             # Run test messages only if not in debug mode or show_debug_messages is enabled

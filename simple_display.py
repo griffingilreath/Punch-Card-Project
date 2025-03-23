@@ -1,24 +1,66 @@
 #!/usr/bin/env python3
-# simple_display.py - A simplified version of the punch card display
+# Simple Punch Card Display GUI
+# This version has a simpler interface and uses PyQt6
 
+import os
 import sys
 import time
-import random
-import argparse
 import json
+import random
 import signal
-import os
-import requests
+import argparse
 from datetime import datetime
+import requests
+import sqlite3
+
 from PyQt6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QGridLayout, 
     QLabel, QPushButton, QRadioButton, QGroupBox,
-    QDialogButtonBox, QSpinBox, QCheckBox, QTextEdit, QWidget, QFrame
+    QDialogButtonBox, QSpinBox, QCheckBox, QTextEdit, 
+    QWidget, QFrame, QTabWidget, QScrollArea, QLineEdit, 
+    QMessageBox, QComboBox, QFormLayout, QDoubleSpinBox,
+    QMainWindow, QHBoxLayout, QDockWidget, QSlider
 )
 from PyQt6.QtCore import QTimer, Qt, QEvent, QObject
 from src.display.gui_display import main as gui_main
-from openai import OpenAI
+from openai import OpenAI, APIError
 from PyQt6.QtGui import QAction, QKeyEvent  # Import QAction from QtGui, not QtWidgets
+
+# Try to import PunchCardDisplay and monkey patch it to use our settings dialog
+try:
+    from src.punch_card import PunchCardDisplay
+    
+    # Store original method for backup
+    original_show_settings = PunchCardDisplay._show_settings_menu
+    
+    # Define our replacement method that will be used when imported
+    def patched_show_settings_menu(self):
+        """
+        Show the enhanced settings dialog from simple_display.py.
+        
+        This replaces the old terminal-based settings menu.
+        """
+        print("Opening enhanced settings dialog via monkey patch...")
+        try:
+            # Import the show_settings_dialog function if needed
+            # Note: This uses relative import since we're in the patch
+            from simple_display import show_settings_dialog
+            
+            # Call the enhanced settings dialog
+            show_settings_dialog(self)
+        except Exception as e:
+            print(f"⚠️ Error showing enhanced settings dialog: {e}")
+            print("Falling back to original terminal settings menu...")
+            # Call the original method
+            original_show_settings(self)
+            
+    # Replace the method
+    PunchCardDisplay._show_settings_menu = patched_show_settings_menu
+    print("✅ Successfully patched PunchCardDisplay to use enhanced settings dialog")
+except ImportError:
+    print("ℹ️ PunchCardDisplay not imported - terminal patching not required")
+except Exception as e:
+    print(f"⚠️ Failed to patch PunchCardDisplay: {e}")
 
 # Global variables
 message_source = "local"  # Default to local messages
@@ -35,6 +77,28 @@ message_stats = {
     "last_message": None,  # Store the last message
     "last_source": None    # Store the source of the last message
 }
+
+# OpenAI usage statistics
+openai_usage = {
+    "total_calls": 0,
+    "total_tokens": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "estimated_cost": 0.0,
+    "last_updated": None,
+    "usage_history": [],  # List of individual API calls with usage stats
+    "cost_per_model": {},  # Track cost per model
+}
+
+# OpenAI pricing per 1000 tokens (as of current pricing)
+openai_pricing = {
+    "gpt-3.5-turbo": {"input": 0.0015, "output": 0.002},
+    "gpt-4": {"input": 0.03, "output": 0.06},
+    "gpt-4-turbo": {"input": 0.01, "output": 0.03},
+    "gpt-4o": {"input": 0.01, "output": 0.03},
+    "gpt-4o-mini": {"input": 0.005, "output": 0.015},
+}
+
 # Service status tracking
 service_status = {
     "openai": {
@@ -56,7 +120,8 @@ config = {
     "save_to_database": True,  # whether to save messages to database
     "debug_mode": False,  # enable additional debug output
     "mac_style": True,  # apply classic Mac styling
-    "epa_style": True  # apply EPA-inspired styling
+    "epa_style": True,  # apply EPA-inspired styling
+    "model": "gpt-3.5-turbo"  # default OpenAI model
 }
 
 class UIStyleHelper:
@@ -285,31 +350,96 @@ class UIStyleHelper:
 
     @staticmethod
     def create_menu_bar(window):
-        """Create a classic Mac-style menu bar at the top of the window."""
+        """Create a retro Apple-style menu bar with EPA design influences."""
         from PyQt6.QtWidgets import QMenuBar, QMenu
-        from PyQt6.QtGui import QAction  # Import QAction from QtGui, not QtWidgets
+        from PyQt6.QtGui import QAction, QFont, QColor
+        from PyQt6.QtCore import QSize
         
         # Create a menu bar
         menu_bar = QMenuBar(window)
         menu_bar.setStyleSheet(f"""
-            background-color: {UIStyleHelper.COLORS['button_bg']};
-            color: {UIStyleHelper.COLORS['fg']};
-            border-bottom: 1px solid {UIStyleHelper.COLORS['border']};
-            padding: 2px;
-            min-height: 24px;
+            QMenuBar {{
+                background-color: {UIStyleHelper.COLORS['button_bg']};
+                color: {UIStyleHelper.COLORS['fg']};
+                border-bottom: 1px solid {UIStyleHelper.COLORS['border']};
+                padding: 2px;
+                min-height: 28px;
+                font-family: {UIStyleHelper.FONTS['system']};
+                font-size: 14px;
+            }}
+            QMenuBar::item {{
+                background: transparent;
+                padding: 6px 10px;
+                margin-right: 1px;
+                border-radius: 4px;
+            }}
+            QMenuBar::item:selected {{
+                background-color: {UIStyleHelper.COLORS['accent']};
+                color: white;
+            }}
+            QMenuBar::item:pressed {{
+                background-color: {UIStyleHelper.COLORS['button_press']};
+                color: white;
+            }}
         """)
         
-        # Create File menu
-        file_menu = QMenu("File", window)
-        file_menu.setStyleSheet(f"""
-            background-color: {UIStyleHelper.COLORS['bg']};
-            color: {UIStyleHelper.COLORS['fg']};
+        # Apple logo menu (for aesthetic only)
+        apple_menu = QMenu("\u2318", window)  # Unicode apple command symbol
+        apple_menu.setStyleSheet(f"""
+            QMenu {{
+                background-color: {UIStyleHelper.COLORS['bg']};
+                color: {UIStyleHelper.COLORS['fg']};
+                border: 1px solid {UIStyleHelper.COLORS['border']};
+                border-radius: 5px;
+                padding: 5px;
+                margin-top: 1px;
+            }}
+            QMenu::item {{
+                padding: 6px 25px 6px 20px;
+                border-radius: 3px;
+                min-width: 150px;
+            }}
+            QMenu::item:selected {{
+                background-color: {UIStyleHelper.COLORS['accent']};
+                color: white;
+            }}
+            QMenu::separator {{
+                height: 1px;
+                background: {UIStyleHelper.COLORS['border']};
+                margin: 5px 15px;
+            }}
         """)
         
-        # Add Settings action
-        settings_action = QAction("Settings", window)
+        # About action in Apple menu
+        about_action = QAction("About Punch Card", window)
+        about_action.triggered.connect(lambda: show_about_dialog(window))
+        apple_menu.addAction(about_action)
+        
+        apple_menu.addSeparator()
+        
+        # Settings action in Apple menu
+        settings_action = QAction("⚙️ Settings...", window)
         settings_action.triggered.connect(lambda: show_settings_dialog(window))
-        file_menu.addAction(settings_action)
+        apple_menu.addAction(settings_action)
+        
+        # Add Apple menu to menu bar
+        menu_bar.addMenu(apple_menu)
+        
+        # File menu
+        file_menu = QMenu("File", window)
+        file_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
+        
+        # Add Export action
+        export_action = QAction("Export Messages...", window)
+        export_action.triggered.connect(lambda: export_messages(window))
+        file_menu.addAction(export_action)
+        
+        # Add Clear action
+        clear_action = QAction("Clear Display", window)
+        clear_action.triggered.connect(lambda: clear_display(window))
+        file_menu.addAction(clear_action)
+        
+        file_menu.addSeparator()
         
         # Add Exit action
         exit_action = QAction("Exit", window)
@@ -319,28 +449,59 @@ class UIStyleHelper:
         # Add File menu to menu bar
         menu_bar.addMenu(file_menu)
         
-        # Create Source menu
+        # Source menu
         source_menu = QMenu("Source", window)
-        source_menu.setStyleSheet(f"""
-            background-color: {UIStyleHelper.COLORS['bg']};
-            color: {UIStyleHelper.COLORS['fg']};
-        """)
+        source_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
         
-        # Add source actions
-        local_action = QAction("Local", window)
-        local_action.triggered.connect(lambda: set_message_source(window, "local"))
+        # Add source actions with icons
+        local_action = QAction("🏠 Local Generation", window)
+        local_action.triggered.connect(lambda: set_message_source("local"))
         source_menu.addAction(local_action)
         
-        openai_action = QAction("OpenAI", window)
-        openai_action.triggered.connect(lambda: set_message_source(window, "openai"))
+        openai_action = QAction("🤖 OpenAI API", window)
+        openai_action.triggered.connect(lambda: set_message_source("openai"))
         source_menu.addAction(openai_action)
         
-        database_action = QAction("Database", window)
+        database_action = QAction("💾 Database Messages", window)
         database_action.triggered.connect(lambda: set_message_source(window, "database"))
         source_menu.addAction(database_action)
         
         # Add Source menu to menu bar
         menu_bar.addMenu(source_menu)
+        
+        # View menu
+        view_menu = QMenu("View", window)
+        view_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
+        
+        # Add Console action
+        console_action = QAction("Show API Console", window)
+        console_action.triggered.connect(lambda: ensure_console_visibility())
+        view_menu.addAction(console_action)
+        
+        # Add Stats action
+        stats_action = QAction("Show Statistics", window)
+        stats_action.triggered.connect(lambda: show_stats_dialog(window))
+        view_menu.addAction(stats_action)
+        
+        # Add View menu to menu bar
+        menu_bar.addMenu(view_menu)
+        
+        # Help menu
+        help_menu = QMenu("Help", window)
+        help_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
+        
+        # Add Keyboard Shortcuts action
+        shortcuts_action = QAction("Keyboard Shortcuts", window)
+        shortcuts_action.triggered.connect(lambda: show_shortcuts_dialog(window))
+        help_menu.addAction(shortcuts_action)
+        
+        # Add Check API Status action
+        api_status_action = QAction("Check API Status", window)
+        api_status_action.triggered.connect(lambda: check_and_display_api_status(window))
+        help_menu.addAction(api_status_action)
+        
+        # Add Help menu to menu bar
+        menu_bar.addMenu(help_menu)
         
         # Return the menu bar
         return menu_bar
@@ -351,7 +512,7 @@ MacStyleHelper = UIStyleHelper
 
 def load_settings(settings_file="punch_card_settings.json"):
     """Load settings from a JSON file."""
-    global message_source, config
+    global message_source, config, openai_usage
     try:
         with open(settings_file, 'r') as f:
             settings = json.load(f)
@@ -365,6 +526,10 @@ def load_settings(settings_file="punch_card_settings.json"):
                     if key in config:
                         config[key] = value
                 
+            # Load OpenAI usage if available
+            if 'openai_usage' in settings:
+                openai_usage = settings['openai_usage']
+                
             print(f"✅ Settings loaded from {settings_file}")
             return settings
     except Exception as e:
@@ -373,7 +538,7 @@ def load_settings(settings_file="punch_card_settings.json"):
 
 def save_settings(settings_file="punch_card_settings.json"):
     """Save settings to a JSON file."""
-    global message_source, config
+    global message_source, config, openai_usage
     try:
         # Try to load existing settings first
         try:
@@ -385,6 +550,7 @@ def save_settings(settings_file="punch_card_settings.json"):
         # Update with our settings
         settings['message_source'] = message_source
         settings['config'] = config
+        settings['openai_usage'] = openai_usage
         
         # Save back to file
         with open(settings_file, 'w') as f:
@@ -393,62 +559,36 @@ def save_settings(settings_file="punch_card_settings.json"):
     except Exception as e:
         print(f"⚠️ Error saving settings: {e}")
 
-def save_message_to_database(display, message, source):
-    """Save a message to the database."""
-    global message_database, config, message_stats
+def save_message_to_database(message, source="local"):
+    """Save a message to the database with source information."""
+    global db_connection
     
-    # Check if saving is enabled
-    if not config["save_to_database"]:
-        print("⚠️ Message saving disabled")
+    if not db_connection:
+        update_api_console("⚠️ Database not initialized - message not saved", "warning")
         return False
     
-    # Update stats
-    update_stats(source)
-    
-    # Update last message info
-    message_stats["last_message"] = message
-    message_stats["last_source"] = source
-    
-    # Update API console if available
-    update_api_console(f"Saving message from {source}: {message[:30]}...")
-    
-    # Try multiple approaches to save to database
     try:
-        # Method 1: Use message_db if available
-        if hasattr(display, 'message_db') and hasattr(display.message_db, 'add_message'):
-            display.message_db.add_message(message, source)
-            print(f"✅ Message saved to database via message_db: {message[:30]}...")
-            update_api_console(f"✅ Message saved to database")
-            return True
-            
-        # Method 2: Use db interface if available
-        elif hasattr(display, 'db') and hasattr(display.db, 'save_message'):
-            display.db.save_message(message, source)
-            print(f"✅ Message saved to database via db interface: {message[:30]}...")
-            update_api_console(f"✅ Message saved to database")
-            return True
-            
-        # Method 3: Use save_message_to_history if available
-        elif hasattr(display, 'save_message_to_history'):
-            display.save_message_to_history(message, source)
-            print(f"✅ Message saved to history: {message[:30]}...")
-            update_api_console(f"✅ Message saved to history")
-            return True
-            
-        # Method 4: Save to local backup
-        else:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            message_database.append({
-                "message": message,
-                "source": source,
-                "timestamp": timestamp
-            })
-            print(f"⚠️ No database found, saved to local backup: {message[:30]}...")
-            update_api_console(f"⚠️ Saved to local backup (no database found)")
-            return True
+        cursor = db_connection.cursor()
+        
+        # Get current timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Insert the message with source information
+        cursor.execute(
+            "INSERT INTO messages (message, timestamp, source) VALUES (?, ?, ?)",
+            (message, timestamp, source)
+        )
+        
+        # Commit the changes
+        db_connection.commit()
+        
+        # Log success
+        update_api_console(f"✅ Message saved to database (source: {source})", "system")
+        return True
+        
     except Exception as e:
-        print(f"⚠️ Error saving message to database: {e}")
-        update_api_console(f"⚠️ Error saving message: {str(e)[:50]}")
+        # Log error
+        update_api_console(f"❌ Error saving to database: {str(e)[:100]}", "error")
         return False
 
 def update_stats(source):
@@ -545,164 +685,217 @@ def get_service_status_text():
     return text
 
 class KeyPressFilter(QObject):
-    """Event filter to capture key presses."""
+    """Filter to capture key events for application-wide keyboard shortcuts."""
+    
     def __init__(self, parent=None):
+        """Initialize the key press filter."""
         super().__init__(parent)
+        print("✅ KeyPressFilter initialized")
         
     def eventFilter(self, obj, event):
+        """Filter key events to handle keyboard shortcuts."""
+        global display
+        
+        # Only process key press events
         if event.type() == QEvent.Type.KeyPress:
-            key_event = QKeyEvent(event)
-            key = key_event.key()
+            # Get the key
+            key = event.key()
             
-            # Check for 'C' key press (both upper and lower case)
+            # 'C' key - Show API Console
             if key == Qt.Key.Key_C:
-                update_api_console("Console shortcut key 'C' pressed")
-                # Find and ensure visibility of any console in the application
+                print("C key pressed: Show API console")
+                
+                # Make sure console is visible and update it
                 ensure_console_visibility()
+                update_api_console("Console activated via keyboard shortcut", "system")
+                
+                # Return True to indicate we've handled this event
                 return True
                 
-        # Pass other events through
+            # 'S' key - Show settings dialog
+            elif key == Qt.Key.Key_S:
+                print("S key pressed: Show settings dialog")
+                update_api_console("Opening settings dialog", "system")
+                
+                # Make sure display is initialized
+                if display:
+                    # Show settings dialog
+                    show_settings_dialog(display)
+                else:
+                    update_api_console("❌ Cannot show settings - display not initialized", "error")
+                
+                # Return True to indicate we've handled this event
+                return True
+                
+            # Add other key shortcuts as needed
+                
+        # For all other events, let the default handler take care of it
         return super().eventFilter(obj, event)
 
-def ensure_console_visibility():
-    """Find and ensure visibility of any console in the application."""
+def update_api_console(message, source="system"):
+    """Update the API console with a message, ensuring visibility."""
     global display
     
-    # Try to find any widget with 'console' in its name or object name
-    console_widgets = []
+    # First, print to terminal for debugging
+    timestamp = time.strftime("%H:%M:%S")
+    print(f"[{timestamp}] [{source}] {message}")
     
-    # Look for console in display itself
-    if hasattr(display, 'debug_console') and isinstance(display.debug_console, QTextEdit):
-        console_widgets.append(display.debug_console)
-    
-    if hasattr(display, 'api_console') and isinstance(display.api_console, QTextEdit):
-        console_widgets.append(display.api_console)
-    
-    if hasattr(display, 'console') and isinstance(display.console, QTextEdit):
-        console_widgets.append(display.console)
-    
-    # Find all QTextEdit widgets that might be consoles
-    for widget in display.findChildren(QTextEdit):
-        if "console" in widget.objectName().lower() or "log" in widget.objectName().lower():
-            console_widgets.append(widget)
-    
-    # Make all found consoles visible and ensure they have content
-    for console in console_widgets:
-        try:
-            console.setVisible(True)
-            
-            # If parent widget exists, make it visible too
-            parent = console.parent()
-            while parent:
-                parent.setVisible(True)
-                parent = parent.parent()
-            
-            # Add a test message to the console
-            if hasattr(console, 'append'):
-                timestamp = datetime.now().strftime("%H:%M:%S")
-                console.append(f"[{timestamp}] Console visibility ensured")
-                
-                # Scroll to bottom
-                console.verticalScrollBar().setValue(
-                    console.verticalScrollBar().maximum()
-                )
-                
-            print(f"✅ Made console {console.objectName()} visible")
-        except Exception as e:
-            print(f"⚠️ Error ensuring console visibility: {e}")
-    
-    # If we found consoles, update global api_console reference
-    if console_widgets and not hasattr(display, 'api_console'):
-        display.api_console = console_widgets[0]
-        print(f"✅ Updated api_console reference to {console_widgets[0].objectName()}")
-    
-    # If we didn't find any consoles, create one
-    if not console_widgets:
-        add_api_console(display)
-
-def setup_openai_client():
-    """Initialize the OpenAI client."""
-    global openai_client
-    
-    update_api_console("Initializing OpenAI client...")
-    
-    # Find a suitable API key
-    api_key = None
-    
-    # First try: Check our dedicated secrets file (this will not be committed to GitHub)
-    try:
-        secrets_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secrets", "api_keys.json")
-        if os.path.exists(secrets_file):
-            with open(secrets_file, 'r') as f:
-                secrets = json.load(f)
-                api_key = secrets.get("openai", {}).get("api_key")
-                if api_key and api_key != "YOUR_ACTUAL_API_KEY_HERE":
-                    update_api_console("Found API key in secrets file")
-    except Exception as e:
-        update_api_console(f"Error reading secrets file: {str(e)[:50]}")
-    
-    # Second try: Look in environment variables
-    if not api_key:
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if api_key:
-            update_api_console("Found API key in environment variables")
-    
-    # Third try: Look in settings file (not recommended for security)
-    if not api_key:
-        try:
-            with open("punch_card_settings.json", 'r') as f:
-                settings = json.load(f)
-                api_key = settings.get("openai_api_key")
-                if api_key and api_key != "YOUR_API_KEY_HERE":
-                    update_api_console("Found API key in settings file (consider moving to secrets)")
-        except:
-            update_api_console("No settings file found with API key")
-    
-    # Safety check
-    if not api_key or api_key in ["YOUR_API_KEY_HERE", "YOUR_ACTUAL_API_KEY_HERE"]:
-        update_api_console("⚠️ No valid API key found. Please set your API key in the secrets file or as an environment variable.")
+    # Check if display is initialized
+    if not display or not hasattr(display, 'api_console'):
+        print(f"[WARNING] Cannot update API console - display not properly initialized")
         return False
+        
+    # Ensure API console exists and is visible
+    if display.api_console is None:
+        ensure_console_visibility()
+        
+    if display.api_console:
+        try:
+            # Format the message with timestamp and make it visible
+            formatted_msg = f"<span style='color:#888888;'>[{timestamp}]</span> "
+            
+            # Color-code based on source
+            if source == "error" or "error" in message.lower() or "❌" in message:
+                formatted_msg += f"<span style='color:#ff5555;'>{message}</span>"
+            elif source == "system":
+                formatted_msg += f"<span style='color:#55aa55;'>{message}</span>"
+            elif source == "openai":
+                formatted_msg += f"<span style='color:#5555ff;'>{message}</span>"
+            else:
+                formatted_msg += message
+                
+            # Append the message to the API console
+            display.api_console.append(formatted_msg)
+            
+            # Ensure the last line is visible by scrolling to the bottom
+            scrollbar = display.api_console.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
+            
+            # Force the console to be visible if we have important messages
+            if "error" in message.lower() or "❌" in message:
+                ensure_console_visibility()
+                
+            return True
+        except Exception as e:
+            print(f"[ERROR] Failed to update API console: {str(e)}")
+            return False
+    else:
+        print(f"[WARNING] API console is not available")
+        return False
+
+def ensure_console_visibility():
+    """Make sure the API console is visible."""
+    global display
     
-    try:
-        openai_client = OpenAI(api_key=api_key)
-        print(f"✅ OpenAI client initialized")
-        update_api_console("✅ OpenAI client initialized successfully")
+    if not display:
+        print("[WARNING] Cannot ensure console visibility - display not initialized")
+        return False
         
-        # Check OpenAI API status
-        check_openai_status()
+    # Create API console if it doesn't exist
+    if not hasattr(display, 'api_console') or display.api_console is None:
+        add_api_console()
         
-        return True
-    except Exception as e:
-        error_msg = str(e)
-        print(f"⚠️ Error initializing OpenAI client: {e}")
-        update_api_console(f"⚠️ Error initializing OpenAI client: {error_msg[:50]}")
+    # Make sure it's visible
+    if hasattr(display, 'api_console') and display.api_console:
+        try:
+            # Show the console
+            display.api_console.setVisible(True)
+            
+            # Bring the main window to front
+            if hasattr(display, 'activate'):
+                display.activate()
+            elif hasattr(display, 'raise_'):
+                display.raise_()
+                
+            return True
+        except Exception as e:
+            print(f"[ERROR] Failed to ensure console visibility: {str(e)}")
+            return False
     
     return False
 
-def generate_local_message():
-    """Generate a simple local message."""
-    messages = [
-        "VINTAGE COMPUTING LIVES ON",
-        "PUNCH CARDS: THE ORIGINAL CODE",
-        "DATA PROCESSING SIMPLIFIED",
-        "COMPUTING HISTORY PRESERVED",
-        "IBM SYSTEMS: COMPUTING LEGENDS",
-        "MAINFRAMES: COMPUTING GIANTS",
-        "BINARY LOGIC: COMPUTING FOUNDATION",
-        "DIGITAL REVOLUTION BEGINNINGS",
-        "TECHNOLOGY EVOLUTION SNAPSHOT",
-        "PROGRAMMING PIONEERS REMEMBERED"
-    ]
-    return random.choice(messages)
-
-def generate_openai_message():
-    """Generate message using OpenAI API."""
+def setup_openai_client():
+    """Set up the OpenAI client with improved error handling."""
     global openai_client, config
     
+    # Check if we already have a client
+    if openai_client:
+        update_api_console("OpenAI client already initialized", "system")
+        return True
+    
+    # Get API key from config
+    api_key = config.get("openai_api_key", "")
+    
+    # Check if API key is valid
+    if not api_key or len(api_key.strip()) < 10:
+        update_api_console("❌ Invalid API key. Please set a valid API key in settings.", "error")
+        return False
+    
+    try:
+        # Import OpenAI
+        from openai import OpenAI, APIError
+        
+        # Initialize client
+        update_api_console("Initializing OpenAI client...", "system")
+        openai_client = OpenAI(api_key=api_key)
+        
+        # Test API key by listing models (lightweight call)
+        try:
+            update_api_console("Testing API key validity...", "system")
+            # Call list models with a small limit
+            models = openai_client.models.list(limit=1)
+            
+            # If we get here, the API key is valid
+            update_api_console(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
+            
+            # Set default model if not set
+            if not config.get("model"):
+                config["model"] = "gpt-3.5-turbo"
+                update_api_console(f"Set default model to {config['model']}", "system")
+                
+            return True
+            
+        except APIError as e:
+            # API errors often relate to authentication
+            update_api_console(f"❌ OpenAI API Error: {str(e)[:150]}", "error")
+            openai_client = None
+            return False
+            
+    except ImportError:
+        # Module not installed
+        update_api_console("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
+        return False
+    except Exception as e:
+        # Generic error handling
+        update_api_console(f"❌ Error setting up OpenAI client: {str(e)[:150]}", "error")
+        openai_client = None
+        return False
+
+def generate_openai_message():
+    """Generate message using OpenAI API with enhanced error handling and feedback."""
+    global openai_client, config, display, openai_usage
+    
     # Initialize client if needed
-    if not openai_client and not setup_openai_client():
-        update_api_console("❌ Failed to initialize OpenAI client")
-        return "ERROR: COULD NOT INITIALIZE OPENAI CLIENT"
+    if not openai_client:
+        update_api_console("OpenAI client not initialized. Attempting setup...", "openai")
+        if not setup_openai_client():
+            error_msg = "ERROR: COULD NOT INITIALIZE OPENAI CLIENT"
+            update_api_console(f"❌ {error_msg}", "error")
+            
+            # Force display on punch card - ensure this gets shown
+            if display and hasattr(display, 'punch_card'):
+                try:
+                    # Try to directly update the punch card with an error message
+                    if hasattr(display, 'display_message'):
+                        # This should update the display
+                        display.display_message(error_msg)
+                except Exception as e:
+                    update_api_console(f"Error updating punch card directly: {str(e)[:100]}", "error")
+            
+            return error_msg
+    
+    # Select a model
+    model = config.get("model", "gpt-3.5-turbo")
     
     # Select a prompt
     prompts = [
@@ -711,135 +904,280 @@ def generate_openai_message():
         "Generate a nostalgic message about early computers",
         "Write a haiku about AI and computing",
         "Create a futuristic message about computing",
-        "Generate a punchy tech slogan"
+        "Generate a punchy tech slogan about data processing",
+        "Write a brief message about the history of computing",
+        "Create a short message about the evolution of programming languages"
     ]
     
     prompt = random.choice(prompts)
-    print(f"Using OpenAI with prompt: '{prompt}'")
-    update_api_console(f"Sending prompt to OpenAI: '{prompt}'")
+    update_api_console(f"Using OpenAI model: {model}", "openai")
+    update_api_console(f"Prompt: '{prompt}'", "openai")
     
     try:
         # Call the OpenAI API
         start_time = time.time()
-        update_api_console("Waiting for OpenAI response...")
+        update_api_console("Waiting for OpenAI response...", "openai")
         
+        # Use system message to ensure short, uppercase responses
         completion = openai_client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
+            model=model,
             messages=[
-                {"role": "system", "content": "You generate short messages for an IBM punch card display. Keep your response under 70 characters. Format in UPPERCASE only."},
+                {"role": "system", "content": "You generate short messages for an IBM punch card display. Keep your response under 70 characters. Format in UPPERCASE only. Use vintage computing themes."},
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            temperature=0.7,  # Add some randomness but not too much
+            max_tokens=50     # Limit token usage
         )
+        
+        # Calculate response time
         end_time = time.time()
         api_time = end_time - start_time
-        print(f"✅ OpenAI API response time: {api_time:.2f} seconds")
-        update_api_console(f"✅ Response received in {api_time:.2f} seconds")
         
-        # Adjust delay factor based on actual API response time if needed
-        if api_time > 2.0 and config["delay_factor"] < 2.0:
-            config["delay_factor"] = min(5.0, api_time / 2.0)
-            print(f"ℹ️ Adjusted delay factor to {config['delay_factor']:.1f} based on API response time")
-            update_api_console(f"ℹ️ Adjusted delay factor to {config['delay_factor']:.1f}")
-            # Update timer interval if we have a display
-            if display and hasattr(display, 'message_timer'):
-                new_interval = calculate_message_interval()
-                display.message_timer.setInterval(new_interval)
-                print(f"ℹ️ Updated timer interval to {new_interval/1000:.1f} seconds")
-                update_api_console(f"ℹ️ Next message in {new_interval/1000:.1f} seconds")
+        # Extract and log token usage
+        usage = completion.usage.model_dump() if hasattr(completion, 'usage') else {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        prompt_tokens = usage.get('prompt_tokens', 0)
+        completion_tokens = usage.get('completion_tokens', 0)
+        total_tokens = usage.get('total_tokens', 0)
+        
+        # Calculate cost
+        model_base = model.split(':')[0]  # Handle model versions like gpt-3.5-turbo:0613
+        pricing = openai_pricing.get(model_base, {"input": 0.002, "output": 0.002})  # Default pricing if model not found
+        prompt_cost = (prompt_tokens / 1000) * pricing["input"]
+        completion_cost = (completion_tokens / 1000) * pricing["output"]
+        total_cost = prompt_cost + completion_cost
+        
+        # Update usage statistics
+        openai_usage["total_calls"] += 1
+        openai_usage["prompt_tokens"] += prompt_tokens
+        openai_usage["completion_tokens"] += completion_tokens
+        openai_usage["total_tokens"] += total_tokens
+        openai_usage["estimated_cost"] += total_cost
+        openai_usage["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Update model-specific costs
+        if model_base not in openai_usage["cost_per_model"]:
+            openai_usage["cost_per_model"][model_base] = 0.0
+        openai_usage["cost_per_model"][model_base] += total_cost
+        
+        # Add to usage history (keep last 100 entries)
+        openai_usage["usage_history"].append({
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "model": model,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "cost": total_cost,
+            "response_time": api_time
+        })
+        
+        # Limit history size
+        if len(openai_usage["usage_history"]) > 100:
+            openai_usage["usage_history"] = openai_usage["usage_history"][-100:]
+        
+        # Log tokens and cost
+        update_api_console(f"✅ Response received in {api_time:.2f} seconds", "openai")
+        update_api_console(f"Tokens: {prompt_tokens} prompt + {completion_tokens} completion = {total_tokens} total", "openai")
+        update_api_console(f"Estimated cost: ${total_cost:.6f} (Total: ${openai_usage['estimated_cost']:.4f})", "openai")
         
         # Get the response
         response = completion.choices[0].message.content.strip().upper()
         
-        # Ensure it's not too long for the punch card
+        # Ensure it's not too long for the punch card (80 columns)
         if len(response) > 70:
             response = response[:67] + "..."
             
-        update_api_console(f"Message generated: {response}")
+        update_api_console(f"Message generated: {response}", "openai")
+        
+        # Save usage to config for persistence
+        config["openai_usage"] = openai_usage
+        save_settings()
+        
         return response
+        
     except Exception as e:
+        error_msg = str(e)
         print(f"⚠️ Error calling OpenAI API: {e}")
-        update_api_console(f"❌ Error: {str(e)[:50]}")
-        return f"ERROR: {str(e)[:60]}"
+        update_api_console(f"❌ OpenAI Error: {error_msg[:150]}", "error")
+        
+        error_response = f"ERROR: {error_msg[:60]}"
+        
+        # Force display on punch card - ensure this gets shown
+        if display and hasattr(display, 'punch_card'):
+            try:
+                # Try to directly update the punch card with an error message
+                if hasattr(display, 'display_message'):
+                    # This should update the display
+                    display.display_message(error_response)
+            except Exception as display_err:
+                update_api_console(f"Error updating punch card directly: {str(display_err)[:100]}", "error")
+        
+        return error_response
 
 def get_database_message():
-    """Get a message from the database."""
-    global display, message_database, config
+    """Get a random message from the database."""
+    global db_connection
+    
+    if not db_connection:
+        update_api_console("⚠️ Database not initialized - cannot retrieve message", "warning")
+        return "ERROR: DATABASE NOT INITIALIZED"
     
     try:
-        # Try to get a message from the database
-        if hasattr(display, 'message_db') and hasattr(display.message_db, 'get_random_message'):
-            message = display.message_db.get_random_message()
-            if message:
-                print(f"✅ Retrieved message from database")
-                return message
-                
-        # Try another approach
-        elif hasattr(display, 'db') and hasattr(display.db, 'get_random_message'):
-            message = display.db.get_random_message()
-            if message:
-                print(f"✅ Retrieved message from db interface")
-                return message
-                
-        # Check local backup
-        elif message_database:
-            message_obj = random.choice(message_database)
-            print(f"✅ Retrieved message from local backup")
-            return message_obj["message"]
-            
-        # Default message if no messages found
-        print("⚠️ No messages found in database")
-        return "NO MESSAGES IN DATABASE"
-    except Exception as e:
-        print(f"⚠️ Error getting database message: {e}")
-        return "ERROR: DATABASE MESSAGE RETRIEVAL FAILED"
-
-def get_message():
-    """Get a message based on the selected source."""
-    global message_source
-    
-    if message_source == "openai":
-        return generate_openai_message()
-    elif message_source == "database":
-        return get_database_message()
-    else:  # Default to local
-        return generate_local_message()
-
-def display_next_message(display, count):
-    """Display a message and increment the count."""
-    print(f"--------------------------------------------------")
-    print(f"Displaying message #{count}...")
-    
-    # Get message based on source
-    message = get_message()
-    print(f"Message source: {message_source}")
-    print(f"Message: {message}")
-    
-    try:
-        if hasattr(display, 'display_message'):
-            # No AI prefix - just display the raw message
-            display.display_message(message)
-            print(f"✅ Message displayed")
-            
-            # Save message to database
-            save_message_to_database(display, message, message_source)
-        else:
-            print(f"⚠️ Display does not have display_message method")
-    except Exception as e:
-        print(f"⚠️ Error displaying message: {e}")
-    
-    print(f"--------------------------------------------------")
-    
-    # Recalculate interval for next message if necessary
-    if hasattr(display, 'message_timer'):
-        current_interval = display.message_timer.interval()
-        calculated_interval = calculate_message_interval()
+        cursor = db_connection.cursor()
         
-        # If there's a significant difference, update the timer
-        if abs(current_interval - calculated_interval) > 1000:  # 1 second difference
-            display.message_timer.setInterval(calculated_interval)
-            print(f"ℹ️ Adjusted message interval to {calculated_interval/1000:.1f} seconds")
+        # Check if we have any messages
+        cursor.execute("SELECT COUNT(*) FROM messages")
+        count = cursor.fetchone()[0]
+        
+        if count == 0:
+            update_api_console("⚠️ No messages in database", "warning")
+            return "NO MESSAGES IN DATABASE"
+        
+        # Get a random message from the database
+        cursor.execute("""
+            SELECT message FROM messages 
+            ORDER BY RANDOM() 
+            LIMIT 1
+        """)
+        
+        message = cursor.fetchone()
+        
+        if message and message[0]:
+            update_api_console(f"✅ Retrieved message from database", "system")
+            return message[0]
+        else:
+            update_api_console("⚠️ Failed to retrieve message from database", "warning")
+            return "ERROR: COULD NOT RETRIEVE MESSAGE"
+            
+    except Exception as e:
+        update_api_console(f"❌ Error retrieving from database: {str(e)[:100]}", "error")
+        return "ERROR: DATABASE RETRIEVAL FAILED"
+
+def get_message(source=None):
+    """Get a message from the specified source."""
+    global config
     
-    return count + 1
+    # If source not specified, use the configured source
+    if source is None:
+        source = config.get("message_source", "local")
+        
+    update_api_console(f"Getting message from source: {source}", "system")
+    
+    try:
+        # Get message from source
+        if source == "openai":
+            update_api_console("Using OpenAI API for message generation", "system")
+            message = generate_openai_message()
+        elif source == "database":
+            update_api_console("Retrieving message from database", "system")
+            message = get_database_message()
+        elif source == "stats":
+            update_api_console("Generating statistics message", "system")
+            message = get_stats_text()
+        else:  # Default is local
+            update_api_console("Generating local message", "system")
+            message = generate_local_message()
+            
+        # Make sure we have a valid message
+        if not message or not isinstance(message, str) or len(message.strip()) == 0:
+            update_api_console("⚠️ Invalid message received, falling back to local generation", "warning")
+            message = generate_local_message()
+            
+        return message
+        
+    except Exception as e:
+        update_api_console(f"❌ Error getting message: {str(e)[:100]}", "error")
+        # Fallback to local message
+        try:
+            return generate_local_message()
+        except Exception as fallback_error:
+            # Last resort message
+            return "ERROR: COULD NOT GENERATE MESSAGE"
+
+def display_next_message():
+    """Get and display the next message based on current settings."""
+    global display, config
+    
+    if not display:
+        print("[ERROR] Display object not initialized")
+        return False
+    
+    # Get a message based on current source setting
+    msg_source = config.get("message_source", "local")
+    update_api_console(f"Getting message from source: {msg_source}", "system")
+    
+    # Get message from appropriate source
+    message = get_message(msg_source)
+    
+    # Format message (ensure uppercase for punch card)
+    if message:
+        message = message.strip().upper()
+        
+        # Debug info
+        print(f"Displaying message: {message}")
+        
+        # Display the message in multiple ways
+        display_success = False
+        
+        # Method 1: Use display_message method if available
+        if hasattr(display, 'display_message'):
+            try:
+                display.display_message(message)
+                display_success = True
+                update_api_console(f"✅ Message displayed via display_message(): {message}", "system")
+            except Exception as e:
+                update_api_console(f"❌ Error in display_message(): {str(e)[:100]}", "error")
+                
+        # Method 2: Update punch_card directly if available
+        elif hasattr(display, 'punch_card'):
+            try:
+                # Try to set display data directly
+                if hasattr(display.punch_card, 'update_data'):
+                    # Preferred method
+                    display.punch_card.update_data(message)
+                    display_success = True
+                    update_api_console(f"✅ Message displayed via punch_card.update_data(): {message}", "system")
+                # Or try setting text
+                elif hasattr(display.punch_card, 'setText'):
+                    display.punch_card.setText(message)
+                    display_success = True
+                    update_api_console(f"✅ Message displayed via punch_card.setText(): {message}", "system")
+                # Or try setting plain text
+                elif hasattr(display.punch_card, 'setPlainText'):
+                    display.punch_card.setPlainText(message)
+                    display_success = True
+                    update_api_console(f"✅ Message displayed via punch_card.setPlainText(): {message}", "system")
+            except Exception as e:
+                update_api_console(f"❌ Error updating punch_card directly: {str(e)[:100]}", "error")
+        
+        # Log failure
+        if not display_success:
+            update_api_console("❌ FAILED to display message - no suitable display method found", "error")
+            
+            # Emergency fallback - try to find any text display widget
+            for widget_name in ['message_display', 'textEdit', 'textBrowser', 'label']:
+                if hasattr(display, widget_name):
+                    try:
+                        widget = getattr(display, widget_name)
+                        if hasattr(widget, 'setText'):
+                            widget.setText(message)
+                            update_api_console(f"✅ Emergency fallback: displayed via {widget_name}.setText()", "system")
+                            display_success = True
+                            break
+                        elif hasattr(widget, 'setPlainText'):
+                            widget.setPlainText(message)
+                            update_api_console(f"✅ Emergency fallback: displayed via {widget_name}.setPlainText()", "system")
+                            display_success = True
+                            break
+                    except Exception as e:
+                        update_api_console(f"❌ Emergency fallback failed for {widget_name}: {str(e)[:100]}", "error")
+        
+        # Save the message to the database
+        save_message_to_database(message, source=msg_source)
+        
+        return display_success
+    else:
+        update_api_console("⚠️ No message to display - received empty message", "warning")
+        return False
 
 def get_stats_text():
     """Get statistics as formatted text."""
@@ -861,101 +1199,622 @@ def get_stats_text():
     return stats_text
 
 class SettingsDialog(QDialog):
-    """Consolidated settings dialog."""
+    """
+    Comprehensive Settings Dialog - THE SINGLE SOURCE OF TRUTH FOR ALL SETTINGS
     
+    This is the only settings dialog in the application and should be used for all
+    settings management. Any other settings mechanisms should be removed or redirected
+    to use this dialog.
+    """
     def __init__(self, parent=None):
+        """Initialize the settings dialog with multiple tabs for different settings categories."""
         super().__init__(parent)
+        self.parent_display = parent
+        
+        # Set window title
         self.setWindowTitle("Punch Card Settings")
-        self.setMinimumWidth(400)
         
-        # Main layout
-        main_layout = QVBoxLayout()
+        # Increase fixed width for better readability
+        self.setFixedWidth(600)
+        self.setMinimumHeight(550)
         
-        # Message Source Group
-        source_group = QGroupBox("Message Source")
-        source_layout = QVBoxLayout()
+        # Create main layout
+        main_layout = QVBoxLayout(self)
         
-        # Radio buttons
-        self.local_radio = QRadioButton("Local Generation")
-        self.openai_radio = QRadioButton("OpenAI Generation")
-        self.database_radio = QRadioButton("Database Messages")
+        # Create tab widget
+        self.tab_widget = QTabWidget()
+        main_layout.addWidget(self.tab_widget)
         
-        # Set current selection
-        global message_source
-        if message_source == "openai":
-            self.openai_radio.setChecked(True)
-        elif message_source == "database":
-            self.database_radio.setChecked(True)
-        else:
-            self.local_radio.setChecked(True)
+        # Setup tabs
+        self._setup_general_tab()  # ⚙️ General tab
+        self._setup_openai_tab()   # 🤖 OpenAI API tab
+        self._setup_stats_tab()    # 📊 Statistics tab
         
-        source_layout.addWidget(self.local_radio)
-        source_layout.addWidget(self.openai_radio)
-        source_layout.addWidget(self.database_radio)
-        source_group.setLayout(source_layout)
-        main_layout.addWidget(source_group)
+        # Set General tab as default
+        self.tab_widget.setCurrentIndex(0)  # General tab
         
-        # Timing Settings Group
-        timing_group = QGroupBox("Timing Settings")
-        timing_layout = QGridLayout()
-        
-        # Interval spinner
-        timing_layout.addWidget(QLabel("Message Interval (seconds):"), 0, 0)
-        self.interval_spin = QSpinBox()
-        self.interval_spin.setRange(5, 60)
-        self.interval_spin.setValue(config["interval"])
-        timing_layout.addWidget(self.interval_spin, 0, 1)
-        
-        # Delay factor spinner
-        timing_layout.addWidget(QLabel("API Delay Factor:"), 1, 0)
-        self.delay_factor_spin = QSpinBox()
-        self.delay_factor_spin.setRange(1, 5)
-        self.delay_factor_spin.setValue(int(config["delay_factor"]))
-        timing_layout.addWidget(self.delay_factor_spin, 1, 1)
-        
-        timing_group.setLayout(timing_layout)
-        main_layout.addWidget(timing_group)
-        
-        # Options Group
-        options_group = QGroupBox("Options")
-        options_layout = QVBoxLayout()
-        
-        # Display stats checkbox
-        self.display_stats_check = QCheckBox("Display Statistics in Console")
-        self.display_stats_check.setChecked(config["display_stats"])
-        options_layout.addWidget(self.display_stats_check)
-        
-        # Save to database checkbox
-        self.save_db_check = QCheckBox("Save Messages to Database")
-        self.save_db_check.setChecked(config["save_to_database"])
-        options_layout.addWidget(self.save_db_check)
-        
-        # Debug mode checkbox
-        self.debug_check = QCheckBox("Debug Mode")
-        self.debug_check.setChecked(config["debug_mode"])
-        options_layout.addWidget(self.debug_check)
-        
-        options_group.setLayout(options_layout)
-        main_layout.addWidget(options_group)
-        
-        # Stats display
-        stats_group = QGroupBox("Message Statistics")
-        stats_layout = QVBoxLayout()
-        self.stats_label = QLabel(get_stats_text())
-        stats_layout.addWidget(self.stats_label)
-        stats_group.setLayout(stats_layout)
-        main_layout.addWidget(stats_group)
-        
-        # Dialog buttons
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | 
-            QDialogButtonBox.StandardButton.Cancel
-        )
+        # Add OK/Cancel buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         main_layout.addWidget(button_box)
         
-        self.setLayout(main_layout)
+        # Load initial values from settings
+        self.load_from_settings()
+    
+    def _setup_general_tab(self):
+        """Set up the general settings tab."""
+        layout = QVBoxLayout()
+        self.general_tab.setLayout(layout)
+        
+        # Message source group
+        source_group = QGroupBox("Message Source")
+        source_layout = QVBoxLayout()
+        source_group.setLayout(source_layout)
+        
+        # Radio buttons for message source
+        self.local_radio = QRadioButton("Local Generation")
+        self.local_radio.setToolTip("Generate messages locally using patterns and templates")
+        self.openai_radio = QRadioButton("OpenAI API")
+        self.openai_radio.setToolTip("Generate messages using OpenAI's API (requires API key)")
+        self.database_radio = QRadioButton("Message Database")
+        self.database_radio.setToolTip("Display stored messages from database")
+        
+        source_layout.addWidget(self.local_radio)
+        source_layout.addWidget(self.openai_radio)
+        source_layout.addWidget(self.database_radio)
+        
+        layout.addWidget(source_group)
+        
+        # Display settings group
+        display_group = QGroupBox("Display Settings")
+        display_layout = QFormLayout()
+        display_group.setLayout(display_layout)
+        
+        # Interval setting
+        self.interval_spin = QSpinBox()
+        self.interval_spin.setRange(1, 600)  # 1 second to 10 minutes
+        self.interval_spin.setSuffix(" seconds")
+        self.interval_spin.setToolTip("Time between messages")
+        display_layout.addRow("Message Interval:", self.interval_spin)
+        
+        # Delay factor setting
+        self.delay_factor_spin = QDoubleSpinBox()
+        self.delay_factor_spin.setRange(0.1, 5.0)
+        self.delay_factor_spin.setSingleStep(0.1)
+        self.delay_factor_spin.setDecimals(1)
+        self.delay_factor_spin.setToolTip("Factor to adjust message timing based on length")
+        display_layout.addRow("Delay Factor:", self.delay_factor_spin)
+        
+        layout.addWidget(display_group)
+        
+        # Other settings group
+        other_group = QGroupBox("Other Settings")
+        other_layout = QVBoxLayout()
+        other_group.setLayout(other_layout)
+        
+        # Display statistics option
+        self.display_stats_check = QCheckBox("Display Statistics")
+        self.display_stats_check.setToolTip("Display statistics about message generation")
+        other_layout.addWidget(self.display_stats_check)
+        
+        # Save to database option
+        self.save_db_check = QCheckBox("Save Messages to Database")
+        self.save_db_check.setToolTip("Save generated messages to the database")
+        other_layout.addWidget(self.save_db_check)
+        
+        # Debug mode option
+        self.debug_check = QCheckBox("Debug Mode")
+        self.debug_check.setToolTip("Enable debug mode with additional logging")
+        other_layout.addWidget(self.debug_check)
+        
+        layout.addWidget(other_group)
+        
+        # Add stretch to push everything to the top
+        layout.addStretch()
+    
+    def _setup_openai_tab(self):
+        """Set up the OpenAI API tab."""
+        # Create tab and layout
+        openai_tab = QWidget()
+        self.tab_widget.addTab(openai_tab, "🤖 OpenAI API")
+        
+        tab_layout = QVBoxLayout(openai_tab)
+        
+        # API Key section with toggle visibility button
+        api_group = QGroupBox("API Configuration")
+        form_layout = QFormLayout()
+        api_group.setLayout(form_layout)
+        
+        api_key_layout = QHBoxLayout()
+        self.api_key_edit = QLineEdit()
+        self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.api_key_edit.setPlaceholderText("Enter your OpenAI API key here")
+        
+        toggle_button = QPushButton("👁️")
+        toggle_button.setFixedWidth(30)
+        toggle_button.setToolTip("Show/Hide API Key")
+        toggle_button.clicked.connect(self.toggle_key_visibility)
+        
+        api_key_layout.addWidget(self.api_key_edit)
+        api_key_layout.addWidget(toggle_button)
+        
+        form_layout.addRow("API Key:", api_key_layout)
+        
+        # API Key verification status
+        self.api_key_status = QLabel("API key status: Not verified")
+        self.api_key_status.setStyleSheet("color: #888888;")
+        form_layout.addRow("", self.api_key_status)
+        
+        # API Key verification button
+        verify_button = QPushButton("Verify API Key")
+        verify_button.clicked.connect(self.update_api_key_status)
+        form_layout.addRow("", verify_button)
+        
+        tab_layout.addWidget(api_group)
+        
+        # Add separator
+        separator1 = QFrame()
+        separator1.setFrameShape(QFrame.Shape.HLine)
+        separator1.setFrameShadow(QFrame.Shadow.Sunken)
+        tab_layout.addWidget(separator1)
+        
+        # Model selection group
+        model_group = QGroupBox("Model Selection")
+        model_layout = QVBoxLayout()
+        model_group.setLayout(model_layout)
+        
+        model_select_layout = QHBoxLayout()
+        
+        # Model combobox
+        self.model_combo = QComboBox()
+        self.model_combo.addItems([
+            "gpt-3.5-turbo",
+            "gpt-4",
+            "gpt-4-turbo",
+            "gpt-4o",
+            "gpt-4o-mini"
+        ])
+        self.model_combo.currentIndexChanged.connect(self.update_model_description)
+        model_select_layout.addWidget(self.model_combo)
+        
+        # Refresh models button
+        refresh_button = QPushButton("Refresh")
+        refresh_button.setFixedWidth(80)
+        refresh_button.clicked.connect(self.refresh_available_models)
+        model_select_layout.addWidget(refresh_button)
+        
+        model_layout.addLayout(model_select_layout)
+        
+        # Model description
+        self.model_description = QLabel("GPT 3.5 Turbo: Fast and cost-effective for most tasks")
+        self.model_description.setWordWrap(True)
+        model_layout.addWidget(self.model_description)
+        
+        # Temperature setting
+        temp_layout = QHBoxLayout()
+        temp_label = QLabel("Temperature:")
+        temp_layout.addWidget(temp_label)
+        
+        self.temperature_slider = QSlider(Qt.Orientation.Horizontal)
+        self.temperature_slider.setMinimum(0)
+        self.temperature_slider.setMaximum(100)
+        self.temperature_slider.setValue(70)  # Default 0.7
+        self.temperature_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.temperature_slider.setTickInterval(10)
+        self.temperature_slider.valueChanged.connect(self.update_temperature_label)
+        temp_layout.addWidget(self.temperature_slider)
+        
+        self.temperature_label = QLabel("0.7")
+        self.temperature_label.setFixedWidth(30)
+        temp_layout.addWidget(self.temperature_label)
+        
+        model_layout.addLayout(temp_layout)
+        
+        # Temperature explanation
+        temp_explanation = QLabel("Lower values (0.0) make output more focused and deterministic, higher values (1.0) make output more random and creative.")
+        temp_explanation.setWordWrap(True)
+        temp_explanation.setStyleSheet("color: #888888; font-size: 10px;")
+        model_layout.addWidget(temp_explanation)
+        
+        tab_layout.addWidget(model_group)
+        
+        # Add separator
+        separator2 = QFrame()
+        separator2.setFrameShape(QFrame.Shape.HLine)
+        separator2.setFrameShadow(QFrame.Shadow.Sunken)
+        tab_layout.addWidget(separator2)
+        
+        # Usage and Cost tracking
+        usage_group = QGroupBox("Usage and Cost Tracking")
+        usage_layout = QVBoxLayout()
+        usage_group.setLayout(usage_layout)
+        
+        # Usage statistics
+        self.usage_text = QTextEdit()
+        self.usage_text.setReadOnly(True)
+        self.usage_text.setMinimumHeight(150)
+        usage_layout.addWidget(self.usage_text)
+        
+        # Update and reset buttons
+        button_layout = QHBoxLayout()
+        
+        update_usage_btn = QPushButton("Update Stats")
+        update_usage_btn.clicked.connect(self.update_usage_stats)
+        button_layout.addWidget(update_usage_btn)
+        
+        reset_usage_btn = QPushButton("Reset Usage Data")
+        reset_usage_btn.clicked.connect(self.reset_usage_stats)
+        button_layout.addWidget(reset_usage_btn)
+        
+        usage_layout.addLayout(button_layout)
+        
+        tab_layout.addWidget(usage_group)
+        
+        # Add separator
+        separator3 = QFrame()
+        separator3.setFrameShape(QFrame.Shape.HLine)
+        separator3.setFrameShadow(QFrame.Shadow.Sunken)
+        tab_layout.addWidget(separator3)
+        
+        # Service status section
+        service_group = QGroupBox("OpenAI Service Status")
+        service_layout = QHBoxLayout()
+        service_group.setLayout(service_layout)
+        
+        self.service_status_label = QLabel("Status: Not checked")
+        service_layout.addWidget(self.service_status_label)
+        
+        check_status_btn = QPushButton("Check Status")
+        check_status_btn.clicked.connect(self.check_openai_service)
+        service_layout.addWidget(check_status_btn)
+        
+        tab_layout.addWidget(service_group)
+        
+        # Initialize the usage stats
+        self.update_usage_stats()
+    
+    def update_temperature_label(self, value):
+        """Update the temperature label when slider changes."""
+        temperature = value / 100.0
+        self.temperature_label.setText(f"{temperature:.1f}")
+    
+    def update_usage_stats(self):
+        """Update the usage statistics display."""
+        global openai_usage
+        
+        # Format usage statistics
+        text = "<h3>OpenAI API Usage Statistics</h3>"
+        
+        # Total usage
+        text += "<p><b>Total Calls:</b> " + str(openai_usage.get("total_calls", 0)) + "</p>"
+        text += "<p><b>Total Tokens:</b> " + str(openai_usage.get("total_tokens", 0)) + "</p>"
+        text += "<p><b>Prompt Tokens:</b> " + str(openai_usage.get("prompt_tokens", 0)) + "</p>"
+        text += "<p><b>Completion Tokens:</b> " + str(openai_usage.get("completion_tokens", 0)) + "</p>"
+        
+        # Cost breakdown
+        text += "<h4>Cost Breakdown</h4>"
+        text += "<p><b>Total Estimated Cost:</b> $" + f"{openai_usage.get('estimated_cost', 0.0):.4f}" + "</p>"
+        
+        # Per model breakdown
+        if openai_usage.get("cost_per_model"):
+            text += "<p><b>Cost by Model:</b></p>"
+            text += "<ul>"
+            for model, cost in openai_usage.get("cost_per_model", {}).items():
+                text += f"<li>{model}: ${cost:.4f}</li>"
+            text += "</ul>"
+        
+        # Last update
+        if openai_usage.get("last_updated"):
+            text += "<p><b>Last Updated:</b> " + openai_usage.get("last_updated", "Never") + "</p>"
+        
+        # Recent history
+        if openai_usage.get("usage_history"):
+            text += "<h4>Recent Calls (last 5)</h4>"
+            history = openai_usage.get("usage_history", [])[-5:]  # Get last 5 entries
+            
+            for call in reversed(history):  # Show most recent first
+                text += f"<p>{call.get('timestamp')}: {call.get('model')} - "
+                text += f"{call.get('total_tokens')} tokens, "
+                text += f"${call.get('cost', 0.0):.4f}, "
+                text += f"{call.get('response_time', 0.0):.2f}s</p>"
+        
+        # Update the text widget
+        self.usage_text.setHtml(text)
+    
+    def reset_usage_stats(self):
+        """Reset the OpenAI usage statistics."""
+        global openai_usage
+        
+        reply = QMessageBox.question(
+            self,
+            "Reset Usage Statistics",
+            "Are you sure you want to reset all OpenAI usage statistics?\nThis will clear all cost and token tracking data.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            # Reset usage stats
+            openai_usage = {
+                "total_calls": 0,
+                "total_tokens": 0,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "estimated_cost": 0.0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "usage_history": [],
+                "cost_per_model": {},
+            }
+            
+            # Update display
+            self.update_usage_stats()
+            
+            # Save to config
+            config["openai_usage"] = openai_usage
+            save_settings()
+            
+            QMessageBox.information(
+                self,
+                "Reset Complete",
+                "OpenAI usage statistics have been reset."
+            )
+        
+    def check_openai_service(self):
+        """Check the OpenAI service status."""
+        result = check_openai_status()
+        
+        if result:
+            status = service_status.get("openai", {}).get("status", "unknown")
+            message = service_status.get("openai", {}).get("message", "No message")
+            
+            self.service_status_label.setText(f"Status: {status} - {message}")
+            
+            # Update styling based on status
+            if status == "operational" or status == "none":
+                self.service_status_label.setStyleSheet("color: #55AA55;")  # Green
+            elif status == "minor" or status == "major":
+                self.service_status_label.setStyleSheet("color: #AAAA55;")  # Yellow
+            else:
+                self.service_status_label.setStyleSheet("color: #AA5555;")  # Red
+        else:
+            self.service_status_label.setText("Status: Error checking service")
+            self.service_status_label.setStyleSheet("color: #AA5555;")  # Red
+    
+    def load_from_settings(self):
+        """Load settings into the dialog fields."""
+        global config
+        
+        # General tab
+        # Set source radio button
+        source = config.get("message_source", "local")
+        if source == "local":
+            self.local_radio.setChecked(True)
+        elif source == "openai":
+            self.openai_radio.setChecked(True)
+        elif source == "database":
+            self.database_radio.setChecked(True)
+        elif source == "stats":
+            self.stats_radio.setChecked(True)
+        
+        # Set message interval
+        interval = config.get("interval", 15)
+        self.interval_spinbox.setValue(interval)
+        
+        # Set delay factor
+        delay_factor = config.get("delay_factor", 1.0)
+        self.delay_factor_spinbox.setValue(delay_factor)
+        
+        # Set save to database checkbox
+        save_to_db = config.get("save_to_database", True)
+        self.save_checkbox.setChecked(save_to_db)
+        
+        # Set debug mode checkbox
+        debug_mode = config.get("debug_mode", False)
+        self.debug_checkbox.setChecked(debug_mode)
+        
+        # OpenAI tab
+        # Set API key if it exists (only display placeholder if it exists)
+        api_key = config.get("openai_api_key", "")
+        if api_key:
+            self.api_key_edit.setText(api_key)
+            self.api_key_status.setText("Status: Key loaded from settings (not verified)")
+            self.api_key_status.setStyleSheet("color: #AAAAAA;")
+        
+        # Set model selection
+        model = config.get("model", "gpt-3.5-turbo")
+        index = self.model_combo.findText(model)
+        if index >= 0:
+            self.model_combo.setCurrentIndex(index)
+        
+        # Set temperature
+        temperature = config.get("temperature", 0.7)
+        self.temperature_slider.setValue(int(temperature * 100))
+        self.temperature_label.setText(f"{temperature:.1f}")
+        
+        # Stats tab
+        # Update stats display
+        self.stats_text.setText(get_stats_text())
+        
+        # Check service status
+        self.refresh_service_status()
+    
+    def refresh_service_status(self):
+        """Refresh the service status display."""
+        global service_status
+        
+        # Update the status
+        check_openai_status()
+        check_flyio_status()
+        
+        # Update the display
+        self.service_status_text.setText(get_service_status_text())
+        
+        QMessageBox.information(
+            self,
+            "Service Status",
+            "Service status has been refreshed."
+        )
+    
+    def toggle_key_visibility(self):
+        """Toggle visibility of the API key."""
+        if self.api_key_edit.echoMode() == QLineEdit.EchoMode.Password:
+            self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Normal)
+        else:
+            self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+
+    def update_api_key_status(self):
+        """Check if the API key is valid."""
+        # Get API key from input
+        api_key = self.api_key_edit.text()
+        
+        # Check if we have text entered
+        if not api_key or len(api_key.strip()) < 10:
+            self.api_key_status.setText("Status: Invalid key (too short)")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+            return
+        
+        # Update UI
+        self.api_key_status.setText("Status: Verifying...")
+        self.api_key_status.setStyleSheet("color: #AAAAAA;")
+        
+        # Try to initialize a client to test the key
+        try:
+            # Import OpenAI
+            from openai import OpenAI, APIError
+            
+            # Create a temporary client
+            temp_client = OpenAI(api_key=api_key)
+            
+            # Try a lightweight API call to verify the key
+            try:
+                models = temp_client.models.list(limit=1)
+                
+                # Key is valid
+                self.api_key_status.setText(f"Status: Valid ✅ (found {len(models.data)} models)")
+                self.api_key_status.setStyleSheet("color: #55AA55;")
+                
+                # Update config globally
+                global config
+                config["openai_api_key"] = api_key
+                update_api_console("API key verified and saved", "system")
+                
+            except APIError as e:
+                # API-specific errors (usually authentication or permissions)
+                self.api_key_status.setText(f"Status: Invalid key - {str(e)[:60]}")
+                self.api_key_status.setStyleSheet("color: #FF5555;")
+                
+        except ImportError:
+            self.api_key_status.setText("Status: OpenAI module not installed")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+        except Exception as e:
+            self.api_key_status.setText(f"Status: Error - {str(e)[:60]}")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+    
+    def update_api_key(self):
+        """Update the API key in the secrets file."""
+        api_key = self.api_key_input.text()
+        org_id = self.org_id_input.text()
+        
+        # Skip if key is just placeholder asterisks
+        if api_key == "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            QMessageBox.warning(
+                self, 
+                "API Key Update", 
+                "Please enter your actual API key, not the placeholder."
+            )
+            return
+        
+        if not api_key:
+            QMessageBox.warning(
+                self, 
+                "API Key Update", 
+                "API key cannot be empty."
+            )
+            return
+        
+        # Get the root directory and path to secrets
+        root_dir = os.path.dirname(os.path.abspath(__file__))
+        secrets_dir = os.path.join(root_dir, "secrets")
+        api_keys_file = os.path.join(secrets_dir, "api_keys.json")
+        template_file = os.path.join(root_dir, "templates", "api_keys.json.template")
+        
+        # Create the secrets directory if it doesn't exist
+        if not os.path.exists(secrets_dir):
+            os.makedirs(secrets_dir)
+        
+        # Initialize the API keys structure
+        api_keys = {
+            "openai": {
+                "api_key": "",
+                "organization_id": ""
+            },
+            "other_services": {
+                "service1_key": "",
+                "service2_key": ""
+            }
+        }
+        
+        # Try to load from template first
+        if os.path.exists(template_file):
+            try:
+                with open(template_file, 'r') as f:
+                    template_keys = json.load(f)
+                    # Use structure from template but not values
+                    for service in template_keys:
+                        if service not in api_keys:
+                            api_keys[service] = {}
+                        for key in template_keys[service]:
+                            if key not in api_keys[service]:
+                                api_keys[service][key] = ""
+            except Exception as e:
+                print(f"Error loading template: {e}")
+        
+        # Load existing keys if available
+        if os.path.exists(api_keys_file):
+            try:
+                with open(api_keys_file, 'r') as f:
+                    api_keys = json.load(f)
+            except Exception as e:
+                print(f"Error loading existing keys: {e}")
+        
+        # Update the keys
+        api_keys["openai"]["api_key"] = api_key
+        api_keys["openai"]["organization_id"] = org_id
+        
+        # Save to file
+        try:
+            with open(api_keys_file, 'w') as f:
+                json.dump(api_keys, f, indent=2)
+            
+            QMessageBox.information(
+                self, 
+                "API Key Update", 
+                "✅ API key successfully saved to secrets/api_keys.json\n\n"
+                "This file is excluded from Git to keep your key secure."
+            )
+            
+            # Update status
+            self.update_api_key_status()
+            
+            # Attempt to initialize the OpenAI client with the new key
+            global openai_client
+            old_client = openai_client
+            setup_openai_client()
+            
+            if openai_client and openai_client != old_client:
+                QMessageBox.information(
+                    self,
+                    "OpenAI Client",
+                    "✅ OpenAI client successfully initialized with your new API key."
+                )
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self, 
+                "API Key Update", 
+                f"❌ Error saving API key: {str(e)}"
+            )
     
     def get_settings(self):
         """Get all settings from the dialog."""
@@ -969,139 +1828,293 @@ class SettingsDialog(QDialog):
         else:
             settings["message_source"] = "local"
         
+        # Get OpenAI model
+        model = self.model_combo.currentText()
+        
         # Get config settings
         settings["config"] = {
             "interval": self.interval_spin.value(),
             "delay_factor": float(self.delay_factor_spin.value()),
             "display_stats": self.display_stats_check.isChecked(),
             "save_to_database": self.save_db_check.isChecked(),
-            "debug_mode": self.debug_check.isChecked()
+            "debug_mode": self.debug_check.isChecked(),
+            "model": model
         }
         
         return settings
 
-def show_settings_dialog(display):
-    """Show the settings dialog and update settings."""
-    global message_source, config
+    def refresh_available_models(self):
+        """Refresh the available models from the OpenAI API."""
+        global openai_client
+        
+        # Get API key from input
+        api_key = self.api_key_edit.text()
+        
+        # Check if we have a valid API key
+        if not api_key or len(api_key.strip()) < 10:
+            self.model_description.setText("Please enter a valid API key to refresh models")
+            return
+        
+        # Try to initialize a temporary client to fetch models
+        self.model_description.setText("Fetching available models...")
+        
+        try:
+            # Import OpenAI
+            from openai import OpenAI, APIError
+            
+            # Create a temporary client
+            temp_client = OpenAI(api_key=api_key)
+            
+            # Fetch available models
+            models = temp_client.models.list()
+            
+            # Filter for chat models only
+            chat_models = [m.id for m in models.data if m.id.startswith("gpt")]
+            
+            # Update the model combo box
+            current_model = self.model_combo.currentText()
+            self.model_combo.clear()
+            self.model_combo.addItems(sorted(chat_models))
+            
+            # Try to restore previous selection
+            index = self.model_combo.findText(current_model)
+            if index >= 0:
+                self.model_combo.setCurrentIndex(index)
+            
+            # Update description
+            self.model_description.setText(f"Successfully fetched {len(chat_models)} chat models")
+            
+        except ImportError:
+            self.model_description.setText("OpenAI module not installed")
+        except APIError as e:
+            self.model_description.setText(f"API Error: {str(e)[:100]}")
+        except Exception as e:
+            self.model_description.setText(f"Error: {str(e)[:100]}")
+
+    def update_model_description(self, index):
+        """Update the model description when selection changes."""
+        model = self.model_combo.currentText()
+        
+        descriptions = {
+            "gpt-4o-mini": "Efficient, cost-effective version of GPT-4o with lower latency.",
+            "gpt-4o": "Latest model, best for both text and vision tasks.",
+            "gpt-3.5-turbo": "Faster and more cost-effective model, good for most tasks.",
+            "gpt-4-turbo": "Expanded knowledge cutoff to April 2023.",
+            "gpt-4": "Most capable model with a knowledge cutoff of April 2023."
+        }
+        
+        self.model_description.setText(descriptions.get(model, "No description available"))
     
-    dialog = SettingsDialog()
+    def _setup_stats_tab(self):
+        """Set up the statistics tab."""
+        stats_tab = QWidget()
+        self.tab_widget.addTab(stats_tab, "📊 Statistics")
+        
+        layout = QVBoxLayout(stats_tab)
+        
+        # Statistics data
+        stats_group = QGroupBox("Message Statistics")
+        stats_layout = QVBoxLayout()
+        stats_group.setLayout(stats_layout)
+        
+        # Statistics text display
+        self.stats_text = QTextEdit()
+        self.stats_text.setReadOnly(True)
+        self.stats_text.setMinimumHeight(150)
+        stats_layout.addWidget(self.stats_text)
+        
+        # Reset stats button
+        self.reset_stats_btn = QPushButton("Reset Statistics")
+        self.reset_stats_btn.clicked.connect(self.reset_stats)
+        stats_layout.addWidget(self.reset_stats_btn)
+        
+        layout.addWidget(stats_group)
+        
+        # Service status
+        service_group = QGroupBox("Service Status")
+        service_layout = QVBoxLayout()
+        service_group.setLayout(service_layout)
+        
+        # Service status text display
+        self.service_status_text = QTextEdit()
+        self.service_status_text.setReadOnly(True)
+        self.service_status_text.setMinimumHeight(150)
+        service_layout.addWidget(self.service_status_text)
+        
+        # Refresh status button
+        self.refresh_status_btn = QPushButton("Refresh Status")
+        self.refresh_status_btn.clicked.connect(self.refresh_service_status)
+        service_layout.addWidget(self.refresh_status_btn)
+        
+        layout.addWidget(service_group)
+        
+        # Add stretch to push everything to the top
+        layout.addStretch()
+        
+        # Load initial stats
+        self.stats_text.setText(get_stats_text())
+        self.service_status_text.setText(get_service_status_text())
     
-    # Apply EPA-inspired style to the dialog
+    def reset_stats(self):
+        """Reset the message statistics."""
+        global message_stats
+        
+        reply = QMessageBox.question(
+            self,
+            "Reset Statistics",
+            "Are you sure you want to reset all message statistics?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            message_stats = {
+                "total": 0,
+                "local": 0,
+                "openai": 0,
+                "database": 0,
+                "system": 0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "last_message": None,
+                "last_source": None
+            }
+            self.stats_text.setText(get_stats_text())
+            QMessageBox.information(
+                self,
+                "Reset Statistics",
+                "Message statistics have been reset."
+            )
+
+def show_settings_dialog(display_obj):
+    """Show settings dialog and process results if accepted."""
+    global display, config
+    
+    # Debug output
+    print(f"Show settings dialog called with display object: {id(display_obj)}")
+    print(f"Global display object ID: {id(display)}")
+    
+    # Ensure display is initialized
+    if not display_obj:
+        update_api_console("❌ Cannot show settings - invalid display object", "error")
+        return
+        
+    # Ensure we're using the correct display object
+    display_to_use = display_obj
+    if display_obj != display:
+        update_api_console("⚠️ Warning: Settings dialog called with different display object than global", "warning")
+        display_to_use = display
+    
+    # Create dialog
+    dialog = SettingsDialog(display_to_use)
+    
+    # Apply styling
     UIStyleHelper.apply_settings_dialog_style(dialog)
     
-    # Apply button style to buttons
+    # Apply button styling to all buttons
     for button in dialog.findChildren(QPushButton):
         UIStyleHelper.apply_button_style(button)
     
-    if dialog.exec() == QDialog.DialogCode.Accepted:
-        # Get all settings
-        settings = dialog.get_settings()
+    # Ensure dialog is sized appropriately
+    if dialog.width() < 600:
+        dialog.resize(600, dialog.height())
+    if dialog.height() < 550:
+        dialog.resize(dialog.width(), 550)
+    
+    # Debug - print dialog tabs
+    print(f"Dialog tabs: {[dialog.tab_widget.tabText(i) for i in range(dialog.tab_widget.count())]}")
+    
+    # Make dialog modal and execute
+    dialog.setModal(True)
+    if dialog.exec():
+        # Dialog was accepted
+        update_api_console("Settings dialog accepted - applying changes", "system")
         
-        # Get the new message source
-        new_source = settings["message_source"]
+        # Get settings from dialog
+        new_settings = dialog.get_settings()
         
-        # If changing to OpenAI, initialize the client
-        if new_source == "openai" and message_source != "openai":
+        # Update message source if changed
+        if new_settings.get("message_source") != config.get("message_source"):
+            set_message_source(display_to_use, new_settings["message_source"])
+        
+        # Update config with new settings
+        config.update(new_settings)
+        
+        # Reinitialize OpenAI client if key changed
+        if "openai_api_key" in new_settings and new_settings["openai_api_key"] != config.get("openai_api_key", ""):
+            update_api_console("API key changed - reinitializing OpenAI client", "system")
             setup_openai_client()
         
-        # Update the message source and config
-        message_source = new_source
-        config.update(settings["config"])
-        
-        # Update message timer interval
-        if hasattr(display, 'message_timer') and display.message_timer:
+        # Update message timer interval if needed
+        if "interval" in new_settings and hasattr(display_to_use, 'message_timer'):
             new_interval = calculate_message_interval()
-            display.message_timer.setInterval(new_interval)
-            print(f"✅ Message timer interval updated to {new_interval/1000:.1f} seconds")
-            update_api_console(f"Message timer updated to {new_interval/1000:.1f} seconds")
+            display_to_use.message_timer.setInterval(new_interval)
+            update_api_console(f"Message timer interval updated to {new_interval/1000:.1f} seconds", "system")
         
-        # Save settings
+        # Save settings to permanent storage
         save_settings()
         
-        # Show what source was selected
-        display.display_message(f"SOURCE: {message_source.upper()}")
-        save_message_to_database(display, f"SOURCE: {message_source.upper()}", "system")
-        update_api_console(f"Message source changed to {message_source}")
-        return True
-    return False
-
-def check_database(display):
-    """Check if the database is available and functioning."""
-    # Check if display has a message_db attribute
-    if hasattr(display, 'message_db'):
-        db = display.message_db
-        if db:
-            db_info = str(db)
-            print(f"✅ Database found: {db_info}")
-            return True
-    
-    # Check if display has a db attribute
-    if hasattr(display, 'db'):
-        db = display.db
-        if db:
-            db_info = str(db)
-            print(f"✅ Database found: {db_info}")
-            return True
-    
-    # No database found, create a simple one
-    print("⚠️ No database found, will use local backup")
-    return False
-
-def initialize_database(display):
-    """Initialize or create a database interface."""
-    # Check if the display already has a database interface
-    if hasattr(display, 'message_db') and display.message_db:
-        print("✅ Using existing message database")
-        return True
+        # Update window title
+        if hasattr(display_to_use, 'setWindowTitle'):
+            source = config.get("message_source", "local").upper()
+            display_to_use.setWindowTitle(f"Punch Card Display - {source} Mode")
         
-    # If not, create a simple database interface and attach it to the display
+        # Display source change
+        if hasattr(display_to_use, 'display_message'):
+            source = config.get("message_source", "local").upper()
+            display_to_use.display_message(f"SOURCE: {source}")
+            save_message_to_database(f"SETTINGS UPDATED - SOURCE: {source}", "system")
+        
+        update_api_console("✅ Settings saved and applied", "system")
+    else:
+        # Dialog was rejected
+        update_api_console("Settings dialog canceled - no changes applied", "system")
+
+def check_database():
+    """Legacy wrapper for database initialization."""
+    return initialize_database()
+
+def initialize_database():
+    """Initialize the SQLite database for message storage."""
+    global db_connection, config
+    
     try:
-        class SimpleMessageDB:
-            def __init__(self):
-                self.messages = []
-                self.max_messages = 1000
-                
-            def add_message(self, message, source="Unknown"):
-                """Add a message to the database."""
-                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-                self.messages.append({
-                    "message": message,
-                    "source": source,
-                    "timestamp": timestamp
-                })
-                # Keep only the latest N messages
-                if len(self.messages) > self.max_messages:
-                    self.messages = self.messages[-self.max_messages:]
-                return True
-                
-            def get_random_message(self):
-                """Get a random message from the database."""
-                if not self.messages:
-                    return None
-                message_obj = random.choice(self.messages)
-                return message_obj["message"]
-                
-            def get_messages(self, limit=10):
-                """Get the latest messages."""
-                return self.messages[-limit:]
-                
-            def __str__(self):
-                return f"SimpleMessageDB with {len(self.messages)} messages"
+        # Get database path from config or use default
+        db_path = config.get("database_path", "punch_card_messages.db")
         
-        # Create and attach the database
-        if not hasattr(display, 'message_db'):
-            display.message_db = SimpleMessageDB()
-            display.message_db.max_messages = 1000
-            print(f"✅ Created simple message database (max 1000 msgs)")
-            
-            # If there are existing messages in our global variable, add them to the new DB
-            global message_database
-            for msg in message_database:
-                display.message_db.add_message(msg["message"], msg["source"])
-            
-            return True
+        # Connect to the database
+        db_connection = sqlite3.connect(db_path)
+        
+        # Create tables if they don't exist
+        cursor = db_connection.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                source TEXT NOT NULL
+            )
+        ''')
+        
+        # Create stats table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS stats (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        ''')
+        
+        # Commit changes
+        db_connection.commit()
+        
+        # Count messages for reporting
+        cursor.execute("SELECT COUNT(*) FROM messages")
+        message_count = cursor.fetchone()[0]
+        
+        update_api_console(f"✅ Database initialized with {message_count} messages", "system")
+        return True
+        
     except Exception as e:
-        print(f"⚠️ Error creating message database: {e}")
+        update_api_console(f"❌ Error initializing database: {str(e)[:100]}", "error")
         return False
 
 def calculate_message_interval():
@@ -1116,244 +2129,53 @@ def calculate_message_interval():
     
     return base_interval
 
-def update_api_console(message):
-    """Update the API console with a message."""
-    global display, config
-    
-    # Always update console regardless of debug mode
-    # Print to terminal as well to aid debugging
-    print(f"API Console: {message}")
-    
-    # First try to find any debug console that appears when pressing 'C'
-    if hasattr(display, 'debug_console') and hasattr(display.debug_console, 'append'):
-        try:
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            display.debug_console.setVisible(True)
-            display.debug_console.append(f"[{timestamp}] {message}")
-            
-            # Make sure to scroll to the bottom
-            try:
-                display.debug_console.verticalScrollBar().setValue(
-                    display.debug_console.verticalScrollBar().maximum()
-                )
-            except Exception as e:
-                print(f"⚠️ Error scrolling debug_console: {e}")
-            
-            # If parent is hidden, make it visible
-            if hasattr(display.debug_console, 'parent') and display.debug_console.parent():
-                display.debug_console.parent().setVisible(True)
-            
-            return True
-        except Exception as e:
-            print(f"⚠️ Error updating debug console: {e}")
-    
-    # Then try normal api_console
-    try:
-        # Method 1: Use api_console if available
-        if hasattr(display, 'api_console') and hasattr(display.api_console, 'append'):
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            # Force console to be visible if it's not
-            display.api_console.setVisible(True)
-            
-            # Add the message
-            display.api_console.append(f"[{timestamp}] {message}")
-            
-            # Make sure to scroll to the bottom to show the latest message
-            try:
-                display.api_console.verticalScrollBar().setValue(
-                    display.api_console.verticalScrollBar().maximum()
-                )
-            except Exception as e:
-                print(f"⚠️ Error scrolling console: {e}")
-                
-            # If parent is hidden, make it visible
-            if hasattr(display.api_console, 'parent') and display.api_console.parent():
-                display.api_console.parent().setVisible(True)
-                
-            return True
-            
-        # Method 2: Use console_output if available
-        elif hasattr(display, 'console_output') and hasattr(display.console_output, 'append'):
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            display.console_output.setVisible(True)
-            display.console_output.append(f"[{timestamp}] {message}")
-            
-            # Make sure to scroll to the bottom
-            try:
-                display.console_output.verticalScrollBar().setValue(
-                    display.console_output.verticalScrollBar().maximum()
-                )
-            except Exception as e:
-                print(f"⚠️ Error scrolling console_output: {e}")
-                
-            return True
-            
-        # Method 3: Update status_label if available
-        elif hasattr(display, 'status_label') and hasattr(display.status_label, 'setText'):
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            current_text = display.status_label.text()
-            # Limit to last 5 lines
-            lines = current_text.split('\n')[-4:] if current_text else []
-            lines.append(f"[{timestamp}] {message}")
-            display.status_label.setText('\n'.join(lines))
-            display.status_label.setVisible(True)
-            return True
-            
-        # Method 4: Look for any console-like widget
-        for widget in display.findChildren(QTextEdit):
-            if "console" in widget.objectName().lower() or "log" in widget.objectName().lower():
-                timestamp = datetime.now().strftime("%H:%M:%S")
-                widget.setVisible(True)
-                if hasattr(widget, 'append'):
-                    widget.append(f"[{timestamp}] {message}")
-                    
-                    # Make sure to scroll to the bottom
-                    try:
-                        widget.verticalScrollBar().setValue(
-                            widget.verticalScrollBar().maximum()
-                        )
-                    except Exception as e:
-                        print(f"⚠️ Error scrolling found console: {e}")
-                    
-                    return True
-    except Exception as e:
-        print(f"⚠️ Error updating API console: {e}")
-    
-    return False
-
-def add_api_console(display):
+def add_api_console():
     """Add an API console to the display."""
-    from PyQt6.QtWidgets import QTextEdit, QVBoxLayout, QWidget, QLabel, QFrame
+    global display
     
-    # Check if display already has an api_console
-    if hasattr(display, 'api_console'):
-        print("✅ Display already has an API console")
-        update_api_console("API Console ready")
+    # Check if display exists
+    if not display:
+        print("[ERROR] Cannot add API console - display not initialized")
+        return False
         
-        # Make sure it's visible
-        display.api_console.setVisible(True)
-        if hasattr(display.api_console, 'parent') and display.api_console.parent():
-            display.api_console.parent().setVisible(True)
-            
-        return True
-        
-    # Check if display has debug_console (used by 'C' key)
-    if hasattr(display, 'debug_console'):
-        print("✅ Using existing debug_console as API console")
-        display.api_console = display.debug_console
-        update_api_console("API Console ready (using debug console)")
-        
-        # Make sure it's visible
-        display.api_console.setVisible(True)
-        if hasattr(display.api_console, 'parent') and display.api_console.parent():
-            display.api_console.parent().setVisible(True)
-            
-        return True
-    
     try:
-        # Create a console widget with more visibility
+        # Create a console text edit
         console = QTextEdit()
         console.setObjectName("api_console")
         console.setReadOnly(True)
-        console.setMinimumHeight(200)
-        console.setMaximumHeight(300)
+        console.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
         
-        # Add initial text to make it obvious
-        console.setText("=== API CONSOLE ===\n\nInitialized: " + 
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S") +
-                        "\n\nThis console shows API status and messages.\n\n")
-        
-        # Apply dark style to console for better readability
-        UIStyleHelper.apply_console_style(console)
-        
-        # Add a heading
-        heading = QLabel("API Console")
-        heading.setObjectName("api_console_heading")
-        UIStyleHelper.apply_heading_style(heading)
-        
-        # Create a container with a border to make it more visible
-        console_container = QFrame()
-        console_container.setObjectName("api_console_container")
-        console_container.setFrameShape(QFrame.Shape.Box)
-        console_container.setFrameShadow(QFrame.Shadow.Raised)
-        console_container.setLineWidth(2)
-        console_container.setStyleSheet(f"""
-            background-color: {UIStyleHelper.COLORS['bg']};
-            border: 2px solid {UIStyleHelper.COLORS['accent']};
-            border-radius: 5px;
-            margin: 5px;
+        # Set some styling
+        console.setStyleSheet("""
+            QTextEdit {
+                background-color: #1a1a1a;
+                color: #ffffff;
+                font-family: 'Consolas', 'Courier New', monospace;
+                font-size: 12px;
+                border: 1px solid #444444;
+                border-radius: 4px;
+            }
         """)
         
-        console_layout = QVBoxLayout(console_container)
-        console_layout.setContentsMargins(10, 5, 10, 10)
-        console_layout.addWidget(heading)
-        console_layout.addWidget(console)
+        # Simple floating window approach
+        console_window = QMainWindow()
+        console_window.setWindowTitle("API Console")
+        console_window.setCentralWidget(console)
+        console_window.resize(600, 300)
         
-        # If the display has a layout, try to add the console to it
-        added = False
-        if hasattr(display, 'layout') and display.layout():
-            try:
-                # Try to add to the main layout
-                display.layout().insertWidget(0, console_container)
-                display.api_console = console
-                print("✅ Added API console to main layout")
-                added = True
-            except Exception as e:
-                print(f"⚠️ Error adding to main layout: {e}")
+        # Store references
+        display.api_console = console
+        display.api_console_window = console_window
         
-        # If there's a control layout and we haven't added it yet
-        if not added and hasattr(display, 'control_layout'):
-            try:
-                display.control_layout.insertWidget(0, console_container)
-                display.api_console = console
-                print("✅ Added API console to control layout")
-                added = True
-            except Exception as e:
-                print(f"⚠️ Error adding to control layout: {e}")
-            
-        # If there's a button container and we haven't added it yet
-        if not added and hasattr(display, 'button_container') and display.button_container.parentWidget():
-            try:
-                parent = display.button_container.parentWidget()
-                parent_layout = parent.layout()
-                
-                if parent_layout:
-                    parent_layout.insertWidget(0, console_container)
-                    display.api_console = console
-                    print("✅ Added API console next to button container")
-                    added = True
-            except Exception as e:
-                print(f"⚠️ Error adding next to button container: {e}")
+        # Add welcome message
+        console.append("<span style='color:#5555ff;'>API Console initialized. Messages will appear here.</span>")
         
-        # Last resort - try to add it to a central widget
-        if not added and hasattr(display, 'centralWidget') and display.centralWidget():
-            try:
-                central_widget = display.centralWidget()
-                if central_widget.layout():
-                    central_widget.layout().insertWidget(0, console_container)
-                    display.api_console = console
-                    print("✅ Added API console to central widget")
-                    added = True
-            except Exception as e:
-                print(f"⚠️ Error adding to central widget: {e}")
+        # Show the window
+        console_window.show()
         
-        if not added:
-            print("⚠️ Could not find a suitable place to add API console")
-            return False
-        
-        # Add service status information
-        update_api_console(get_service_status_text())
-        
-        # Make sure to verify the console was added
-        if hasattr(display, 'api_console'):
-            # Force update with a test message
-            update_api_console("API Console initialization confirmed")
-            return True
-        else:
-            print("⚠️ API console was not properly attached to display")
-            return False
+        return True
     except Exception as e:
-        print(f"⚠️ Error adding API console: {e}")
+        print(f"[ERROR] Failed to add API console: {str(e)}")
         return False
 
 def style_ui_elements(display):
@@ -1436,29 +2258,41 @@ def style_ui_elements(display):
 
 def set_message_source(display, source):
     """Set message source from menu action."""
-    global message_source, config
+    global config
     
     # Only change if different
-    if message_source != source:
+    if config.get("message_source", "local") != source:
+        update_api_console(f"Changing message source from {config.get('message_source', 'local')} to {source}", "system")
+        
         # If changing to OpenAI, initialize the client
         if source == "openai" and not openai_client:
-            setup_openai_client()
+            if setup_openai_client():
+                update_api_console("OpenAI client initialized successfully", "system")
+            else:
+                update_api_console("❌ Failed to initialize OpenAI client. Check your API key in settings.", "error")
         
-        # Update message source
-        message_source = source
+        # Update message source in config
+        config["message_source"] = source
         
         # Update display
         if hasattr(display, 'display_message'):
-            display.display_message(f"SOURCE: {source.upper()}")
-            save_message_to_database(display, f"SOURCE: {source.upper()}", "system")
-            update_api_console(f"Message source changed to {source}")
+            try:
+                display.display_message(f"SOURCE: {source.upper()}")
+                save_message_to_database(f"SOURCE: {source.upper()}", "system")
+                update_api_console(f"Message source changed to {source}", "system")
+            except Exception as e:
+                update_api_console(f"❌ Error displaying source change: {str(e)[:100]}", "error")
         
         # Update timer interval if needed
         if hasattr(display, 'message_timer') and display.message_timer:
             new_interval = calculate_message_interval()
             display.message_timer.setInterval(new_interval)
-            print(f"✅ Message timer interval updated to {new_interval/1000:.1f} seconds")
-            update_api_console(f"Message timer updated to {new_interval/1000:.1f} seconds")
+            update_api_console(f"Message timer updated to {new_interval/1000:.1f} seconds", "system")
+        
+        # Update window title if possible
+        if hasattr(display, 'setWindowTitle'):
+            display.setWindowTitle(f"Punch Card Display - {source.upper()} Mode")
+            update_api_console("Window title updated", "system")
         
         # Save settings
         save_settings()
@@ -1466,6 +2300,10 @@ def set_message_source(display, source):
     return False
 
 def main():
+    """Main application entry point."""
+    global statistics_timer, display, openai_client, config, args
+    
+    # Parse command line arguments
     parser = argparse.ArgumentParser(description='Simple Punch Card Display')
     parser.add_argument('--interval', type=int, default=15, help='Interval between messages in seconds')
     parser.add_argument('--openai', action='store_true', help='Start with OpenAI message source')
@@ -1512,7 +2350,7 @@ def main():
     
     # Add API console for message display - do this before adding menu bar
     # to ensure console is available for status updates
-    add_api_console(display)
+    add_api_console()
     
     # Check service statuses
     check_openai_status()
@@ -1527,131 +2365,12 @@ def main():
     status_timer.start(300000)  # Check every 5 minutes
     display.status_timer = status_timer
     
-    # Find out if display is a QMainWindow (supports menu bar)
-    from PyQt6.QtWidgets import QMainWindow
-    is_main_window = isinstance(display, QMainWindow)
-    print(f"Display is a QMainWindow: {is_main_window}")
-    
-    # Add menu bar (classic Mac style)
-    try:
-        if is_main_window and hasattr(display, 'setMenuBar'):
-            menu_bar = UIStyleHelper.create_menu_bar(display)
-            display.setMenuBar(menu_bar)
-            print("✅ Added classic Mac-style menu bar")
-            update_api_console("Added Mac-style menu bar")
-        else:
-            print("⚠️ Cannot add menu bar (not a QMainWindow)")
-            update_api_console("Creating button toolbar instead of menu bar")
-            
-            # Create a more visible button toolbar at the top
-            from PyQt6.QtWidgets import QHBoxLayout, QWidget, QPushButton, QFrame
-            
-            # Create a frame with a border for visibility
-            menu_container = QFrame()
-            menu_container.setFrameShape(QFrame.Shape.Panel)
-            menu_container.setFrameShadow(QFrame.Shadow.Raised)
-            menu_container.setLineWidth(2)
-            menu_layout = QHBoxLayout(menu_container)
-            menu_layout.setContentsMargins(5, 5, 5, 5)
-            menu_layout.setSpacing(5)
-            
-            # Apply distinct styling to make it visible
-            menu_container.setStyleSheet(f"""
-                background-color: {UIStyleHelper.COLORS['button_bg']};
-                border: 2px solid {UIStyleHelper.COLORS['accent']};
-                border-bottom: 1px solid {UIStyleHelper.COLORS['border']};
-                margin: 0px;
-                padding: 5px;
-                min-height: 40px;
-            """)
-            
-            # Add menu-style buttons with fixed sizes to prevent cutting off
-            settings_btn = QPushButton("Settings")
-            settings_btn.setFixedSize(100, 30)  # Fixed size to prevent cutting off
-            settings_btn.clicked.connect(lambda: show_settings_dialog(display))
-            UIStyleHelper.apply_button_style(settings_btn)
-            menu_layout.addWidget(settings_btn)
-            
-            # Add a console toggle button
-            console_btn = QPushButton("Console")
-            console_btn.setFixedSize(100, 30)
-            console_btn.clicked.connect(lambda: ensure_console_visibility())
-            UIStyleHelper.apply_button_style(console_btn)
-            menu_layout.addWidget(console_btn)
-            
-            # Add source buttons with fixed sizes
-            local_btn = QPushButton("Local")
-            local_btn.setFixedSize(100, 30)
-            local_btn.clicked.connect(lambda: set_message_source(display, "local"))
-            UIStyleHelper.apply_button_style(local_btn)
-            menu_layout.addWidget(local_btn)
-            
-            openai_btn = QPushButton("OpenAI")
-            openai_btn.setFixedSize(100, 30)
-            openai_btn.clicked.connect(lambda: set_message_source(display, "openai"))
-            UIStyleHelper.apply_button_style(openai_btn)
-            menu_layout.addWidget(openai_btn)
-            
-            db_btn = QPushButton("Database")
-            db_btn.setFixedSize(100, 30)
-            db_btn.clicked.connect(lambda: set_message_source(display, "database"))
-            UIStyleHelper.apply_button_style(db_btn)
-            menu_layout.addWidget(db_btn)
-            
-            # Add spacer to push buttons to the left
-            menu_layout.addStretch()
-            
-            # Try different approaches to add it to the top of the layout
-            added = False
-            
-            # Approach 1: Add to main layout if it exists
-            if hasattr(display, 'layout') and display.layout():
-                try:
-                    display.layout().insertWidget(0, menu_container)
-                    added = True
-                    print("✅ Added menu button bar to main layout")
-                except Exception as e:
-                    print(f"⚠️ Error adding menu to main layout: {e}")
-            
-            # Approach 2: Add to the central widget if it exists
-            if not added and hasattr(display, 'centralWidget') and display.centralWidget():
-                try:
-                    central_widget = display.centralWidget()
-                    if central_widget.layout():
-                        central_widget.layout().insertWidget(0, menu_container)
-                        added = True
-                        print("✅ Added menu button bar to central widget")
-                except Exception as e:
-                    print(f"⚠️ Error adding menu to central widget: {e}")
-            
-            # Approach 3: If display has a parent, try adding to parent
-            if not added and hasattr(display, 'parent') and display.parent():
-                try:
-                    parent = display.parent()
-                    if parent.layout():
-                        parent.layout().insertWidget(0, menu_container)
-                        added = True
-                        print("✅ Added menu button bar to parent widget")
-                except Exception as e:
-                    print(f"⚠️ Error adding menu to parent widget: {e}")
-            
-            if added:
-                # Store reference
-                display.menu_container = menu_container
-                update_api_console("Added button toolbar at top")
-            else:
-                print("⚠️ Could not add menu button bar to any layout")
-                update_api_console("Failed to add button toolbar")
-    except Exception as e:
-        print(f"⚠️ Error adding menu bar: {e}")
-        update_api_console(f"Error adding menu bar: {str(e)[:50]}")
-
     # Apply styling to UI elements with black background
     style_ui_elements(display)
     
     # Check and initialize database
-    check_database(display)
-    initialize_database(display)
+    check_database()
+    initialize_database()
     
     # Verify database functionality
     if hasattr(display, 'message_db'):
@@ -1668,150 +2387,6 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
-    # Disable auto-messages and stop timers
-    print("✅ Disabling auto-messages and stopping timers")
-    try:
-        if hasattr(display, 'disable_auto_messages'):
-            display.disable_auto_messages()
-        
-        # Stop any timers
-        for attr_name in dir(display):
-            if attr_name.endswith('_timer') and hasattr(getattr(display, attr_name), 'stop'):
-                timer = getattr(display, attr_name)
-                timer.stop()
-                print(f"✅ Stopped timer: {attr_name}")
-    except Exception as e:
-        print(f"⚠️ Error disabling auto-messages: {e}")
-    
-    # If we added a menu bar, we don't need to add separate Settings button
-    if not hasattr(display, 'menu_container') and not hasattr(display, 'setMenuBar'):
-        # Add Settings button if display has button_container
-        if hasattr(display, 'add_control_button'):
-            display.add_control_button("Settings", lambda: show_settings_dialog(display))
-            print("✅ Added Settings button via add_control_button")
-            
-            # Apply style to any buttons added by add_control_button
-            control_buttons = display.findChildren(QPushButton)
-            for button in control_buttons:
-                UIStyleHelper.apply_button_style(button)
-                # Make sure button is sized properly
-                button.setMinimumSize(100, 30)
-                
-        elif hasattr(display, 'button_container'):
-            try:
-                # Create settings button with clear styling
-                settings_button = QPushButton("Settings")
-                settings_button.setFixedSize(100, 30)  # Fixed size to prevent cutting off
-                settings_button.clicked.connect(lambda: show_settings_dialog(display))
-                
-                # Add button to container
-                display.button_container.layout().addWidget(settings_button)
-                
-                # Apply styling
-                UIStyleHelper.apply_button_style(settings_button)
-                
-                # Make button accessible
-                settings_button.setToolTip("Open settings dialog")
-                
-                # Store reference
-                display.settings_button = settings_button
-                print("✅ Added Settings button to button container")
-            except Exception as e:
-                print(f"⚠️ Error adding settings button: {e}")
-    
-    # Apply styling to entire window and all widgets for black background
-    try:
-        # Import all widget types we need to style
-        from PyQt6.QtWidgets import QWidget, QPushButton, QLabel, QTextEdit, QMainWindow
-        
-        # Explicitly set background for all widgets
-        for widget in display.findChildren(QWidget):
-            if not isinstance(widget, QPushButton):  # Skip buttons as they have specific styling
-                widget.setStyleSheet(f"""
-                    background-color: {UIStyleHelper.COLORS['bg']};
-                    color: {UIStyleHelper.COLORS['fg']};
-                """)
-        
-        # Make sure the main window background is black
-        if hasattr(display, 'setStyleSheet'):
-            display.setStyleSheet(f"""
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: none;
-            """)
-        
-        # Apply style to the central widget if it exists
-        if hasattr(display, 'centralWidget') and display.centralWidget():
-            display.centralWidget().setStyleSheet(f"""
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: none;
-            """)
-            
-        # Ensure all labels have white text
-        for label in display.findChildren(QLabel):
-            label.setStyleSheet(f"""
-                color: {UIStyleHelper.COLORS['fg']};
-                background-color: transparent;
-                border: none;
-            """)
-            
-        # Make sure any QTextEdit components have the proper styling
-        for text_edit in display.findChildren(QTextEdit):
-            UIStyleHelper.apply_console_style(text_edit)
-            
-        # Apply styling to all buttons to ensure they're not cut off
-        for button in display.findChildren(QPushButton):
-            UIStyleHelper.apply_button_style(button)
-            if not button.minimumWidth() or button.minimumWidth() < 80:
-                button.setMinimumWidth(80)
-            if not button.minimumHeight() or button.minimumHeight() < 28:
-                button.setMinimumHeight(28)
-                
-        # Special style for the card display area if it exists
-        if hasattr(display, 'card_display'):
-            display.card_display.setStyleSheet(f"""
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                font-family: {UIStyleHelper.FONTS['monospace']};
-                font-size: {UIStyleHelper.FONTS['size_large']};
-                padding: 10px;
-            """)
-            
-        print("✅ Applied black background to all components")
-    except Exception as e:
-        print(f"⚠️ Error applying black background: {e}")
-    
-    # Additional styling for the content area to ensure black background
-    try:
-        # Find content/display widgets and ensure they're black
-        content_widgets = [w for w in display.findChildren(QWidget) 
-                         if any(name in w.objectName().lower() 
-                               for name in ['content', 'display', 'card', 'message'])]
-        
-        for widget in content_widgets:
-            widget.setStyleSheet(f"""
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: none;
-            """)
-        
-        # If there's a layout, ensure all widgets in it have proper styling
-        if hasattr(display, 'layout') and display.layout():
-            for i in range(display.layout().count()):
-                item = display.layout().itemAt(i)
-                if item and item.widget():
-                    widget = item.widget()
-                    if not isinstance(widget, QPushButton):
-                        widget.setStyleSheet(f"""
-                            background-color: {UIStyleHelper.COLORS['bg']};
-                            color: {UIStyleHelper.COLORS['fg']};
-                            border: none;
-                        """)
-    except Exception as e:
-        print(f"⚠️ Error applying additional styling: {e}")
-        
     # Display initial message
     try:
         if hasattr(display, 'display_message'):
@@ -1822,7 +2397,7 @@ def main():
             
             # Save welcome message to database with correct source format
             try:
-                save_message_to_database(display, welcome_message, "system")
+                save_message_to_database(welcome_message, "system")
                 print("✅ Welcome message saved to database")
             except Exception as e:
                 print(f"⚠️ Error saving welcome message: {e}")
@@ -1830,28 +2405,375 @@ def main():
             print("⚠️ Display does not have display_message method")
     except Exception as e:
         print(f"⚠️ Error displaying initial message: {e}")
-
+    
     # Create a message counter that persists across timer callbacks
     message_count = [0]
     
     # Set up a timer for displaying messages with dynamic interval
-    message_timer = QTimer()
-    message_timer.timeout.connect(lambda: message_count.__setitem__(0, display_next_message(display, message_count[0])))
-    
-    # Store message timer in display for later adjustment
-    display.message_timer = message_timer
-    
-    # Start timer with calculated interval
-    interval_ms = calculate_message_interval()
-    message_timer.start(interval_ms)
-    
-    print(f"✅ Message timer started with {interval_ms/1000:.1f} second interval")
-    update_api_console(f"Message timer started ({interval_ms/1000:.1f}s interval)")
+    display.message_timer = QTimer()
+    display.message_timer.setInterval(calculate_message_interval())
+    display.message_timer.timeout.connect(display_next_message)
+    display.message_timer.start()
+    print(f"✅ Message timer started with interval: {display.message_timer.interval()/1000:.1f} seconds")
+    update_api_console(f"Message timer started - next message in {display.message_timer.interval()/1000:.1f} seconds")
     update_api_console("Press 'C' to show API console at any time")
+    update_api_console("Press 'S' to show settings dialog at any time")
     print("✅ Running event loop. Press Ctrl+C to exit.")
     
     # Start the event loop
     sys.exit(app.exec())
+
+# Menu helper functions
+def show_about_dialog(parent=None):
+    """Show an about dialog with application information."""
+    try:
+        from PyQt6.QtWidgets import QMessageBox
+        msg_box = QMessageBox(parent)
+        msg_box.setWindowTitle("About Punch Card")
+        
+        msg_box.setText("""<h2>Punch Card Display</h2>
+        <p>A retro-inspired message display application that evokes the feeling of vintage computing.</p>
+        <p>Version: 3.0.0</p>
+        <p>© 2023-2024</p>
+        <p>Created with PyQt6</p>
+        """)
+        
+        # Apply styling
+        msg_box.setStyleSheet(f"""
+            QMessageBox {{
+                background-color: {UIStyleHelper.COLORS['bg']};
+                color: {UIStyleHelper.COLORS['fg']};
+                font-family: {UIStyleHelper.FONTS['system']};
+            }}
+            QLabel {{
+                color: {UIStyleHelper.COLORS['fg']};
+                background-color: transparent;
+            }}
+            QPushButton {{
+                background-color: {UIStyleHelper.COLORS['button_bg']};
+                color: {UIStyleHelper.COLORS['button_text']};
+                border: 1px solid {UIStyleHelper.COLORS['border']};
+                border-radius: 3px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }}
+            QPushButton:hover {{
+                background-color: {UIStyleHelper.COLORS['button_hover']};
+                border: 1px solid {UIStyleHelper.COLORS['accent']};
+            }}
+        """)
+        
+        update_api_console("Showing About dialog")
+        msg_box.exec()
+    except Exception as e:
+        print(f"⚠️ Error showing about dialog: {e}")
+        update_api_console(f"Error showing About dialog: {str(e)[:50]}")
+
+def export_messages(parent=None):
+    """Export messages to a file."""
+    global display, message_database
+    
+    try:
+        from PyQt6.QtWidgets import QFileDialog, QMessageBox
+        import json
+        from datetime import datetime
+        
+        update_api_console("Preparing to export messages...")
+        
+        # Get messages from appropriate source
+        messages = []
+        
+        # Try to get from display's database
+        if hasattr(display, 'message_db') and hasattr(display.message_db, 'messages'):
+            messages = display.message_db.messages
+            update_api_console(f"Exporting {len(messages)} messages from database")
+        # Try backup database
+        elif message_database:
+            messages = message_database
+            update_api_console(f"Exporting {len(messages)} messages from backup")
+        else:
+            update_api_console("No messages to export")
+            QMessageBox.warning(parent, "Export Messages", "No messages available to export.")
+            return
+        
+        # Get current date for filename
+        date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Open file dialog to select save location
+        file_path, _ = QFileDialog.getSaveFileName(
+            parent,
+            "Export Messages",
+            f"punch_card_messages_{date_str}.json",
+            "JSON Files (*.json);;All Files (*)"
+        )
+        
+        if not file_path:
+            update_api_console("Export cancelled")
+            return
+        
+        # Save messages to file
+        with open(file_path, 'w') as f:
+            json.dump(messages, f, indent=2)
+        
+        update_api_console(f"✅ Exported {len(messages)} messages to {file_path}")
+        QMessageBox.information(parent, "Export Complete", f"Successfully exported {len(messages)} messages.")
+        
+    except Exception as e:
+        print(f"⚠️ Error exporting messages: {e}")
+        update_api_console(f"Error exporting messages: {str(e)[:50]}")
+        
+        if parent:
+            QMessageBox.critical(
+                parent,
+                "Export Error",
+                f"An error occurred while exporting messages:\n{str(e)}"
+            )
+
+def clear_display(parent=None):
+    """Clear the display."""
+    global display
+    
+    try:
+        from PyQt6.QtWidgets import QMessageBox
+        
+        # Ask for confirmation
+        reply = QMessageBox.question(
+            parent,
+            "Clear Display",
+            "Are you sure you want to clear the display?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            update_api_console("Clearing display...")
+            
+            # Display empty message
+            if hasattr(display, 'display_message'):
+                display.display_message("")
+                update_api_console("Display cleared")
+            else:
+                update_api_console("⚠️ Unable to clear display - no display_message method found")
+                
+    except Exception as e:
+        print(f"⚠️ Error clearing display: {e}")
+        update_api_console(f"Error clearing display: {str(e)[:50]}")
+
+def show_stats_dialog(parent=None):
+    """Show statistics in a dialog."""
+    global message_stats, service_status
+    
+    try:
+        from PyQt6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QLabel
+        
+        # Create dialog
+        dialog = QDialog(parent)
+        dialog.setWindowTitle("Message Statistics")
+        dialog.setMinimumSize(500, 400)
+        
+        # Apply styling
+        UIStyleHelper.apply_settings_dialog_style(dialog)
+        
+        # Create layout
+        layout = QVBoxLayout(dialog)
+        
+        # Add heading
+        heading = QLabel("Message Statistics")
+        UIStyleHelper.apply_heading_style(heading)
+        layout.addWidget(heading)
+        
+        # Add stats text
+        stats_text = QTextEdit()
+        stats_text.setReadOnly(True)
+        stats_text.setText(get_stats_text() + "\n\n" + get_service_status_text())
+        UIStyleHelper.apply_console_style(stats_text)
+        layout.addWidget(stats_text)
+        
+        # Add refresh button
+        refresh_btn = QPushButton("Refresh Statistics")
+        UIStyleHelper.apply_button_style(refresh_btn)
+        refresh_btn.clicked.connect(lambda: stats_text.setText(get_stats_text() + "\n\n" + get_service_status_text()))
+        layout.addWidget(refresh_btn)
+        
+        # Add close button
+        close_btn = QPushButton("Close")
+        UIStyleHelper.apply_button_style(close_btn)
+        close_btn.clicked.connect(dialog.accept)
+        layout.addWidget(close_btn)
+        
+        update_api_console("Showing statistics dialog")
+        dialog.exec()
+        
+    except Exception as e:
+        print(f"⚠️ Error showing stats dialog: {e}")
+        update_api_console(f"Error showing statistics dialog: {str(e)[:50]}")
+
+def show_shortcuts_dialog(parent=None):
+    """Show keyboard shortcuts dialog."""
+    try:
+        from PyQt6.QtWidgets import QMessageBox
+        
+        msg_box = QMessageBox(parent)
+        msg_box.setWindowTitle("Keyboard Shortcuts")
+        
+        msg_box.setText("""
+        <h3>Keyboard Shortcuts</h3>
+        <table>
+        <tr><td><b>S</b></td><td>Show Settings Dialog</td></tr>
+        <tr><td><b>C</b></td><td>Show API Console</td></tr>
+        <tr><td><b>Esc</b></td><td>Close dialogs</td></tr>
+        </table>
+        """)
+        
+        # Apply styling
+        msg_box.setStyleSheet(f"""
+            QMessageBox {{
+                background-color: {UIStyleHelper.COLORS['bg']};
+                color: {UIStyleHelper.COLORS['fg']};
+                font-family: {UIStyleHelper.FONTS['system']};
+            }}
+            QLabel {{
+                color: {UIStyleHelper.COLORS['fg']};
+                background-color: transparent;
+            }}
+            QPushButton {{
+                background-color: {UIStyleHelper.COLORS['button_bg']};
+                color: {UIStyleHelper.COLORS['button_text']};
+                border: 1px solid {UIStyleHelper.COLORS['border']};
+                border-radius: 3px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }}
+        """)
+        
+        update_api_console("Showing keyboard shortcuts dialog")
+        msg_box.exec()
+        
+    except Exception as e:
+        print(f"⚠️ Error showing shortcuts dialog: {e}")
+        update_api_console(f"Error showing shortcuts dialog: {str(e)[:50]}")
+
+def check_and_display_api_status(parent=None):
+    """Check API status and display results."""
+    global service_status
+    
+    try:
+        from PyQt6.QtWidgets import QMessageBox
+        
+        update_api_console("Checking API status...")
+        
+        # Check OpenAI and Fly.io status
+        check_openai_status()
+        check_flyio_status()
+        
+        # Create message with status info
+        status_text = get_service_status_text()
+        
+        # Show in message box
+        msg_box = QMessageBox(parent)
+        msg_box.setWindowTitle("API Status")
+        msg_box.setText(status_text.replace("\n", "<br>"))
+        
+        # Apply styling
+        msg_box.setStyleSheet(f"""
+            QMessageBox {{
+                background-color: {UIStyleHelper.COLORS['bg']};
+                color: {UIStyleHelper.COLORS['fg']};
+                font-family: {UIStyleHelper.FONTS['system']};
+            }}
+            QLabel {{
+                color: {UIStyleHelper.COLORS['fg']};
+                background-color: transparent;
+            }}
+            QPushButton {{
+                background-color: {UIStyleHelper.COLORS['button_bg']};
+                color: {UIStyleHelper.COLORS['button_text']};
+                border: 1px solid {UIStyleHelper.COLORS['border']};
+                border-radius: 3px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }}
+        """)
+        
+        update_api_console("Showing API status dialog")
+        msg_box.exec()
+        
+    except Exception as e:
+        print(f"⚠️ Error checking API status: {e}")
+        update_api_console(f"Error checking API status: {str(e)[:50]}")
+
+def generate_local_message():
+    """Generate a local message for display on the punch card."""
+    # Vintage computing messages inspired by IBM mainframes and early computing
+    messages = [
+        # System status messages
+        "SYSTEM READY FOR INPUT",
+        "BATCH PROCESSING COMPLETE",
+        "DATA PROCESSING INITIALIZED",
+        "MAINFRAME OPERATIONS NORMAL",
+        "SYSTEM EXECUTING AT OPTIMAL CAPACITY",
+        "ALL SUBSYSTEMS OPERATIONAL",
+        "DIAGNOSTICS: ALL SYSTEMS NOMINAL",
+        "PROCESSING QUEUE: READY",
+        "SYSTEM IDLE - AWAITING INSTRUCTIONS",
+        "1401 PROCESSING UNIT ONLINE",
+        
+        # Historical computing references
+        "IBM SYSTEM/360: COMPUTING MILESTONE",
+        "COBOL: COMMON BUSINESS ORIENTED LANGUAGE",
+        "FORTRAN: FORMULA TRANSLATION",
+        "VACUUM TUBES AT FULL POWER",
+        "CORE MEMORY INITIALIZED",
+        "MAGNETIC TAPE BACKUP COMPLETE",
+        "HOLLERITH ENCODING ACTIVATED",
+        "ENIAC: ELECTRONIC NUMERICAL INTEGRATOR AND COMPUTER",
+        "UNIVAC: UNIVERSAL AUTOMATIC COMPUTER",
+        "COMPUTING PIONEERS REMEMBERED",
+        
+        # Punch card specific references
+        "80 COLUMNS OF ENGINEERING EXCELLENCE",
+        "DO NOT FOLD, SPINDLE OR MUTILATE",
+        "KEYPUNCH OPERATOR ON DUTY",
+        "CARD READER CALIBRATED",
+        "PUNCH PRECISION: 0.087 × 0.187 INCHES",
+        "PUNCH CARD CAPACITY: 80 CHARACTERS",
+        "BINARY DATA ENCODED SUCCESSFULLY",
+        "HOLLERITH CODE TRANSLATION COMPLETE",
+        "CARD DECK READY FOR PROCESSING",
+        "VINTAGE COMPUTING LIVES ON",
+        
+        # Philosophical/reflective computing messages
+        "TECHNOLOGY EVOLUTION SNAPSHOT",
+        "COMPUTING HISTORY PRESERVED",
+        "DIGITAL ARCHAEOLOGY: EXPLORING THE PAST",
+        "HUMAN-MACHINE INTERFACE TIMELINE",
+        "MECHANICAL COMPUTING TO QUANTUM: THE JOURNEY",
+        "PROGRAMMING PARADIGMS THROUGH TIME",
+        "BINARY LOGIC: COMPUTING FOUNDATION",
+        "HARDWARE-SOFTWARE SYMBIOSIS",
+        "DATA PROCESSING EVOLUTION",
+        "IBM SYSTEMS: COMPUTING LEGENDS",
+        
+        # Fun/creative messages
+        "CYBERNETICS RESEARCH ONGOING",
+        "ARTIFICIAL INTELLIGENCE SEEDS PLANTED",
+        "QUANTUM COMPUTING ON THE HORIZON",
+        "SILICON REVOLUTION REMEMBERED",
+        "DIGITAL DAWN: COMPUTING'S EARLY LIGHT",
+        "COMPUTATIONAL THINKING PATTERNS",
+        "DIGITAL TO ANALOG CONVERSION COMPLETE",
+        "PUNCH CARD V3: VINTAGE REIMAGINED",
+        "RETRO COMPUTING AESTHETIC INITIALIZED",
+        "COMPUTING ANACHRONISM ACTIVATED"
+    ]
+    
+    # Select a random message
+    message = random.choice(messages)
+    
+    # Logging
+    update_api_console(f"Generated local message: {message}", "system")
+    
+    return message
 
 if __name__ == '__main__':
     main() 

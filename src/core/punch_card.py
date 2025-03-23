@@ -1178,7 +1178,30 @@ class PunchCardDisplay:
         time.sleep(1.0)
 
     def _show_settings_menu(self):
-        """Display and handle the settings menu"""
+        """
+        Show the enhanced settings dialog from simple_display.py.
+        
+        This method redirects to the consolidated settings dialog in simple_display.py
+        instead of showing the old terminal-based settings menu.
+        """
+        try:
+            # Import the enhanced settings dialog function from simple_display
+            from simple_display import show_settings_dialog
+            
+            # Call the enhanced settings dialog
+            print("Opening enhanced settings dialog...")
+            show_settings_dialog(self)
+        except ImportError:
+            print("⚠️ Could not import settings dialog from simple_display.py")
+            print("Falling back to old terminal settings menu...")
+            self._show_terminal_settings_menu()
+        except Exception as e:
+            print(f"⚠️ Error showing settings dialog: {e}")
+            print("Falling back to old terminal settings menu...")
+            self._show_terminal_settings_menu()
+            
+    def _show_terminal_settings_menu(self):
+        """Display and handle the terminal-based settings menu (legacy)"""
         # Define settings with their descriptions
         settings = [
             {

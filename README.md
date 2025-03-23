@@ -1,4 +1,4 @@
-# Punch Card Display System v0.5.1 - The Documentation Update
+# Punch Card Display System v0.5.2 - The Reorganization Update
 
 ```
 ┌─────────────────────────────── PUNCH CARD GUI UPDATE ───────────────────────────────┐
@@ -42,7 +42,23 @@
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
-**Status**: Beta - The Documentation Update adds comprehensive design history research.
+**Status**: Beta - The Reorganization Update improves project structure while building on v0.5.1's design documentation.
+
+### What's New in v0.5.2 (Released March 24, 2024):
+
+This version significantly reorganizes the project structure for better maintainability and developer experience while building on the design documentation added in v0.5.1.
+
+#### Project Structure Improvements
+- **Reorganized code architecture**:
+  - Properly separated core, display, and utility modules
+  - Consolidated similar functionality
+  - Enhanced import structure with proper module organization
+- **Improved testing organization** with dedicated unit and integration test directories
+- **Better configuration management** with centralized config directory
+- **Streamlined data handling** with consolidated data storage
+- **Standardized logging** with dedicated logs directory
+- **Cleaner version archiving** with proper structure for previous versions
+- **Fixed duplicate files** by archiving older versions
 
 ### What's New in v0.5.1 (Released March 23, 2024):
 
@@ -97,24 +113,38 @@ This version represents a significant visual overhaul of the Punch Card Display 
 
 ## Repository Organization
 
-The project uses a structured versioning system to preserve development history and ensure past versions remain accessible:
+The project now uses a standardized directory structure that follows best practices for Python projects:
 
 ```
 punch_card_project/
-├── src/                    # Current source code
+├── src/                    # Source code
+│   ├── core/               # Core functionality modules
+│   │   ├── punch_card.py   # Main punch card logic
+│   │   ├── message_generator.py # Message generation
+│   │   └── database.py     # Database interactions
+│   ├── display/            # Display modules
+│   │   ├── terminal_display.py  # Terminal UI
+│   │   ├── gui_display.py  # GUI interface
+│   │   └── display_adapter.py  # Display abstraction
+│   └── utils/              # Utility functions
+│       ├── settings_menu.py # Settings management
+│       └── gui_integration.py # GUI utilities
+├── docs/                   # Documentation
+│   ├── research/           # Design research documents
+│   └── technical/          # Technical documentation
+├── tests/                  # Test files
+│   ├── unit/               # Unit tests
+│   └── integration/        # Integration tests  
+├── config/                 # Configuration files
+├── data/                   # Data storage
+├── logs/                   # Log files
+├── scripts/                # Utility scripts
 ├── versions/               # Archive of previous versions
 │   ├── 0.1.0/              # The initial version
-│   │   ├── src/            # Source code as of v0.1.0
-│   │   ├── manifest.md     # Detailed version information
-│   │   └── version_info.txt # Version metadata
-│   │
 │   ├── 0.5.0/              # The GUI Update
-│   │   ├── src/            # Source code as of v0.5.0
-│   │   ├── manifest.md     # Detailed version information
-│   │   └── version_info.txt # Version metadata
-│   
-├── scripts/                # Utility scripts including version_manager.py
-├── tests/                  # Test files
+│   ├── 0.5.1/              # The Documentation Update
+│   └── 0.5.2/              # The Reorganization Update
+├── secrets/                # API keys (git-ignored)
 └── README.md               # This file
 ```
 
@@ -479,6 +509,15 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 
 ## 🗓️ Version History
 
+- v0.5.2 (2024-03-24): **The Reorganization Update**
+  - Reorganized project structure for better maintainability
+  - Properly separated core, display, and utility modules
+  - Improved test organization with unit and integration directories
+  - Created proper configuration and data directories
+  - Enhanced import structure with proper module organization
+  - Fixed duplicate files by archiving older versions
+  - Standardized directory structure following best practices
+  
 - v0.5.1 (2024-03-23): **The Documentation Update**
   - Added comprehensive Interface Design History documentation
   - Created research on Early Apple UI Design Language (1970s-1980s)

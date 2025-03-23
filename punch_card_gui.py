@@ -29,7 +29,7 @@ def main():
     
     # Display the message if not in wait mode
     if not args.wait:
-        display.display_message(args.message, args.delay)
+        display.display_message(args.message, source="Manual Entry", delay=args.delay)
     
     # Start the event loop
     sys.exit(app.exec())

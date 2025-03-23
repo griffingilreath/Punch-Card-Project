@@ -633,6 +633,236 @@ class HardwareDetector:
         self.is_hardware_ready = True
         self.detection_complete = True
 
+class APIConsoleWindow(QDialog):
+    """Console window specifically for API activity, requests, and error logging."""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("API Console")
+        self.setMinimumSize(600, 400)
+        
+        # Set dark theme with accent color for API
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {COLORS['console_bg'].name()};
+                color: {COLORS['console_text'].name()};
+            }}
+            QTextEdit {{
+                background-color: {COLORS['console_bg'].name()};
+                color: {COLORS['console_text'].name()};
+                {get_font_css(size=12)}
+            }}
+        """)
+        
+        layout = QVBoxLayout(self)
+        
+        # Add header with status
+        status_layout = QHBoxLayout()
+        
+        self.status_label = QLabel("API Status: Unknown")
+        self.status_label.setStyleSheet(f"""
+            QLabel {{
+                color: {COLORS['text'].name()};
+                {get_font_css(bold=True, size=12)}
+            }}
+        """)
+        status_layout.addWidget(self.status_label)
+        
+        self.endpoint_label = QLabel("")
+        self.endpoint_label.setStyleSheet(f"""
+            QLabel {{
+                color: {COLORS['text'].name()};
+                {get_font_css(size=11)}
+            }}
+        """)
+        status_layout.addWidget(self.endpoint_label, 1)
+        
+        layout.addLayout(status_layout)
+        
+        # Create console text area
+        self.console = QTextEdit()
+        self.console.setReadOnly(True)
+        layout.addWidget(self.console)
+        
+        # Add filter options
+        filter_layout = QHBoxLayout()
+        
+        self.show_requests = QCheckBox("Requests")
+        self.show_requests.setChecked(True)
+        self.show_requests.setStyleSheet(f"color: {COLORS['text'].name()}")
+        
+        self.show_responses = QCheckBox("Responses")
+        self.show_responses.setChecked(True)
+        self.show_responses.setStyleSheet(f"color: {COLORS['text'].name()}")
+        
+        self.show_errors = QCheckBox("Errors")
+        self.show_errors.setChecked(True)
+        self.show_errors.setStyleSheet(f"color: {COLORS['text'].name()}")
+        
+        self.show_status = QCheckBox("Status Changes")
+        self.show_status.setChecked(True)
+        self.show_status.setStyleSheet(f"color: {COLORS['text'].name()}")
+        
+        filter_layout.addWidget(QLabel("Show:"))
+        filter_layout.addWidget(self.show_requests)
+        filter_layout.addWidget(self.show_responses) 
+        filter_layout.addWidget(self.show_errors)
+        filter_layout.addWidget(self.show_status)
+        filter_layout.addStretch(1)
+        
+        layout.addLayout(filter_layout)
+        
+        # Add buttons layout
+        button_layout = QHBoxLayout()
+        
+        # Add save button
+        save_button = RetroButton("Save Log")
+        save_button.clicked.connect(self.save_log)
+        button_layout.addWidget(save_button)
+        
+        # Add clear button
+        clear_button = RetroButton("Clear")
+        clear_button.clicked.connect(self.clear_log)
+        button_layout.addWidget(clear_button)
+        
+        # Add test API button
+        test_button = RetroButton("Test API")
+        test_button.clicked.connect(self.test_api_connection)
+        button_layout.addWidget(test_button)
+        
+        # Add close button
+        close_button = RetroButton("Close")
+        close_button.clicked.connect(self.close)
+        button_layout.addWidget(close_button)
+        
+        layout.addLayout(button_layout)
+        
+        # Initialize with endpoint info
+        self.set_endpoint("https://punch-card-api-v3.fly.dev")
+    
+    def set_endpoint(self, endpoint):
+        """Set the API endpoint information."""
+        self.endpoint_label.setText(f"Endpoint: {endpoint}")
+        self.api_endpoint = endpoint
+    
+    def update_status(self, status):
+        """Update the API status display."""
+        self.status_label.setText(f"API Status: {status}")
+        
+        # Set color based on status
+        color = COLORS['text'].name()
+        if status == "Connected":
+            color = COLORS['success'].name()
+        elif status == "Fallback Mode":
+            color = COLORS['warning'].name()
+        elif status in ["Error", "Unavailable", "No API Key", "Timeout"]:
+            color = COLORS['error'].name()
+            
+        self.status_label.setStyleSheet(f"""
+            QLabel {{
+                color: {color};
+                {get_font_css(bold=True, size=12)}
+            }}
+        """)
+        
+        # Log status change if filter enabled
+        if self.show_status.isChecked():
+            self.log(f"API Status changed to: {status}", "STATUS")
+    
+    def log(self, message, level="INFO"):
+        """Add a message to the console with timestamp and level."""
+        # Apply filtering based on level and checkbox settings
+        if (level == "REQUEST" and not self.show_requests.isChecked() or
+            level == "RESPONSE" and not self.show_responses.isChecked() or
+            level == "ERROR" and not self.show_errors.isChecked() or
+            level == "STATUS" and not self.show_status.isChecked()):
+            return
+            
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        level_color = {
+            "INFO": "white",
+            "REQUEST": "cyan",
+            "RESPONSE": "lightgreen",
+            "ERROR": "red",
+            "STATUS": "yellow"
+        }.get(level, "white")
+        
+        self.console.append(f'<span style="color: gray">[{timestamp}]</span> '
+                          f'<span style="color: {level_color}">[{level}]</span> '
+                          f'<span style="color: white">{message}</span>')
+        self.console.verticalScrollBar().setValue(
+            self.console.verticalScrollBar().maximum()
+        )
+
+    def log_request(self, endpoint, params=None):
+        """Log an API request."""
+        request_details = f"Request to {endpoint}"
+        if params:
+            request_details += f" with params: {params}"
+        self.log(request_details, "REQUEST")
+    
+    def log_response(self, response_data, status_code=200):
+        """Log an API response."""
+        import json
+        try:
+            # Format JSON for better readability
+            formatted_data = json.dumps(response_data, indent=2)
+            self.log(f"Response (Status {status_code}):\n{formatted_data}", "RESPONSE")
+        except:
+            # Fallback for non-JSON responses
+            self.log(f"Response (Status {status_code}): {response_data}", "RESPONSE")
+    
+    def log_error(self, error_message, exception=None):
+        """Log an API error."""
+        error_text = f"Error: {error_message}"
+        if exception:
+            error_text += f"\nException: {str(exception)}"
+        self.log(error_text, "ERROR")
+
+    def save_log(self):
+        """Save the console log to a file."""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"api_log_{timestamp}.txt"
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.console.toPlainText())
+            self.log(f"Log saved to {filename}", "INFO")
+        except Exception as e:
+            self.log(f"Error saving log: {str(e)}", "ERROR")
+    
+    def clear_log(self):
+        """Clear the console log."""
+        self.console.clear()
+        self.log("Console cleared", "INFO")
+    
+    def test_api_connection(self):
+        """Test the API connection and log results."""
+        self.log("Testing API connection...", "INFO")
+        
+        try:
+            import requests
+            self.log_request(f"{self.api_endpoint}/health")
+            
+            response = requests.get(f"{self.api_endpoint}/health", timeout=3)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_response(data, response.status_code)
+                
+                if data.get('api', {}).get('api_key_exists', False):
+                    self.update_status("Connected")
+                else:
+                    self.update_status("No API Key")
+            else:
+                self.log_response(f"Non-200 status code: {response.status_code}", response.status_code)
+                self.update_status("Error")
+                
+        except requests.exceptions.Timeout:
+            self.log_error("Request timed out after 3 seconds")
+            self.update_status("Timeout")
+        except Exception as e:
+            self.log_error("Failed to connect to API", e)
+            self.update_status("Unavailable")
+
 class PunchCardDisplay(QMainWindow):
     """Main window for the minimalist punch card display application."""
     
@@ -746,6 +976,21 @@ class PunchCardDisplay(QMainWindow):
         self.keyboard_hint_label.setFixedHeight(30)
         bottom_layout.addWidget(self.keyboard_hint_label)
         
+        # Create API status label
+        self.api_status_label = QLabel("API: Unknown")
+        self.api_status_label.setStyleSheet(f"""
+            QLabel {{
+                color: {COLORS['text'].name()};
+                background-color: {COLORS['card_bg'].name()};
+                padding: 3px 8px;
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-radius: 2px;
+                {get_font_css(bold=True, size=10)}
+            }}
+        """)
+        self.api_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        bottom_layout.addWidget(self.api_status_label)
+        
         # Create a spacer widget to maintain spacing even when elements are hidden
         spacer = QWidget()
         spacer.setFixedHeight(10)
@@ -758,15 +1003,18 @@ class PunchCardDisplay(QMainWindow):
         
         self.start_button = RetroButton("DISPLAY MESSAGE")
         self.clear_button = RetroButton("CLEAR")
+        self.api_button = RetroButton("API CONSOLE")
         self.exit_button = RetroButton("EXIT")
         
         self.start_button.clicked.connect(self.start_display)
         self.clear_button.clicked.connect(self.punch_card.clear_grid)
+        self.api_button.clicked.connect(self.show_api_console)
         self.exit_button.clicked.connect(self.close)
         
         button_layout.addStretch(1)
         button_layout.addWidget(self.start_button)
         button_layout.addWidget(self.clear_button)
+        button_layout.addWidget(self.api_button)
         button_layout.addWidget(self.exit_button)
         button_layout.addStretch(1)
         
@@ -787,6 +1035,9 @@ class PunchCardDisplay(QMainWindow):
         # Create console and settings dialogs
         self.console = ConsoleWindow(self)
         self.settings = SettingsDialog(self)
+        
+        # Create API console window
+        self.api_console = APIConsoleWindow(self)
         
         # Show console automatically
         self.console.show()
@@ -851,6 +1102,8 @@ class PunchCardDisplay(QMainWindow):
         """Handle keyboard shortcuts."""
         if event.key() == Qt.Key.Key_C:
             self.console.show()
+        elif event.key() == Qt.Key.Key_A:
+            self.api_console.show()
         elif event.key() == Qt.Key.Key_S:
             if self.settings.exec() == QDialog.DialogCode.Accepted:
                 settings = self.settings.get_settings()
@@ -870,8 +1123,27 @@ class PunchCardDisplay(QMainWindow):
             
         self.console.log(f"Status: {status}")
     
-    def display_message(self, message: str, delay: int = 100):
-        """Display a message on the punch card."""
+    def display_message(self, message: str, source: str = "", delay: int = 100):
+        """Display a message with optional source information."""
+        # Update source information if provided (including API status)
+        if source:
+            # Check if source includes API status
+            if "API:" in source:
+                api_status = source.split("|")[0].strip().replace("API: ", "")
+                self.update_api_status(api_status)
+                
+                # Update status label with just the serial number part
+                if "|" in source:
+                    serial_info = source.split("|")[1].strip()
+                    self.status_label.setText(serial_info)
+                else:
+                    self.status_label.setText("")
+            else:
+                # Traditional source display (backward compatibility)
+                self.status_label.setText(source)
+        else:
+            self.status_label.setText("")
+            
         # Don't display messages during splash screen
         if self.showing_splash:
             self.console.log("Ignoring message display request during splash animation", "WARNING")
@@ -1424,6 +1696,40 @@ class PunchCardDisplay(QMainWindow):
         self.console.log(f"Alignment: window={self.width()}, card={self.punch_card.card_width}, " +
                          f"card_margin={card_margin}, main_margin={main_left_margin}, " +
                          f"applied_margin={left_margin}", "INFO")
+
+    def update_api_status(self, status: str):
+        """Update the API status display."""
+        self.api_status_label.setText(f"API: {status}")
+        
+        # Set color based on status
+        color = COLORS['text'].name()
+        if status == "Connected":
+            color = COLORS['success'].name()
+        elif status == "Fallback Mode":
+            color = COLORS['warning'].name()
+        elif status in ["Error", "Unavailable", "No API Key"]:
+            color = COLORS['error'].name()
+            
+        self.api_status_label.setStyleSheet(f"""
+            QLabel {{
+                color: {color};
+                background-color: {COLORS['card_bg'].name()};
+                padding: 3px 8px;
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-radius: 2px;
+                {get_font_css(bold=True, size=10)}
+            }}
+        """)
+        
+        # Update API console window if it exists
+        if hasattr(self, 'api_console'):
+            self.api_console.update_status(status)
+
+    def show_api_console(self):
+        """Show the API console window."""
+        self.api_console.show()
+        self.api_console.raise_()
+        self.api_console.activateWindow()
 
 
 def main():
