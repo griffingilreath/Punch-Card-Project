@@ -1,5 +1,7 @@
 # Punch Card Project v0.5.2 - The Reorganization Update
 
+[![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
+
 ```
 ┌─────────────────────────────── PUNCH CARD GUI UPDATE ───────────────────────────────┐
 │ ┌──────────┐ ┌─────────────────────────────────────────────────────────────┐ ┌───┐ │
