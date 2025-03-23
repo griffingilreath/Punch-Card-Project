@@ -160,12 +160,20 @@ punch_card_project/
 
 ### Versioning Strategy
 
+The project follows a comprehensive versioning approach:
+
 - Each version is tagged in Git with the format `v{major}.{minor}.{patch}`
 - Complete snapshots of each version are preserved in the `versions/` directory
-- The version_manager.py script in the scripts directory handles creating new version snapshots
-- Previous versions can be accessed by:
+- The project follows a modified GitFlow branching strategy
+- Version branches (e.g., `v0.5.2`) provide historical reference points
+- The `git_version_manager.py` script in the scripts directory manages Git branches and version creation
+
+For details on the branching strategy and version management workflow, see [VERSION_CONTROL.md](docs/VERSION_CONTROL.md).
+
+Previous versions can be accessed by:
   1. Git tags: `git checkout v0.1.0`
-  2. Version archives: Explore the `versions/0.1.0/` directory
+  2. Version branches: `git checkout v0.5.0`
+  3. Version archives: Explore the `versions/0.1.0/` directory
 
 ## What is the Punch Card Project?
 
