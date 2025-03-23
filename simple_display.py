@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Simple Punch Card Display GUI
 # This version has a simpler interface and uses PyQt6
+# Version 0.5.3 - MonkeyPatch Update
 
 import os
 import sys
@@ -13,26 +14,39 @@ from datetime import datetime
 import requests
 import sqlite3
 
+# Version information
+VERSION = "0.5.3 - MonkeyPatch Update"
+# ASCII art for the MonkeyPatch update
+MONKEY_ART = """
+  ,-.-.
+ ( o o )  MONKEY PATCH
+ |  ^  |
+ | `-' |  v0.5.3
+ `-----'
+"""
+
 # ==== DIRECT OPENAI PATCHING - HIGHEST PRIORITY ====
 # This must run before any other imports to ensure we properly patch OpenAI
-print("====== Direct OpenAI client wrapper - HIGHEST PRIORITY ======")
+print("====== MONKEY PATCH - HIGHEST PRIORITY ======")
+print("🐒 Welcome to the Punch Card MonkeyPatch Update v0.5.3 🐒")
+print(MONKEY_ART)
 
-# Define a clean wrapper function for creating OpenAI clients
-openai_client = None  # Global client instance
+# Global patched client instance
+openai_client = None
 
 def create_clean_openai_client(api_key=None, **kwargs):
     """
     Create a clean OpenAI client without any problematic parameters.
-    This is a wrapper around the official client that ensures no invalid parameters are passed.
+    This is a monkey-patched wrapper around the official client that ensures no invalid parameters are passed.
     """
     global openai_client
     
     # Only create once if the client exists
     if openai_client is not None:
-        print("Returning existing OpenAI client instance")
+        print("🐒 Returning existing monkey-patched OpenAI client instance")
         return openai_client
     
-    print(f"Creating clean OpenAI client with provided API key")
+    print(f"🐒 Creating monkey-patched OpenAI client with provided API key")
     
     try:
         # Import the module
@@ -46,11 +60,11 @@ def create_clean_openai_client(api_key=None, **kwargs):
         # Only add parameters that are not None
         valid_params = {k: v for k, v in valid_params.items() if v is not None}
         
-        print(f"Creating OpenAI client with parameters: {list(valid_params.keys())}")
+        print(f"🐒 Creating OpenAI client with parameters: {list(valid_params.keys())}")
         
         # Create the client with minimal parameters
         openai_client = openai.OpenAI(**valid_params)
-        print("✅ Successfully created OpenAI client")
+        print("✅ Successfully created monkey-patched OpenAI client")
         return openai_client
         
     except ImportError:
@@ -60,73 +74,78 @@ def create_clean_openai_client(api_key=None, **kwargs):
         print(f"❌ Error creating OpenAI client: {str(e)}")
         return None
 
-# Clean any settings files to ensure no proxies
+# Monkey patch all potential sources of 'proxies' in settings files
+def clean_proxies_from_settings():
+    try:
+        files_to_check = [
+            "punch_card_settings.json",
+            os.path.join("config", "punch_card_settings.json"),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "punch_card_settings.json"),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "punch_card_settings.json")
+        ]
+        
+        for settings_file in files_to_check:
+            if os.path.exists(settings_file):
+                print(f"🐒 Checking settings file: {settings_file}")
+                try:
+                    with open(settings_file, 'r') as f:
+                        config_data = json.load(f)
+                        modified = False
+                        
+                        # Check top level
+                        if 'proxies' in config_data:
+                            print(f"🐒 Removing 'proxies' from settings file (top level)")
+                            del config_data['proxies']
+                            modified = True
+                        
+                        # Check in config section
+                        if 'config' in config_data and isinstance(config_data['config'], dict):
+                            if 'proxies' in config_data['config']:
+                                print(f"🐒 Removing 'proxies' from settings file (config section)")
+                                del config_data['config']['proxies']
+                                modified = True
+                        
+                        # Check in other sections
+                        for section in config_data:
+                            if isinstance(config_data[section], dict) and 'proxies' in config_data[section]:
+                                print(f"🐒 Removing 'proxies' from settings file (section: {section})")
+                                del config_data[section]['proxies']
+                                modified = True
+                        
+                        if modified:
+                            with open(settings_file, 'w') as f_out:
+                                json.dump(config_data, f_out, indent=4)
+                            print(f"✅ Saved cleaned settings to {settings_file}")
+                        else:
+                            print(f"No problematic settings found in {settings_file}")
+                except Exception as e:
+                    print(f"Error checking settings file {settings_file}: {e}")
+    except Exception as e:
+        print(f"Error in settings cleaning: {e}")
+
+# Run the settings cleaner
+clean_proxies_from_settings()
+
+# Monkey patch the OpenAI client creation
 try:
-    settings_file = "punch_card_settings.json"
-    if os.path.exists(settings_file):
-        print(f"Checking settings file: {settings_file}")
-        try:
-            with open(settings_file, 'r') as f:
-                config_data = json.load(f)
-                modified = False
-                
-                if 'proxies' in config_data:
-                    print(f"Removing 'proxies' from settings file")
-                    del config_data['proxies']
-                    modified = True
-                
-                if modified:
-                    with open(settings_file, 'w') as f_out:
-                        json.dump(config_data, f_out, indent=2)
-                    print(f"✅ Saved cleaned settings")
-                else:
-                    print("No problematic settings found")
-        except Exception as e:
-            print(f"Error checking settings file: {e}")
-except Exception as e:
-    print(f"Error in initialization: {e}")
-
-print("====== Direct OpenAI client wrapper complete ======")
-
-print("====== Starting OpenAI client monkey patching ======")
-
-# Try to directly fix the configuration by modifying the config file
-try:
-    settings_file = "punch_card_settings.json"
-    if os.path.exists(settings_file):
-        print(f"Loading settings from {settings_file} to check for proxies...")
-        with open(settings_file, 'r') as f:
-            try:
-                config_data = json.load(f)
-                if 'proxies' in config_data:
-                    print(f"⚠️ Found 'proxies' in settings file, removing it...")
-                    del config_data['proxies']
-                    with open(settings_file, 'w') as f_out:
-                        json.dump(config_data, f_out, indent=2)
-                    print(f"✅ Saved settings without 'proxies' parameter")
-                else:
-                    print(f"No 'proxies' key found in settings file")
-            except json.JSONDecodeError:
-                print(f"⚠️ Error parsing settings file")
-    else:
-        print(f"Settings file {settings_file} not found")
-except Exception as e:
-    print(f"⚠️ Error cleaning settings file: {e}")
-
-# Redirect all OpenAI client creation to our clean wrapper function
-try:
-    print("Setting up OpenAI redirection to clean wrapper...")
+    print("🐒 Setting up OpenAI monkey patching...")
     import openai
     
     # Replace the OpenAI class with our wrapper function
     original_OpenAI = openai.OpenAI
     
-    def wrapped_OpenAI(*args, **kwargs):
-        print("Redirecting OpenAI client creation to our clean wrapper")
+    def monkey_patched_OpenAI(*args, **kwargs):
+        print("🐒 Redirecting OpenAI client creation to our monkey-patched wrapper")
         
         # Log the arguments we received
         if kwargs:
             print(f"Original parameters: {list(kwargs.keys())}")
+            
+            # Remove any problematic parameters
+            for param in ['proxies', 'proxy', 'organization', 'org_id']:
+                if param in kwargs:
+                    print(f"🐒 Removing '{param}' parameter from OpenAI client creation")
+                    kwargs.pop(param)
         
         # Extract the API key if present
         api_key = kwargs.get('api_key')
@@ -135,14 +154,14 @@ try:
         return create_clean_openai_client(api_key=api_key)
     
     # Replace the OpenAI class
-    openai.OpenAI = wrapped_OpenAI
-    print("✅ Successfully redirected OpenAI client creation to our clean wrapper")
+    openai.OpenAI = monkey_patched_OpenAI
+    print("✅ Successfully monkey-patched OpenAI client creation")
 except ImportError:
-    print("OpenAI module not available, skipping redirection")
+    print("OpenAI module not available, skipping monkey patching")
 except Exception as e:
-    print(f"⚠️ Error setting up OpenAI redirection: {e}")
+    print(f"⚠️ Error setting up OpenAI monkey patching: {e}")
 
-print("====== Finished OpenAI client monkey patching ======")
+print("====== MONKEY PATCH COMPLETE ======")
 
 from PyQt6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QGridLayout, 
@@ -152,10 +171,14 @@ from PyQt6.QtWidgets import (
     QMessageBox, QComboBox, QFormLayout, QDoubleSpinBox,
     QMainWindow, QHBoxLayout, QDockWidget, QSlider
 )
-from PyQt6.QtCore import QTimer, Qt, QEvent, QObject
+from PyQt6.QtCore import QTimer, Qt, QEvent, QObject, QKeySequence, QSize
+from PyQt6.QtGui import (
+    QIcon, QShortcut, QPixmap, QColor, QPainter, QPalette, 
+    QFont, QKeyEvent, QTextOption, QLinearGradient, QFontMetrics,
+    QSyntaxHighlighter, QTextCharFormat
+)
 from src.display.gui_display import main as gui_main
 from openai import OpenAI, APIError
-from PyQt6.QtGui import QAction, QKeyEvent  # Import QAction from QtGui, not QtWidgets
 
 # Try to import PunchCardDisplay and monkey patch it to use our settings dialog
 try:
@@ -481,145 +504,139 @@ class UIStyleHelper:
 
     @staticmethod
     def create_menu_bar(window):
-        """Create a retro Apple-style menu bar with EPA design influences."""
+        """Create a menu bar for the application"""
         from PyQt6.QtWidgets import QMenuBar, QMenu
-        from PyQt6.QtGui import QAction, QFont, QColor
         from PyQt6.QtCore import QSize
+        from PyQt6.QtGui import QAction
         
-        # Create a menu bar
+        # Create menu bar
         menu_bar = QMenuBar(window)
         menu_bar.setStyleSheet(f"""
-            QMenuBar {{
-                background-color: {UIStyleHelper.COLORS['button_bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border-bottom: 1px solid {UIStyleHelper.COLORS['border']};
-                padding: 2px;
-                min-height: 28px;
-                font-family: {UIStyleHelper.FONTS['system']};
-                font-size: 14px;
-            }}
-            QMenuBar::item {{
-                background: transparent;
-                padding: 6px 10px;
-                margin-right: 1px;
-                border-radius: 4px;
-            }}
-            QMenuBar::item:selected {{
-                background-color: {UIStyleHelper.COLORS['accent']};
-                color: white;
-            }}
-            QMenuBar::item:pressed {{
-                background-color: {UIStyleHelper.COLORS['button_press']};
-                color: white;
-            }}
+        QMenuBar {{
+            background-color: #2E2E2E;
+            color: white;
+            padding: 4px;
+            border-bottom: 1px solid #444;
+            min-height: 28px;
+        }}
+        QMenuBar::item {{
+            background-color: transparent;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }}
+        QMenuBar::item:selected {{
+            background-color: #3E3E3E;
+        }}
+        QMenuBar::item:pressed {{
+            background-color: #444;
+        }}
         """)
         
-        # Apple logo menu (for aesthetic only)
-        apple_menu = QMenu("\u2318", window)  # Unicode apple command symbol
-        apple_menu.setStyleSheet(f"""
-            QMenu {{
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 5px;
-                padding: 5px;
-                margin-top: 1px;
-            }}
-            QMenu::item {{
-                padding: 6px 25px 6px 20px;
-                border-radius: 3px;
-                min-width: 150px;
-            }}
-            QMenu::item:selected {{
-                background-color: {UIStyleHelper.COLORS['accent']};
-                color: white;
-            }}
-            QMenu::separator {{
-                height: 1px;
-                background: {UIStyleHelper.COLORS['border']};
-                margin: 5px 15px;
-            }}
+        # Create Apple menu (macOS style)
+        apple_menu = QMenu("🍎", window)
+        apple_menu.setStyleSheet("""
+        QMenu {
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+            padding: 5px;
+        }
+        QMenu::item {
+            padding: 6px 25px 6px 20px;
+            border-radius: 3px;
+        }
+        QMenu::item:selected {
+            background-color: #444;
+        }
+        QMenu::separator {
+            height: 1px;
+            background-color: #444;
+            margin: 5px 0px;
+        }
         """)
         
-        # About action in Apple menu
+        # Add About action
         about_action = QAction("About Punch Card", window)
         about_action.triggered.connect(lambda: show_about_dialog(window))
         apple_menu.addAction(about_action)
         
+        # Add separator
         apple_menu.addSeparator()
         
-        # Settings action in Apple menu
-        settings_action = QAction("⚙️ Settings...", window)
+        # Add Settings action
+        settings_action = QAction("Settings", window)
+        settings_action.setShortcut("S")
         settings_action.triggered.connect(lambda: show_settings_dialog(window))
         apple_menu.addAction(settings_action)
+        
+        # Add Quit action
+        quit_action = QAction("Quit", window)
+        quit_action.setShortcut("Ctrl+Q")
+        quit_action.triggered.connect(lambda: QApplication.instance().quit())
+        apple_menu.addAction(quit_action)
         
         # Add Apple menu to menu bar
         menu_bar.addMenu(apple_menu)
         
-        # File menu
+        # Create File menu
         file_menu = QMenu("File", window)
         file_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
         
-        # Add Export action
-        export_action = QAction("Export Messages...", window)
-        export_action.triggered.connect(lambda: export_messages(window))
-        file_menu.addAction(export_action)
+        # Add Save Message action
+        save_action = QAction("Save Current Message", window)
+        save_action.triggered.connect(lambda: save_current_message(window))
+        file_menu.addAction(save_action)
         
-        # Add Clear action
-        clear_action = QAction("Clear Display", window)
-        clear_action.triggered.connect(lambda: clear_display(window))
-        file_menu.addAction(clear_action)
-        
-        file_menu.addSeparator()
-        
-        # Add Exit action
-        exit_action = QAction("Exit", window)
-        exit_action.triggered.connect(window.close)
-        file_menu.addAction(exit_action)
+        # Add Load Message action
+        load_action = QAction("Load Message", window)
+        load_action.triggered.connect(lambda: load_message(window))
+        file_menu.addAction(load_action)
         
         # Add File menu to menu bar
         menu_bar.addMenu(file_menu)
         
-        # Source menu
-        source_menu = QMenu("Source", window)
+        # Create Source menu
+        source_menu = QMenu("Message Source", window)
         source_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
         
-        # Add source actions with icons
-        local_action = QAction("🏠 Local Generation", window)
+        # Add Local Source action
+        local_action = QAction("Local Messages", window)
         local_action.triggered.connect(lambda: set_message_source("local"))
         source_menu.addAction(local_action)
         
-        openai_action = QAction("🤖 OpenAI API", window)
+        # Add OpenAI Source action
+        openai_action = QAction("OpenAI", window)
         openai_action.triggered.connect(lambda: set_message_source("openai"))
         source_menu.addAction(openai_action)
-        
-        database_action = QAction("💾 Database Messages", window)
-        database_action.triggered.connect(lambda: set_message_source(window, "database"))
-        source_menu.addAction(database_action)
         
         # Add Source menu to menu bar
         menu_bar.addMenu(source_menu)
         
-        # View menu
+        # Create View menu
         view_menu = QMenu("View", window)
         view_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
         
-        # Add Console action
-        console_action = QAction("Show API Console", window)
-        console_action.triggered.connect(lambda: ensure_console_visibility())
+        # Add Toggle Console action
+        console_action = QAction("Toggle API Console", window)
+        console_action.setShortcut("C")
+        console_action.triggered.connect(lambda: toggle_api_console(window))
         view_menu.addAction(console_action)
-        
-        # Add Stats action
-        stats_action = QAction("Show Statistics", window)
-        stats_action.triggered.connect(lambda: show_stats_dialog(window))
-        view_menu.addAction(stats_action)
         
         # Add View menu to menu bar
         menu_bar.addMenu(view_menu)
         
-        # Help menu
+        # Create Help menu
         help_menu = QMenu("Help", window)
         help_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
+        
+        # Add About action to Help menu
+        about_help_action = QAction("About Punch Card", window)
+        about_help_action.triggered.connect(lambda: show_about_dialog(window))
+        help_menu.addAction(about_help_action)
+        
+        # Add separator
+        help_menu.addSeparator()
         
         # Add Keyboard Shortcuts action
         shortcuts_action = QAction("Keyboard Shortcuts", window)
@@ -1002,39 +1019,39 @@ def ensure_console_visibility():
     return False
 
 def setup_openai_client():
-    """Set up the OpenAI client with improved error handling."""
+    """Set up the OpenAI client with improved error handling and monkey patching."""
     global openai_client, config
     
     print("\n====== setup_openai_client function started ======")
-    print(f"Current config keys: {list(config.keys())}")
-    debug_log("Setting up OpenAI client...", "system")
+    print(f"🐒 Current config keys: {list(config.keys())}")
+    debug_log("Setting up monkey-patched OpenAI client...", "system")
     
     # Check if we already have a client
     if openai_client:
-        print("OpenAI client already initialized, returning existing client")
+        print("🐒 OpenAI client already initialized, returning existing client")
         debug_log("OpenAI client already initialized", "system")
         print("====== setup_openai_client function completed ======\n")
         return True
     
     # Check if the OpenAI module is installed
     try:
-        print("Importing OpenAI and APIError...")
+        print("🐒 Importing OpenAI and APIError...")
         from openai import OpenAI, APIError
-        print("Successfully imported OpenAI module")
+        print("✅ Successfully imported OpenAI module")
         
     except ImportError as ie:
-        print(f"Failed to import OpenAI module: {ie}")
+        print(f"❌ Failed to import OpenAI module: {ie}")
         debug_log("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
         print("====== setup_openai_client function failed ======\n")
         return False
     
     # Get API key from config
     api_key = config.get("openai_api_key", "")
-    print(f"API key from config: {'<present>' if api_key and len(api_key) > 10 else '<missing or invalid>'}")
+    print(f"🐒 API key from config: {'<present>' if api_key and len(api_key) > 10 else '<missing or invalid>'}")
     
     # Try to load from secrets if not in config
     if not api_key or len(api_key.strip()) < 10:
-        print("API key missing or invalid, attempting to load from secrets file...")
+        print("🐒 API key missing or invalid, attempting to load from secrets file...")
         try:
             secrets_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secrets", "api_keys.json")
             print(f"Looking for secrets file at: {secrets_path}")
@@ -1069,37 +1086,37 @@ def setup_openai_client():
         return False
     
     try:
-        # Initialize client with our clean wrapper function
-        debug_log("Initializing OpenAI client with your API key...", "system")
-        print("Creating OpenAI client using clean wrapper function...")
+        # Initialize client with our monkey-patched wrapper function
+        debug_log("🐒 Initializing monkey-patched OpenAI client with your API key...", "system")
+        print("🐒 Creating OpenAI client using monkey-patched wrapper function...")
         
-        # Ensure all keys in the settings object are compatible with the OpenAI client
-        print("Checking for 'proxies' in config object...")
-        if 'proxies' in config:
-            print("Found 'proxies' in config, removing it...")
-            del config['proxies']
-            # Save the cleaned config
-            print("Saving cleaned config...")
-            save_settings()
-            print("Config saved without 'proxies' parameter")
+        # Clean the config of any problematic parameters
+        problematic_params = ['proxies', 'proxy', 'organization', 'org_id']
+        for param in problematic_params:
+            if param in config:
+                print(f"🐒 Removing '{param}' from config before client creation...")
+                del config[param]
+                # Save the cleaned config
+                save_settings()
+                print(f"Config saved without '{param}' parameter")
         
         # Create with minimal parameters using our wrapper
-        print("Using create_clean_openai_client wrapper function...")
+        print("🐒 Using create_clean_openai_client wrapper function...")
         openai_client = create_clean_openai_client(api_key=api_key)
         
         if not openai_client:
-            print("Failed to create OpenAI client using wrapper")
+            print("❌ Failed to create OpenAI client using wrapper")
             debug_log("❌ Failed to create OpenAI client", "error")
             print("====== setup_openai_client function failed ======\n")
             return False
             
         # Test API key by listing models (lightweight call)
         try:
-            print("Testing API key by calling models.list()...")
+            print("🐒 Testing API key by calling models.list()...")
             debug_log("Testing API key validity by listing available models...", "system")
             # Call list models with a small limit
             models = openai_client.models.list(limit=5)
-            print(f"Successfully listed models: found {len(models.data)} models")
+            print(f"✅ Successfully listed models: found {len(models.data)} models")
             
             # If we get here, the API key is valid
             debug_log(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
@@ -1141,17 +1158,17 @@ def setup_openai_client():
         except APIError as e:
             # API errors often relate to authentication
             error_message = str(e)[:200]
-            print(f"API Error: {error_message}")
+            print(f"❌ API Error: {error_message}")
             debug_log(f"❌ OpenAI API Error: {error_message}", "error")
             
             if "API key" in error_message and "invalid" in error_message.lower():
-                print("Invalid API key error detected")
+                print("❌ Invalid API key error detected")
                 debug_log("The API key you provided appears to be invalid. Please check the key and try again.", "error")
             elif "exceeded your current quota" in error_message.lower():
-                print("Quota exceeded error detected")
+                print("❌ Quota exceeded error detected")
                 debug_log("Your OpenAI account has exceeded its quota. Please check your billing information.", "error")
             elif "rate limit" in error_message.lower():
-                print("Rate limit error detected")
+                print("⚠️ Rate limit error detected")
                 debug_log("You've hit a rate limit. Please wait a moment before trying again.", "warning")
             
             openai_client = None
@@ -1161,7 +1178,7 @@ def setup_openai_client():
     except Exception as e:
         # Generic error handling
         error_message = str(e)[:200]
-        print(f"Unexpected error: {error_message}")
+        print(f"❌ Unexpected error: {error_message}")
         debug_log(f"❌ Error setting up OpenAI client: {error_message}", "error")
         openai_client = None
         print("====== setup_openai_client function failed ======\n")
@@ -2770,50 +2787,11 @@ def main():
     sys.exit(app.exec())
 
 # Menu helper functions
-def show_about_dialog(parent=None):
-    """Show an about dialog with application information."""
-    try:
-        from PyQt6.QtWidgets import QMessageBox
-        msg_box = QMessageBox(parent)
-        msg_box.setWindowTitle("About Punch Card")
-        
-        msg_box.setText("""<h2>Punch Card Display</h2>
-        <p>A retro-inspired message display application that evokes the feeling of vintage computing.</p>
-        <p>Version: 3.0.0</p>
-        <p>© 2023-2024</p>
-        <p>Created with PyQt6</p>
-        """)
-        
-        # Apply styling
-        msg_box.setStyleSheet(f"""
-            QMessageBox {{
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                font-family: {UIStyleHelper.FONTS['system']};
-            }}
-            QLabel {{
-                color: {UIStyleHelper.COLORS['fg']};
-                background-color: transparent;
-            }}
-            QPushButton {{
-                background-color: {UIStyleHelper.COLORS['button_bg']};
-                color: {UIStyleHelper.COLORS['button_text']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 3px;
-                padding: 6px 12px;
-                min-width: 80px;
-            }}
-            QPushButton:hover {{
-                background-color: {UIStyleHelper.COLORS['button_hover']};
-                border: 1px solid {UIStyleHelper.COLORS['accent']};
-            }}
-        """)
-        
-        update_api_console("Showing About dialog")
-        msg_box.exec()
-    except Exception as e:
-        print(f"⚠️ Error showing about dialog: {e}")
-        update_api_console(f"Error showing About dialog: {str(e)[:50]}")
+def show_about_dialog(window=None):
+    """Show the about dialog with version and monkey patch information."""
+    global display
+    about_dialog = AboutDialog(window or display.main_window if display else None)
+    about_dialog.exec()
 
 def export_messages(parent=None):
     """Export messages to a file."""
@@ -3148,6 +3126,76 @@ def clean_legacy_settings(settings_file="punch_card_settings.json"):
             
     except Exception as e:
         debug_log(f"Error cleaning legacy settings: {e}", "error", False)
+
+class AboutDialog(QDialog):
+    """Dialog to display information about the application and version."""
+    def __init__(self, parent=None):
+        super(AboutDialog, self).__init__(parent)
+        self.setWindowTitle(f"About Punch Card v{VERSION}")
+        self.setMinimumWidth(600)
+        self.setMinimumHeight(500)
+        
+        layout = QVBoxLayout()
+        
+        # Title
+        title_label = QLabel("<h1>Punch Card Display</h1>")
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title_label)
+        
+        # Version
+        version_label = QLabel(f"<h3>Version {VERSION}</h3>")
+        version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(version_label)
+        
+        # ASCII art
+        if "MonkeyPatch" in VERSION:
+            art_label = QLabel(f"<pre>{MONKEY_ART}</pre>")
+            art_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            art_label.setStyleSheet("font-family: monospace; font-size: 16px;")
+            layout.addWidget(art_label)
+        
+        # Description
+        about_text = """
+        <p>Punch Card Display is a retro-themed message display application that simulates 
+        the look of old IBM punch cards.</p>
+        
+        <p>This application can display messages from multiple sources:</p>
+        <ul>
+            <li>Local pre-defined messages</li>
+            <li>OpenAI-generated messages</li>
+            <li>Custom user messages</li>
+        </ul>
+        """
+        about_label = QLabel(about_text)
+        about_label.setWordWrap(True)
+        layout.addWidget(about_label)
+        
+        # MonkeyPatch info
+        if "MonkeyPatch" in VERSION:
+            monkeypatch_text = """
+            <h3>About the MonkeyPatch Update</h3>
+            <p>The MonkeyPatch Update (v0.5.3) addresses issues with the OpenAI client initialization
+            by implementing a technique called "monkey patching".</p>
+            
+            <p><b>What is Monkey Patching?</b><br>
+            Monkey patching is a technique to change the behavior of existing code at runtime without 
+            modifying the original source code. It's named "monkey patch" because it involves "patching" 
+            or modifying part of the running code in a way that might be considered a bit cheeky or 
+            mischievous - like what a monkey might do!</p>
+            
+            <p>In this update, we use monkey patching to replace the standard OpenAI client creation with 
+            our own implementation that removes problematic parameters that were causing errors.</p>
+            """
+            monkeypatch_label = QLabel(monkeypatch_text)
+            monkeypatch_label.setWordWrap(True)
+            layout.addWidget(monkeypatch_label)
+        
+        # Close button
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(self.accept)
+        layout.addWidget(close_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        self.setLayout(layout)
 
 if __name__ == '__main__':
     main() 
