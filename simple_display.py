@@ -39,33 +39,20 @@ def create_clean_openai_client(api_key=None, **kwargs):
     Create a clean OpenAI client without any problematic parameters.
     This is a monkey-patched wrapper around the official client that ensures no invalid parameters are passed.
     """
-    global openai_client
-    
-    # Only create once if the client exists
-    if openai_client is not None:
-        print("🐒 Returning existing monkey-patched OpenAI client instance")
-        return openai_client
-    
-    print(f"🐒 Creating monkey-patched OpenAI client with provided API key")
+    print("🐒 Creating clean OpenAI client")
     
     try:
         # Import the module
         import openai
+        from openai import OpenAI
         
-        # Clean the parameters - keep ONLY valid parameters
-        valid_params = {
-            'api_key': api_key
-        }
+        print("🐒 Initializing with API key only")
         
-        # Only add parameters that are not None
-        valid_params = {k: v for k, v in valid_params.items() if v is not None}
-        
-        print(f"🐒 Creating OpenAI client with parameters: {list(valid_params.keys())}")
-        
-        # Create the client with minimal parameters
-        openai_client = openai.OpenAI(**valid_params)
-        print("✅ Successfully created monkey-patched OpenAI client")
-        return openai_client
+        # Create the direct client - avoid using any kwargs at all
+        # Only pass the API key as a parameter, nothing else
+        client = OpenAI(api_key=api_key)
+        print("✅ Successfully created OpenAI client with direct approach")
+        return client
         
     except ImportError:
         print("❌ OpenAI module not installed")
@@ -129,37 +116,56 @@ clean_proxies_from_settings()
 # Monkey patch the OpenAI client creation
 try:
     print("🐒 Setting up OpenAI monkey patching...")
-    import openai
     
-    # Replace the OpenAI class with our wrapper function
-    original_OpenAI = openai.OpenAI
-    
-    def monkey_patched_OpenAI(*args, **kwargs):
-        print("🐒 Redirecting OpenAI client creation to our monkey-patched wrapper")
+    # Try importing OpenAI directly
+    try:
+        import openai
+        from openai import OpenAI
         
-        # Log the arguments we received
-        if kwargs:
-            print(f"Original parameters: {list(kwargs.keys())}")
-            
-            # Remove any problematic parameters
-            for param in ['proxies', 'proxy', 'organization', 'org_id']:
-                if param in kwargs:
-                    print(f"🐒 Removing '{param}' parameter from OpenAI client creation")
-                    kwargs.pop(param)
+        # Store the original __init__ method
+        original_init = OpenAI.__init__
         
-        # Extract the API key if present
-        api_key = kwargs.get('api_key')
+        # Create a patched __init__ method that only accepts the API key
+        def patched_init(self, api_key=None, **kwargs):
+            print("🐒 Patched OpenAI.__init__ called")
+            # Filter out problematic parameters
+            if 'proxies' in kwargs:
+                print("🐒 Removing 'proxies' from kwargs")
+                del kwargs['proxies']
+            if 'organization' in kwargs:
+                print("🐒 Removing 'organization' from kwargs")
+                del kwargs['organization']
+            if 'org_id' in kwargs:
+                print("🐒 Removing 'org_id' from kwargs")
+                del kwargs['org_id']
+                
+            # Call the original __init__ with only the clean parameters
+            try:
+                # First try with just the API key
+                if api_key:
+                    print("🐒 Calling original __init__ with api_key only")
+                    original_init(self, api_key=api_key)
+                else:
+                    print("🐒 Calling original __init__ with no parameters")
+                    original_init(self)
+            except Exception as e:
+                print(f"⚠️ Error in patched OpenAI.__init__: {e}")
+                # Last resort - call with no arguments
+                print("🐒 Trying base initialization with no arguments")
+                original_init(self)
         
-        # Use our clean wrapper instead
-        return create_clean_openai_client(api_key=api_key)
-    
-    # Replace the OpenAI class
-    openai.OpenAI = monkey_patched_OpenAI
-    print("✅ Successfully monkey-patched OpenAI client creation")
-except ImportError:
-    print("OpenAI module not available, skipping monkey patching")
+        # Apply the patch
+        OpenAI.__init__ = patched_init
+        print("✅ Successfully patched OpenAI.__init__ method")
+        
+    except ImportError:
+        print("OpenAI module not available, skipping monkey patching")
+    except Exception as e:
+        print(f"⚠️ Error setting up OpenAI monkey patching: {e}")
+        print(f"Error type: {type(e)}")
 except Exception as e:
-    print(f"⚠️ Error setting up OpenAI monkey patching: {e}")
+    print(f"⚠️ Error in monkey patching setup: {e}")
+    print(f"Error type: {type(e)}")
 
 print("====== MONKEY PATCH COMPLETE ======")
 
@@ -171,11 +177,11 @@ from PyQt6.QtWidgets import (
     QMessageBox, QComboBox, QFormLayout, QDoubleSpinBox,
     QMainWindow, QHBoxLayout, QDockWidget, QSlider
 )
-from PyQt6.QtCore import QTimer, Qt, QEvent, QObject, QKeySequence, QSize
+from PyQt6.QtCore import QTimer, Qt, QEvent, QObject, QSize
 from PyQt6.QtGui import (
     QIcon, QShortcut, QPixmap, QColor, QPainter, QPalette, 
     QFont, QKeyEvent, QTextOption, QLinearGradient, QFontMetrics,
-    QSyntaxHighlighter, QTextCharFormat
+    QSyntaxHighlighter, QTextCharFormat, QAction, QKeySequence
 )
 from src.display.gui_display import main as gui_main
 from openai import OpenAI, APIError
@@ -1035,8 +1041,8 @@ def setup_openai_client():
     
     # Check if the OpenAI module is installed
     try:
-        print("🐒 Importing OpenAI and APIError...")
-        from openai import OpenAI, APIError
+        print("🐒 Importing OpenAI module...")
+        import openai
         print("✅ Successfully imported OpenAI module")
         
     except ImportError as ie:
@@ -1086,34 +1092,49 @@ def setup_openai_client():
         return False
     
     try:
-        # Initialize client with our monkey-patched wrapper function
-        debug_log("🐒 Initializing monkey-patched OpenAI client with your API key...", "system")
-        print("🐒 Creating OpenAI client using monkey-patched wrapper function...")
+        # Initialize client with extremely minimal approach
+        debug_log("🐒 Initializing monkey-patched OpenAI client...", "system")
+        print("🐒 Creating OpenAI client with minimal approach...")
         
-        # Clean the config of any problematic parameters
+        # Remove any problematic parameters from config completely
         problematic_params = ['proxies', 'proxy', 'organization', 'org_id']
         for param in problematic_params:
             if param in config:
-                print(f"🐒 Removing '{param}' from config before client creation...")
+                print(f"🐒 Removing '{param}' from config...")
                 del config[param]
-                # Save the cleaned config
-                save_settings()
-                print(f"Config saved without '{param}' parameter")
         
-        # Create with minimal parameters using our wrapper
-        print("🐒 Using create_clean_openai_client wrapper function...")
-        openai_client = create_clean_openai_client(api_key=api_key)
+        # Save the cleaned config
+        save_settings()
+        print("✅ Config saved without problematic parameters")
         
-        if not openai_client:
-            print("❌ Failed to create OpenAI client using wrapper")
-            debug_log("❌ Failed to create OpenAI client", "error")
-            print("====== setup_openai_client function failed ======\n")
-            return False
+        try:
+            # The most direct approach possible - create directly with the API key only
+            print("🐒 Creating OpenAI client with API key only (maximum simplicity)")
+            import openai
             
+            # Create client with only the API key - nothing else
+            openai_client = openai.OpenAI(api_key=api_key)
+            print("✅ OpenAI client created successfully with direct approach")
+            
+        except Exception as client_error:
+            print(f"❌ Direct approach failed: {str(client_error)}")
+            print(f"Error type: {type(client_error)}")
+            print("Trying with create_clean_openai_client function...")
+            
+            # Try our clean wrapper
+            openai_client = create_clean_openai_client(api_key=api_key)
+            
+            if not openai_client:
+                print("❌ All client creation methods failed")
+                debug_log("❌ Failed to create OpenAI client after multiple attempts", "error")
+                print("====== setup_openai_client function failed ======\n")
+                return False
+        
         # Test API key by listing models (lightweight call)
         try:
             print("🐒 Testing API key by calling models.list()...")
-            debug_log("Testing API key validity by listing available models...", "system")
+            debug_log("Testing API key validity...", "system")
+            
             # Call list models with a small limit
             models = openai_client.models.list(limit=5)
             print(f"✅ Successfully listed models: found {len(models.data)} models")
@@ -1155,9 +1176,9 @@ def setup_openai_client():
             print("====== setup_openai_client function completed successfully ======\n")
             return True
             
-        except APIError as e:
-            # API errors often relate to authentication
-            error_message = str(e)[:200]
+        except Exception as api_error:
+            # More generic error handling
+            error_message = str(api_error)[:200]
             print(f"❌ API Error: {error_message}")
             debug_log(f"❌ OpenAI API Error: {error_message}", "error")
             
@@ -1179,6 +1200,7 @@ def setup_openai_client():
         # Generic error handling
         error_message = str(e)[:200]
         print(f"❌ Unexpected error: {error_message}")
+        print(f"Error type: {type(e)}")
         debug_log(f"❌ Error setting up OpenAI client: {error_message}", "error")
         openai_client = None
         print("====== setup_openai_client function failed ======\n")
