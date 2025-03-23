@@ -1,19 +1,8 @@
 # Punch Card Display System - Development Roadmap
 
-## Current Status - Version 0.1.1 (The Visualization Update)
+## Current Status - Version 0.1.0
 
-The current version (0.1.1) includes significant improvements to the terminal display system. Key enhancements include:
-
-- Enhanced terminal display with multiple character sets
-- Improved fallback console mode with row/column indicators
-- Added verbose mode for detailed LED state tracking
-- Resolved synchronization issues between LED state manager and hardware controller
-- Improved error handling and terminal size detection
-- Added command-line arguments for customization
-
-### Previous Version - 0.1.0 (The Renaissance Update)
-
-Version 0.1.0 represented the first stable implementation of the terminal-based IBM 80 Column Punch Card Simulator. The system supported:
+The current version (0.1.0) represents the first stable implementation of the terminal-based IBM 80 Column Punch Card Simulator. The system currently supports:
 
 - Terminal-based display of 80-column punch cards
 - Hollerith/EBCDIC character encoding
@@ -81,12 +70,6 @@ Version 0.1.0 represented the first stable implementation of the terminal-based 
    - Implement communication protocol (likely using serial or network connections)
    - Create fail-safe mechanisms for hardware disconnection
 
-3. **Enhanced Terminal UI Integration**
-   - Build on v0.1.1 terminal display improvements
-   - Implement full-screen mode option with custom borders
-   - Add interaction capabilities for debugging (cursor movement, LED toggling)
-   - Create view switching between different visualization modes
-
 ### Version 0.3.0 - Enhanced Visualization & Web Integration
 
 1. **Terminal Output Capture**
@@ -106,7 +89,6 @@ Version 0.1.0 represented the first stable implementation of the terminal-based 
    - Research and implement more advanced ASCII animation techniques
    - Add "breathing space" between animations for better visual flow
    - Create pause and resume functionality for animations
-   - Implement additional character set support for animations
 
 ### Version 1.0.0 - Production Ready
 
@@ -121,7 +103,6 @@ Version 0.1.0 represented the first stable implementation of the terminal-based 
    - Create administration interface for database management
 
 3. **Robust Error Handling**
-   - Build on v0.1.1 error handling improvements
    - Implement comprehensive error handling for all hardware and software components
    - Create automated recovery mechanisms
    - Add diagnostic tools
@@ -137,7 +118,6 @@ Version 0.1.0 represented the first stable implementation of the terminal-based 
 1. Fix display positioning inconsistency
 2. Resolve statistics management issues
 3. Begin NeoPixel integration Phase 0 (8x8 prototype)
-4. Improve terminal visualization
 
 ### Short-term Goals (1-2 Months)
 1. Complete NeoPixel Phase 1 (16x16 test grid)

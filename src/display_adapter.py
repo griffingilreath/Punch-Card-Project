@@ -1,251 +1,151 @@
-#!/usr/bin/env python3
 """
-Display Adapter for the Punch Card Project
-
-This module bridges the existing punch card display code with the new
-LED state manager. It observes the punch card display and updates the
-LED state manager accordingly, ensuring that what's shown in the terminal
-is also reflected on the physical LEDs.
+Display adapter for Punch Card Project.
+This module provides an adapter to integrate the terminal display
+with the existing punch card system.
 """
 
 import time
 import threading
-from typing import Optional, Dict, List, Any
+from typing import List, Tuple, Dict, Any, Optional
 
-# Import our modules
-from src.led_state_manager import get_instance as get_led_manager
-
+# Import the terminal display module
+from terminal_display import TerminalDisplay, CharacterSet
 
 class PunchCardDisplayAdapter:
-    """
-    Adapter that connects the existing PunchCardDisplay with the LED state manager.
+    """Adapter to integrate terminal display with punch card system."""
     
-    This class observes state changes in the punch card display and 
-    propagates them to the LED state manager, which in turn controls
-    the physical LED hardware.
-    """
-    
-    def __init__(self, char_mapping: Dict[str, List[int]]):
+    def __init__(self, 
+                 num_rows: int = 12, 
+                 num_cols: int = 80, 
+                 verbose: bool = False, 
+                 char_set_name: str = "default",
+                 use_ui: bool = True):
         """
-        Initialize the adapter with the character mapping.
+        Initialize the punch card display adapter.
         
         Args:
-            char_mapping: Mapping of characters to LED punch patterns
+            num_rows: Number of rows in the LED grid
+            num_cols: Number of columns in the LED grid
+            verbose: Whether to print verbose debug information
+            char_set_name: Character set to use for LED visualization
+            use_ui: Whether to use the UI (if False, will use console output)
         """
-        self.char_mapping = char_mapping
-        self.led_manager = get_led_manager()
-        self._running = False
-        self._thread = None
+        self.num_rows = num_rows
+        self.num_cols = num_cols
+        self.verbose = verbose
+        self.use_ui = use_ui
         
-        # We don't have direct access to the punch card grid, so we'll
-        # maintain our own state to detect changes
-        self.current_grid = [[False for _ in range(self.led_manager.columns)] 
-                            for _ in range(self.led_manager.rows)]
+        # Flag to suppress LED output for cleaner console display
+        self._suppress_led_output = False
         
-    def connect_to_punch_card_display(self, punch_card_display: Any) -> None:
+        # Map character set name to enum
+        char_set_map = {
+            "default": CharacterSet.DEFAULT,
+            "block": CharacterSet.BLOCK,
+            "circle": CharacterSet.CIRCLE,
+            "star": CharacterSet.STAR,
+            "ascii": CharacterSet.ASCII
+        }
+        char_set = char_set_map.get(char_set_name.lower(), CharacterSet.DEFAULT)
+        
+        # Initialize terminal display
+        self.terminal_display = TerminalDisplay(verbose=verbose, char_set=char_set)
+        
+        # Initialize grid state
+        self.grid_state = [[False for _ in range(num_cols)] for _ in range(num_rows)]
+        
+        # Start the terminal display
+        if self.use_ui:
+            self.terminal_display.start()
+            self.terminal_display.set_status("Punch Card Display Adapter initialized")
+    
+    def cleanup(self):
+        """Clean up resources."""
+        if self.use_ui and self.terminal_display:
+            self.terminal_display.stop()
+    
+    def set_led(self, row: int, col: int, state: bool):
         """
-        Connect to the existing punch card display.
-        
-        This method patches the relevant methods in the punch card display
-        to intercept state changes and update the LED state manager.
+        Set the state of a single LED.
         
         Args:
-            punch_card_display: The PunchCardDisplay instance to connect to
+            row: Row index (0-based)
+            col: Column index (0-based)
+            state: True to turn on, False to turn off
         """
-        # Store a reference to the punch card display
-        self.punch_card_display = punch_card_display
-        
-        # Patch the methods that update the grid
-        self._patch_display_methods()
-        
-        print("Connected adapter to punch card display")
-    
-    def _patch_display_methods(self) -> None:
-        """
-        Patch the methods in PunchCardDisplay that update the LED grid.
-        
-        This is done by preserving the original methods and extending them
-        to also update the LED state manager.
-        """
-        # Save original methods
-        original_set_led = getattr(self.punch_card_display, 'set_led', None)
-        original_clear = getattr(self.punch_card_display, 'clear', None)
-        original_show_message = getattr(self.punch_card_display, 'show_message', None)
-        original_show_splash_screen = getattr(self.punch_card_display, 'show_splash_screen', None)
-        
-        # Define patched methods
-        def patched_set_led(self_display, row, col, state):
-            # Call original method
-            if original_set_led:
-                original_set_led(self_display, row, col, state)
+        if 0 <= row < self.num_rows and 0 <= col < self.num_cols:
+            self.grid_state[row][col] = state
             
-            # Update LED state manager
-            self.led_manager.set_led(row, col, bool(state))
-        
-        def patched_clear(self_display):
-            # Call original method
-            if original_clear:
-                original_clear(self_display)
-            
-            # Update LED state manager
-            self.led_manager.set_all_leds(False)
-        
-        # Apply patches if the methods exist
-        if original_set_led:
-            self.punch_card_display.set_led = lambda row, col, state: patched_set_led(self.punch_card_display, row, col, state)
-        
-        if original_clear:
-            self.punch_card_display.clear = lambda: patched_clear(self.punch_card_display)
-        
-        # For these methods, we'll use the originals directly since all LED updates
-        # will be caught by our patched set_led method or the monitor_grid_changes method
-        
-        # No need to patch show_message, as it will call set_led internally
-        
-        # No need to patch show_splash_screen
+            if self.use_ui:
+                self.terminal_display.update_led_grid(self.grid_state)
+            elif self.verbose and not self._suppress_led_output:
+                print(f"Set LED at ({row}, {col}) to {state}")
     
-    def start_monitoring(self) -> None:
-        """Start monitoring the punch card display for changes."""
-        if self._running:
-            return
-        
-        self._running = True
-        self._thread = threading.Thread(target=self._monitor_grid_changes, daemon=True)
-        self._thread.start()
-        
-        print("Started monitoring punch card display")
-    
-    def stop_monitoring(self) -> None:
-        """Stop monitoring the punch card display."""
-        self._running = False
-        if self._thread:
-            self._thread.join(timeout=1.0)
-            self._thread = None
-    
-    def _monitor_grid_changes(self) -> None:
+    def set_multiple_leds(self, led_states: List[Tuple[int, int, bool]]):
         """
-        Monitor the punch card display grid for changes.
-        
-        This method is a fallback for catching changes that aren't
-        directly made through the patched methods. It runs in a 
-        background thread.
-        """
-        # Use the grid and current_message attributes from the punch card display
-        # to detect changes that our method patching might have missed
-        while self._running:
-            try:
-                # Check if the grid attribute exists
-                if hasattr(self.punch_card_display, 'grid'):
-                    # Convert the punch card grid to our format (bool)
-                    new_grid = [[bool(self.punch_card_display.grid[row][col]) 
-                               for col in range(self.led_manager.columns)] 
-                               for row in range(self.led_manager.rows)]
-                    
-                    # Check for changes
-                    changes_detected = False
-                    for row in range(self.led_manager.rows):
-                        for col in range(self.led_manager.columns):
-                            if self.current_grid[row][col] != new_grid[row][col]:
-                                # Update our state
-                                self.current_grid[row][col] = new_grid[row][col]
-                                # Update LED state manager
-                                self.led_manager.set_led(row, col, new_grid[row][col])
-                                changes_detected = True
-                    
-                    # If there were changes, we've already updated the LED state manager
-                    # individually for each changed LED
-                    if not changes_detected:
-                        # Check if the current_message attribute exists and has changed
-                        if hasattr(self.punch_card_display, 'current_message'):
-                            message = self.punch_card_display.current_message
-                            
-                            # If the message is new, update our state and the LED state manager
-                            if message:
-                                for col, char in enumerate(message):
-                                    if col < self.led_manager.columns:
-                                        # Use the display_character method which uses the
-                                        # character mapping to correctly set the LED pattern
-                                        self.led_manager.display_character(col, char, self.char_mapping)
-            
-            except Exception as e:
-                print(f"Error monitoring punch card display: {e}")
-            
-            # Sleep to avoid hogging CPU
-            time.sleep(0.1)
-    
-    def update_message(self, message: str) -> None:
-        """
-        Update the LED state manager with a message.
+        Set the state of multiple LEDs at once.
         
         Args:
-            message: The message to display
+            led_states: List of (row, col, state) tuples
         """
-        # Clear the grid first
-        self.led_manager.set_all_leds(False)
+        for row, col, state in led_states:
+            if 0 <= row < self.num_rows and 0 <= col < self.num_cols:
+                self.grid_state[row][col] = state
         
-        # Set each character
-        for col, char in enumerate(message):
-            if col < self.led_manager.columns:
-                self.led_manager.display_character(col, char, self.char_mapping)
-
-
-def create_punch_card_adapter(punch_card_display: Any, char_mapping: Dict[str, List[int]]) -> PunchCardDisplayAdapter:
-    """
-    Create and connect a punch card display adapter.
+        if self.use_ui:
+            self.terminal_display.update_led_grid(self.grid_state)
+        elif self.verbose:
+            print(f"Updated {len(led_states)} LEDs")
     
-    Args:
-        punch_card_display: The PunchCardDisplay instance
-        char_mapping: Mapping of characters to LED patterns
+    def clear_all(self):
+        """Clear all LEDs (turn them off)."""
+        self.grid_state = [[False for _ in range(self.num_cols)] for _ in range(self.num_rows)]
         
-    Returns:
-        PunchCardDisplayAdapter: The connected adapter
-    """
-    adapter = PunchCardDisplayAdapter(char_mapping)
-    adapter.connect_to_punch_card_display(punch_card_display)
-    adapter.start_monitoring()
-    return adapter
-
-
-if __name__ == "__main__":
-    # This would normally be imported from the punch_card module
-    # For testing, we'll create a simple mock
-    class MockPunchCardDisplay:
-        def __init__(self):
-            self.rows = 12
-            self.columns = 80
-            self.grid = [[0 for _ in range(self.columns)] for _ in range(self.rows)]
-            self.current_message = ""
+        if self.use_ui:
+            self.terminal_display.update_led_grid(self.grid_state)
+            self.terminal_display.set_status("Cleared all LEDs")
+        elif self.verbose:
+            print("Cleared all LEDs")
+    
+    def log_message(self, message: str, level: str = "info"):
+        """
+        Log a message to the terminal display.
         
-        def set_led(self, row, col, state):
-            if 0 <= row < self.rows and 0 <= col < self.columns:
-                self.grid[row][col] = 1 if state else 0
+        Args:
+            message: Message to log
+            level: Log level (info, warning, error, debug)
+        """
+        if self.use_ui:
+            if level in ["info", "warning", "error"]:
+                self.terminal_display.set_status(message, level)
+            else:
+                self.terminal_display.add_debug_message(message, level)
+        elif self.verbose:
+            print(f"[{level.upper()}] {message}")
+    
+    def get_grid_state(self) -> List[List[bool]]:
+        """Get the current grid state."""
+        return self.grid_state
+    
+    def update_grid_from_punch_card(self, punch_card_grid: List[List[bool]]):
+        """
+        Update the grid state from the punch card grid.
+        This handles any differences in grid format between systems.
         
-        def clear(self):
-            self.grid = [[0 for _ in range(self.columns)] for _ in range(self.rows)]
-            self.current_message = ""
+        Args:
+            punch_card_grid: Punch card grid to update from
+        """
+        # Copy the grid data (with size checks)
+        rows_to_copy = min(len(punch_card_grid), self.num_rows)
         
-        def show_message(self, message, source="", animate=True):
-            self.current_message = message
-            print(f"MockPunchCardDisplay: Showing message: {message}")
+        for i in range(rows_to_copy):
+            row = punch_card_grid[i]
+            cols_to_copy = min(len(row), self.num_cols)
+            for j in range(cols_to_copy):
+                self.grid_state[i][j] = row[j]
         
-        def show_splash_screen(self):
-            print("MockPunchCardDisplay: Showing splash screen")
-    
-    # Mock character mapping
-    mock_char_mapping = {
-        'A': [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        'B': [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
-    }
-    
-    # Create mock display and adapter
-    mock_display = MockPunchCardDisplay()
-    adapter = create_punch_card_adapter(mock_display, mock_char_mapping)
-    
-    # Test it
-    mock_display.show_message("AB")
-    
-    # Wait for a moment
-    time.sleep(1)
-    
-    # Clean up
-    adapter.stop_monitoring() 
+        if self.use_ui:
+            self.terminal_display.update_led_grid(self.grid_state)
+            self.terminal_display.add_debug_message(f"Updated grid from punch card ({rows_to_copy}x{cols_to_copy})")
+        elif self.verbose:
+            print(f"Updated grid from punch card ({rows_to_copy}x{cols_to_copy})") 

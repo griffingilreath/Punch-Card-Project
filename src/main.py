@@ -33,13 +33,8 @@ import random
 from typing import Optional, Dict
 from database import Database
 from message_generator import MessageGenerator
-from punch_card import PunchCardDisplay, CHAR_MAPPING
+from punch_card import PunchCardDisplay
 import datetime
-
-# Import our new components
-from led_state_manager import get_instance as get_led_manager
-from hardware_controller import create_hardware_controller
-from display_adapter import create_punch_card_adapter
 
 class PunchCardApplication:
     def __init__(self, config_path: str = "/Users/griffingilreath/Documents/Coding/Cursor/Punch Card V3/config/config.yaml"):
@@ -47,8 +42,6 @@ class PunchCardApplication:
         self.config = self._load_config(config_path)
         self.db = Database(config_path)
         self.message_generator = MessageGenerator(config_path)
-        
-        # Initialize the punch card display
         self.display = PunchCardDisplay(
             led_delay=self.config['display']['led_delay'],
             message_delay=self.config['display']['message_delay'],
@@ -56,15 +49,6 @@ class PunchCardApplication:
             skip_splash=False,
             debug_mode=False
         )
-        
-        # Initialize the LED state manager
-        self.led_manager = get_led_manager()
-        
-        # Create hardware controller
-        self.hardware_controller = create_hardware_controller(config_path)
-        
-        # Create the adapter that bridges the punch card display and LED state manager
-        self.display_adapter = create_punch_card_adapter(self.display, CHAR_MAPPING)
         
     def _load_config(self, config_path: str) -> Dict:
         """Load configuration from YAML file"""
@@ -201,13 +185,6 @@ class PunchCardApplication:
     def run(self) -> None:
         """Run the punch card application"""
         try:
-            # Connect to hardware
-            if self.hardware_controller.connect():
-                print("Connected to hardware")
-                self.hardware_controller.start()
-            else:
-                print("Hardware connection failed, running in terminal-only mode")
-            
             # Display splash screen
             self.display.show_splash_screen()
             time.sleep(2)
@@ -226,11 +203,8 @@ class PunchCardApplication:
         except KeyboardInterrupt:
             print("\nShutting down...")
         finally:
-            # Clean up resources
             self.db.close()
             self.display.clear()
-            self.display_adapter.stop_monitoring()
-            self.hardware_controller.disconnect()
 
 def main():
     parser = argparse.ArgumentParser(description="IBM 80 Column Punch Card Simulator")
@@ -243,8 +217,6 @@ def main():
                       help="Delay between messages (seconds)")
     parser.add_argument("--random-delay", type=float,
                       help="Random delay between messages (seconds)")
-    parser.add_argument("--hardware-type", choices=["none", "simulated", "rpi"],
-                      help="Type of hardware to use (none, simulated, rpi)")
     
     args = parser.parse_args()
     
@@ -258,8 +230,6 @@ def main():
     if args.random_delay:
         app.config['display']['random_delay_min'] = args.random_delay
         app.config['display']['random_delay_max'] = args.random_delay
-    if args.hardware_type:
-        app.config['hardware']['type'] = args.hardware_type
         
     if args.test_message:
         app._process_message(args.test_message.upper())

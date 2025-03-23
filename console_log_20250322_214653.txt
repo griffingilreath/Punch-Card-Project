@@ -1,0 +1,337 @@
+[21:46:30] [INFO] Starting splash screen animation
+[21:46:30] [INFO] Status: PROCESSING: HELLO WORLD
+[21:46:30] [INFO] Status: TYPING
+[21:46:30] [LED] LED: Cleared row 0, col 0
+[21:46:30] [LED] LED: Cleared row 1, col 0
+[21:46:30] [LED] LED: Cleared row 2, col 0
+[21:46:30] [LED] LED: Cleared row 3, col 0
+[21:46:30] [LED] LED: Cleared row 4, col 0
+[21:46:30] [LED] LED: Cleared row 5, col 0
+[21:46:30] [LED] LED: Cleared row 6, col 0
+[21:46:30] [LED] LED: Cleared row 7, col 0
+[21:46:30] [LED] LED: Cleared row 8, col 0
+[21:46:30] [LED] LED: Cleared row 9, col 0
+[21:46:30] [LED] LED: Cleared row 10, col 0
+[21:46:30] [LED] LED: Cleared row 11, col 0
+[21:46:30] [INFO] Displaying character 'H' in column 0
+[21:46:30] [LED] LED: Row 12 + Row 10 for 'H'
+[21:46:30] [INFO] Status: DISPLAYING: H
+[21:46:30] [LED] LED: Cleared row 0, col 1
+[21:46:30] [LED] LED: Cleared row 1, col 1
+[21:46:30] [LED] LED: Cleared row 2, col 1
+[21:46:30] [LED] LED: Cleared row 3, col 1
+[21:46:30] [LED] LED: Cleared row 4, col 1
+[21:46:30] [LED] LED: Cleared row 5, col 1
+[21:46:30] [LED] LED: Cleared row 6, col 1
+[21:46:30] [LED] LED: Cleared row 7, col 1
+[21:46:30] [LED] LED: Cleared row 8, col 1
+[21:46:30] [LED] LED: Cleared row 9, col 1
+[21:46:30] [LED] LED: Cleared row 10, col 1
+[21:46:30] [LED] LED: Cleared row 11, col 1
+[21:46:30] [INFO] Displaying character 'E' in column 1
+[21:46:30] [LED] LED: Row 12 + Row 7 for 'E'
+[21:46:30] [INFO] Status: DISPLAYING: HE
+[21:46:31] [LED] LED: Cleared row 0, col 2
+[21:46:31] [LED] LED: Cleared row 1, col 2
+[21:46:31] [LED] LED: Cleared row 2, col 2
+[21:46:31] [LED] LED: Cleared row 3, col 2
+[21:46:31] [LED] LED: Cleared row 4, col 2
+[21:46:31] [LED] LED: Cleared row 5, col 2
+[21:46:31] [LED] LED: Cleared row 6, col 2
+[21:46:31] [LED] LED: Cleared row 7, col 2
+[21:46:31] [LED] LED: Cleared row 8, col 2
+[21:46:31] [LED] LED: Cleared row 9, col 2
+[21:46:31] [LED] LED: Cleared row 10, col 2
+[21:46:31] [LED] LED: Cleared row 11, col 2
+[21:46:31] [INFO] Displaying character 'L' in column 2
+[21:46:31] [LED] LED: Row 11 + Row 5 for 'L'
+[21:46:31] [INFO] Status: DISPLAYING: HEL
+[21:46:31] [LED] LED: Cleared row 0, col 3
+[21:46:31] [LED] LED: Cleared row 1, col 3
+[21:46:31] [LED] LED: Cleared row 2, col 3
+[21:46:31] [LED] LED: Cleared row 3, col 3
+[21:46:31] [LED] LED: Cleared row 4, col 3
+[21:46:31] [LED] LED: Cleared row 5, col 3
+[21:46:31] [LED] LED: Cleared row 6, col 3
+[21:46:31] [LED] LED: Cleared row 7, col 3
+[21:46:31] [LED] LED: Cleared row 8, col 3
+[21:46:31] [LED] LED: Cleared row 9, col 3
+[21:46:31] [LED] LED: Cleared row 10, col 3
+[21:46:31] [LED] LED: Cleared row 11, col 3
+[21:46:31] [INFO] Displaying character 'L' in column 3
+[21:46:31] [LED] LED: Row 11 + Row 5 for 'L'
+[21:46:31] [INFO] Status: DISPLAYING: HELL
+[21:46:31] [LED] LED: Cleared row 0, col 4
+[21:46:31] [LED] LED: Cleared row 1, col 4
+[21:46:31] [LED] LED: Cleared row 2, col 4
+[21:46:31] [LED] LED: Cleared row 3, col 4
+[21:46:31] [LED] LED: Cleared row 4, col 4
+[21:46:31] [LED] LED: Cleared row 5, col 4
+[21:46:31] [LED] LED: Cleared row 6, col 4
+[21:46:31] [LED] LED: Cleared row 7, col 4
+[21:46:31] [LED] LED: Cleared row 8, col 4
+[21:46:31] [LED] LED: Cleared row 9, col 4
+[21:46:31] [LED] LED: Cleared row 10, col 4
+[21:46:31] [LED] LED: Cleared row 11, col 4
+[21:46:31] [INFO] Displaying character 'O' in column 4
+[21:46:31] [LED] LED: Row 11 + Row 8 for 'O'
+[21:46:31] [INFO] Status: DISPLAYING: HELLO
+[21:46:31] [LED] LED: Cleared row 0, col 5
+[21:46:31] [LED] LED: Cleared row 1, col 5
+[21:46:31] [LED] LED: Cleared row 2, col 5
+[21:46:31] [LED] LED: Cleared row 3, col 5
+[21:46:31] [LED] LED: Cleared row 4, col 5
+[21:46:31] [LED] LED: Cleared row 5, col 5
+[21:46:31] [LED] LED: Cleared row 6, col 5
+[21:46:31] [LED] LED: Cleared row 7, col 5
+[21:46:31] [LED] LED: Cleared row 8, col 5
+[21:46:31] [LED] LED: Cleared row 9, col 5
+[21:46:31] [LED] LED: Cleared row 10, col 5
+[21:46:31] [LED] LED: Cleared row 11, col 5
+[21:46:31] [INFO] Displaying character ' ' in column 5
+[21:46:31] [LED] LED: Space character - no punches
+[21:46:31] [INFO] Status: DISPLAYING: HELLO 
+[21:46:31] [LED] LED: Cleared row 0, col 6
+[21:46:31] [LED] LED: Cleared row 1, col 6
+[21:46:31] [LED] LED: Cleared row 2, col 6
+[21:46:31] [LED] LED: Cleared row 3, col 6
+[21:46:31] [LED] LED: Cleared row 4, col 6
+[21:46:31] [LED] LED: Cleared row 5, col 6
+[21:46:31] [LED] LED: Cleared row 6, col 6
+[21:46:31] [LED] LED: Cleared row 7, col 6
+[21:46:31] [LED] LED: Cleared row 8, col 6
+[21:46:31] [LED] LED: Cleared row 9, col 6
+[21:46:31] [LED] LED: Cleared row 10, col 6
+[21:46:31] [LED] LED: Cleared row 11, col 6
+[21:46:31] [INFO] Displaying character 'W' in column 6
+[21:46:31] [LED] LED: Row 0 + Row 8 for 'W'
+[21:46:31] [INFO] Status: DISPLAYING: HELLO W
+[21:46:31] [LED] LED: Cleared row 0, col 7
+[21:46:31] [LED] LED: Cleared row 1, col 7
+[21:46:31] [LED] LED: Cleared row 2, col 7
+[21:46:31] [LED] LED: Cleared row 3, col 7
+[21:46:31] [LED] LED: Cleared row 4, col 7
+[21:46:31] [LED] LED: Cleared row 5, col 7
+[21:46:31] [LED] LED: Cleared row 6, col 7
+[21:46:31] [LED] LED: Cleared row 7, col 7
+[21:46:31] [LED] LED: Cleared row 8, col 7
+[21:46:31] [LED] LED: Cleared row 9, col 7
+[21:46:31] [LED] LED: Cleared row 10, col 7
+[21:46:31] [LED] LED: Cleared row 11, col 7
+[21:46:31] [INFO] Displaying character 'O' in column 7
+[21:46:31] [LED] LED: Row 11 + Row 8 for 'O'
+[21:46:31] [INFO] Status: DISPLAYING: HELLO WO
+[21:46:31] [LED] LED: Cleared row 0, col 8
+[21:46:31] [LED] LED: Cleared row 1, col 8
+[21:46:31] [LED] LED: Cleared row 2, col 8
+[21:46:31] [LED] LED: Cleared row 3, col 8
+[21:46:31] [LED] LED: Cleared row 4, col 8
+[21:46:31] [LED] LED: Cleared row 5, col 8
+[21:46:31] [LED] LED: Cleared row 6, col 8
+[21:46:31] [LED] LED: Cleared row 7, col 8
+[21:46:31] [LED] LED: Cleared row 8, col 8
+[21:46:31] [LED] LED: Cleared row 9, col 8
+[21:46:31] [LED] LED: Cleared row 10, col 8
+[21:46:31] [LED] LED: Cleared row 11, col 8
+[21:46:31] [INFO] Displaying character 'R' in column 8
+[21:46:31] [LED] LED: Row 11 + Row 11 for 'R'
+[21:46:31] [INFO] Status: DISPLAYING: HELLO WOR
+[21:46:31] [LED] LED: Cleared row 0, col 9
+[21:46:31] [LED] LED: Cleared row 1, col 9
+[21:46:31] [LED] LED: Cleared row 2, col 9
+[21:46:31] [LED] LED: Cleared row 3, col 9
+[21:46:31] [LED] LED: Cleared row 4, col 9
+[21:46:31] [LED] LED: Cleared row 5, col 9
+[21:46:31] [LED] LED: Cleared row 6, col 9
+[21:46:31] [LED] LED: Cleared row 7, col 9
+[21:46:31] [LED] LED: Cleared row 8, col 9
+[21:46:31] [LED] LED: Cleared row 9, col 9
+[21:46:31] [LED] LED: Cleared row 10, col 9
+[21:46:31] [LED] LED: Cleared row 11, col 9
+[21:46:31] [INFO] Displaying character 'L' in column 9
+[21:46:31] [LED] LED: Row 11 + Row 5 for 'L'
+[21:46:31] [INFO] Status: DISPLAYING: HELLO WORL
+[21:46:31] [LED] LED: Cleared row 0, col 10
+[21:46:31] [LED] LED: Cleared row 1, col 10
+[21:46:31] [LED] LED: Cleared row 2, col 10
+[21:46:31] [LED] LED: Cleared row 3, col 10
+[21:46:31] [LED] LED: Cleared row 4, col 10
+[21:46:31] [LED] LED: Cleared row 5, col 10
+[21:46:31] [LED] LED: Cleared row 6, col 10
+[21:46:31] [LED] LED: Cleared row 7, col 10
+[21:46:31] [LED] LED: Cleared row 8, col 10
+[21:46:31] [LED] LED: Cleared row 9, col 10
+[21:46:31] [LED] LED: Cleared row 10, col 10
+[21:46:31] [LED] LED: Cleared row 11, col 10
+[21:46:31] [INFO] Displaying character 'D' in column 10
+[21:46:31] [LED] LED: Row 12 + Row 6 for 'D'
+[21:46:31] [INFO] Status: DISPLAYING: HELLO WORLD
+[21:46:31] [INFO] Status: DISPLAY COMPLETE
+[21:46:50] [INFO] Status: PROCESSING: HELLO WORLD
+[21:46:50] [INFO] Status: TYPING
+[21:46:50] [LED] LED: Cleared row 0, col 0
+[21:46:50] [LED] LED: Cleared row 1, col 0
+[21:46:50] [LED] LED: Cleared row 2, col 0
+[21:46:50] [LED] LED: Cleared row 3, col 0
+[21:46:50] [LED] LED: Cleared row 4, col 0
+[21:46:50] [LED] LED: Cleared row 5, col 0
+[21:46:50] [LED] LED: Cleared row 6, col 0
+[21:46:50] [LED] LED: Cleared row 7, col 0
+[21:46:50] [LED] LED: Cleared row 8, col 0
+[21:46:50] [LED] LED: Cleared row 9, col 0
+[21:46:50] [LED] LED: Cleared row 10, col 0
+[21:46:50] [LED] LED: Cleared row 11, col 0
+[21:46:50] [INFO] Displaying character 'H' in column 0
+[21:46:50] [LED] LED: Row 12 + Row 10 for 'H'
+[21:46:50] [INFO] Status: DISPLAYING: H
+[21:46:50] [LED] LED: Cleared row 0, col 1
+[21:46:50] [LED] LED: Cleared row 1, col 1
+[21:46:50] [LED] LED: Cleared row 2, col 1
+[21:46:50] [LED] LED: Cleared row 3, col 1
+[21:46:50] [LED] LED: Cleared row 4, col 1
+[21:46:50] [LED] LED: Cleared row 5, col 1
+[21:46:50] [LED] LED: Cleared row 6, col 1
+[21:46:50] [LED] LED: Cleared row 7, col 1
+[21:46:50] [LED] LED: Cleared row 8, col 1
+[21:46:50] [LED] LED: Cleared row 9, col 1
+[21:46:50] [LED] LED: Cleared row 10, col 1
+[21:46:50] [LED] LED: Cleared row 11, col 1
+[21:46:50] [INFO] Displaying character 'E' in column 1
+[21:46:50] [LED] LED: Row 12 + Row 7 for 'E'
+[21:46:50] [INFO] Status: DISPLAYING: HE
+[21:46:50] [LED] LED: Cleared row 0, col 2
+[21:46:50] [LED] LED: Cleared row 1, col 2
+[21:46:50] [LED] LED: Cleared row 2, col 2
+[21:46:50] [LED] LED: Cleared row 3, col 2
+[21:46:50] [LED] LED: Cleared row 4, col 2
+[21:46:50] [LED] LED: Cleared row 5, col 2
+[21:46:50] [LED] LED: Cleared row 6, col 2
+[21:46:50] [LED] LED: Cleared row 7, col 2
+[21:46:50] [LED] LED: Cleared row 8, col 2
+[21:46:50] [LED] LED: Cleared row 9, col 2
+[21:46:50] [LED] LED: Cleared row 10, col 2
+[21:46:50] [LED] LED: Cleared row 11, col 2
+[21:46:50] [INFO] Displaying character 'L' in column 2
+[21:46:50] [LED] LED: Row 11 + Row 5 for 'L'
+[21:46:50] [INFO] Status: DISPLAYING: HEL
+[21:46:50] [LED] LED: Cleared row 0, col 3
+[21:46:50] [LED] LED: Cleared row 1, col 3
+[21:46:50] [LED] LED: Cleared row 2, col 3
+[21:46:50] [LED] LED: Cleared row 3, col 3
+[21:46:50] [LED] LED: Cleared row 4, col 3
+[21:46:50] [LED] LED: Cleared row 5, col 3
+[21:46:50] [LED] LED: Cleared row 6, col 3
+[21:46:50] [LED] LED: Cleared row 7, col 3
+[21:46:50] [LED] LED: Cleared row 8, col 3
+[21:46:50] [LED] LED: Cleared row 9, col 3
+[21:46:50] [LED] LED: Cleared row 10, col 3
+[21:46:50] [LED] LED: Cleared row 11, col 3
+[21:46:50] [INFO] Displaying character 'L' in column 3
+[21:46:50] [LED] LED: Row 11 + Row 5 for 'L'
+[21:46:50] [INFO] Status: DISPLAYING: HELL
+[21:46:50] [LED] LED: Cleared row 0, col 4
+[21:46:50] [LED] LED: Cleared row 1, col 4
+[21:46:50] [LED] LED: Cleared row 2, col 4
+[21:46:50] [LED] LED: Cleared row 3, col 4
+[21:46:50] [LED] LED: Cleared row 4, col 4
+[21:46:50] [LED] LED: Cleared row 5, col 4
+[21:46:50] [LED] LED: Cleared row 6, col 4
+[21:46:50] [LED] LED: Cleared row 7, col 4
+[21:46:50] [LED] LED: Cleared row 8, col 4
+[21:46:50] [LED] LED: Cleared row 9, col 4
+[21:46:50] [LED] LED: Cleared row 10, col 4
+[21:46:50] [LED] LED: Cleared row 11, col 4
+[21:46:50] [INFO] Displaying character 'O' in column 4
+[21:46:50] [LED] LED: Row 11 + Row 8 for 'O'
+[21:46:50] [INFO] Status: DISPLAYING: HELLO
+[21:46:50] [LED] LED: Cleared row 0, col 5
+[21:46:50] [LED] LED: Cleared row 1, col 5
+[21:46:50] [LED] LED: Cleared row 2, col 5
+[21:46:50] [LED] LED: Cleared row 3, col 5
+[21:46:50] [LED] LED: Cleared row 4, col 5
+[21:46:50] [LED] LED: Cleared row 5, col 5
+[21:46:50] [LED] LED: Cleared row 6, col 5
+[21:46:50] [LED] LED: Cleared row 7, col 5
+[21:46:50] [LED] LED: Cleared row 8, col 5
+[21:46:50] [LED] LED: Cleared row 9, col 5
+[21:46:50] [LED] LED: Cleared row 10, col 5
+[21:46:50] [LED] LED: Cleared row 11, col 5
+[21:46:50] [INFO] Displaying character ' ' in column 5
+[21:46:50] [LED] LED: Space character - no punches
+[21:46:50] [INFO] Status: DISPLAYING: HELLO 
+[21:46:50] [LED] LED: Cleared row 0, col 6
+[21:46:50] [LED] LED: Cleared row 1, col 6
+[21:46:50] [LED] LED: Cleared row 2, col 6
+[21:46:50] [LED] LED: Cleared row 3, col 6
+[21:46:50] [LED] LED: Cleared row 4, col 6
+[21:46:50] [LED] LED: Cleared row 5, col 6
+[21:46:50] [LED] LED: Cleared row 6, col 6
+[21:46:50] [LED] LED: Cleared row 7, col 6
+[21:46:50] [LED] LED: Cleared row 8, col 6
+[21:46:50] [LED] LED: Cleared row 9, col 6
+[21:46:50] [LED] LED: Cleared row 10, col 6
+[21:46:50] [LED] LED: Cleared row 11, col 6
+[21:46:50] [INFO] Displaying character 'W' in column 6
+[21:46:50] [LED] LED: Row 0 + Row 8 for 'W'
+[21:46:50] [INFO] Status: DISPLAYING: HELLO W
+[21:46:51] [LED] LED: Cleared row 0, col 7
+[21:46:51] [LED] LED: Cleared row 1, col 7
+[21:46:51] [LED] LED: Cleared row 2, col 7
+[21:46:51] [LED] LED: Cleared row 3, col 7
+[21:46:51] [LED] LED: Cleared row 4, col 7
+[21:46:51] [LED] LED: Cleared row 5, col 7
+[21:46:51] [LED] LED: Cleared row 6, col 7
+[21:46:51] [LED] LED: Cleared row 7, col 7
+[21:46:51] [LED] LED: Cleared row 8, col 7
+[21:46:51] [LED] LED: Cleared row 9, col 7
+[21:46:51] [LED] LED: Cleared row 10, col 7
+[21:46:51] [LED] LED: Cleared row 11, col 7
+[21:46:51] [INFO] Displaying character 'O' in column 7
+[21:46:51] [LED] LED: Row 11 + Row 8 for 'O'
+[21:46:51] [INFO] Status: DISPLAYING: HELLO WO
+[21:46:51] [LED] LED: Cleared row 0, col 8
+[21:46:51] [LED] LED: Cleared row 1, col 8
+[21:46:51] [LED] LED: Cleared row 2, col 8
+[21:46:51] [LED] LED: Cleared row 3, col 8
+[21:46:51] [LED] LED: Cleared row 4, col 8
+[21:46:51] [LED] LED: Cleared row 5, col 8
+[21:46:51] [LED] LED: Cleared row 6, col 8
+[21:46:51] [LED] LED: Cleared row 7, col 8
+[21:46:51] [LED] LED: Cleared row 8, col 8
+[21:46:51] [LED] LED: Cleared row 9, col 8
+[21:46:51] [LED] LED: Cleared row 10, col 8
+[21:46:51] [LED] LED: Cleared row 11, col 8
+[21:46:51] [INFO] Displaying character 'R' in column 8
+[21:46:51] [LED] LED: Row 11 + Row 11 for 'R'
+[21:46:51] [INFO] Status: DISPLAYING: HELLO WOR
+[21:46:51] [LED] LED: Cleared row 0, col 9
+[21:46:51] [LED] LED: Cleared row 1, col 9
+[21:46:51] [LED] LED: Cleared row 2, col 9
+[21:46:51] [LED] LED: Cleared row 3, col 9
+[21:46:51] [LED] LED: Cleared row 4, col 9
+[21:46:51] [LED] LED: Cleared row 5, col 9
+[21:46:51] [LED] LED: Cleared row 6, col 9
+[21:46:51] [LED] LED: Cleared row 7, col 9
+[21:46:51] [LED] LED: Cleared row 8, col 9
+[21:46:51] [LED] LED: Cleared row 9, col 9
+[21:46:51] [LED] LED: Cleared row 10, col 9
+[21:46:51] [LED] LED: Cleared row 11, col 9
+[21:46:51] [INFO] Displaying character 'L' in column 9
+[21:46:51] [LED] LED: Row 11 + Row 5 for 'L'
+[21:46:51] [INFO] Status: DISPLAYING: HELLO WORL
+[21:46:51] [LED] LED: Cleared row 0, col 10
+[21:46:51] [LED] LED: Cleared row 1, col 10
+[21:46:51] [LED] LED: Cleared row 2, col 10
+[21:46:51] [LED] LED: Cleared row 3, col 10
+[21:46:51] [LED] LED: Cleared row 4, col 10
+[21:46:51] [LED] LED: Cleared row 5, col 10
+[21:46:51] [LED] LED: Cleared row 6, col 10
+[21:46:51] [LED] LED: Cleared row 7, col 10
+[21:46:51] [LED] LED: Cleared row 8, col 10
+[21:46:51] [LED] LED: Cleared row 9, col 10
+[21:46:51] [LED] LED: Cleared row 10, col 10
+[21:46:51] [LED] LED: Cleared row 11, col 10
+[21:46:51] [INFO] Displaying character 'D' in column 10
+[21:46:51] [LED] LED: Row 12 + Row 6 for 'D'
+[21:46:51] [INFO] Status: DISPLAYING: HELLO WORLD
+[21:46:51] [INFO] Status: DISPLAY COMPLETE
