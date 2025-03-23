@@ -1,4 +1,4 @@
-# Punch Card Display System v0.5.2 - The Reorganization Update
+# Punch Card Project v0.5.2 - The Reorganization Update
 
 ## Backup Date
 March 24, 2024
