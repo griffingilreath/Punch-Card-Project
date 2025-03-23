@@ -20,6 +20,7 @@ def main():
     root_dir = os.path.dirname(os.path.abspath(__file__))
     secrets_dir = os.path.join(root_dir, "secrets")
     api_keys_file = os.path.join(secrets_dir, "api_keys.json")
+    template_file = os.path.join(root_dir, "templates", "api_keys.json.template")
     
     # Ensure the secrets directory exists
     if not os.path.exists(secrets_dir):
@@ -37,6 +38,23 @@ def main():
             "service2_key": ""
         }
     }
+    
+    # Try to load from template file first if it exists
+    if os.path.exists(template_file):
+        try:
+            with open(template_file, 'r') as f:
+                template_keys = json.load(f)
+                # Use the structure from the template but not the values
+                for service in template_keys:
+                    if service not in api_keys:
+                        api_keys[service] = {}
+                    for key in template_keys[service]:
+                        if key not in api_keys[service]:
+                            api_keys[service][key] = ""
+            print("Using structure from template file.")
+        except Exception as e:
+            print(f"Error loading template file: {e}")
+            print("Using default API keys structure.")
     
     # Load existing API keys if the file exists
     if os.path.exists(api_keys_file):
