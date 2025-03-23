@@ -1,4 +1,4 @@
-# Punch Card Display System v0.5.0 - The GUI Update
+# Punch Card Display System v0.5.1 - The Documentation Update
 
 ```
 ┌─────────────────────────────── PUNCH CARD GUI UPDATE ───────────────────────────────┐
@@ -42,7 +42,19 @@
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
-**Status**: Beta - The GUI Update improves visual cohesion but still has pending issues.
+**Status**: Beta - The Documentation Update adds comprehensive design history research.
+
+### What's New in v0.5.1 (Released March 23, 2024):
+
+This version adds extensive documentation on early computer interface design history and enhances the internal design language research that informs the project's aesthetic.
+
+#### Documentation Enhancements
+- **Comprehensive Interface Design History** document covering early computing design languages
+- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
+- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
+- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
+- **Design Language summary document** acting as an index to design research resources
+- **Updated references in README** with links to all research documentation
 
 ### What's New in v0.5.0 (Released March 23, 2024):
 
@@ -467,6 +479,15 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 
 ## 🗓️ Version History
 
+- v0.5.1 (2024-03-23): **The Documentation Update**
+  - Added comprehensive Interface Design History documentation
+  - Created research on Early Apple UI Design Language (1970s-1980s)
+  - Added case study on EPA's 1977 Unified Visual Design System
+  - Documented Cultural and Societal Design Trends in early computing
+  - Created a Design Language index document for all design resources
+  - Updated README with links to new research documentation
+  - Expanded the project's design language foundations
+
 - v0.5.0 (2024-03-23): **The GUI Update**
   - Enhanced GUI with black-background theme for better visibility and authentic punch card aesthetic
   - Implemented OpenAI integration with model selection and prompt customization
@@ -513,6 +534,16 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 - [The Craft of Coding: Understanding Historical Computing](https://craftofcoding.wordpress.com/)
 - [University of Iowa Punch Card Collection (D. Jones)](https://www.lib.uiowa.edu/sc/resources/punched-card-collections/)
 - [ANSI X3.26-1970: Hollerith Punched Card Code](https://webstore.ansi.org/Standards/INCITS/ANSIINCITSAssociates1970) 
+
+### Internal Documentation
+
+- [Interface Design History](/docs/research/INTERFACE_DESIGN_HISTORY.md) - Comprehensive research on early computer interface design, including:
+  - Early Apple UI Design Language (1970s-1980s)
+  - The EPA's 1977 Unified Visual Design System
+  - Cultural and Societal Design Trends in Early Computing
+- [Punch Card Encoding](/docs/research/PUNCH_CARD_ENCODING.md) - Technical details on punch card character encoding
+- [LED Implementation](/docs/research/LED_IMPLEMENTATION.md) - Guide to LED matrix implementation
+- [Sociological Aspects](/docs/research/SOCIOLOGICAL_ASPECTS.md) - The cultural impact of punch cards
 
 ---
 
