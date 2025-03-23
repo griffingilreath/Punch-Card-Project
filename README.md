@@ -30,31 +30,44 @@
 
 **Status**: Beta - The GUI Update improves visual cohesion but still has pending issues.
 
-### What's New in v0.5.0:
-- **Enhanced GUI with black-background theme** for better visibility and punch card aesthetic
+### What's New in v0.5.0 (Released March 23, 2024):
+
+This version represents a significant visual overhaul of the Punch Card Display System, focusing on improved GUI elements, better visibility with a black background theme, and enhanced service monitoring for OpenAI and fly.io connections.
+
+#### Visual Interface Improvements
+- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
+- **Space Mono font** for consistent terminal-like appearance throughout the interface
+- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
+- **Fixed button layout issues** to prevent UI elements from being cut off
+- **Improved widget visibility** with enhanced contrast for all UI elements
+
+#### Functionality Enhancements
 - **OpenAI integration** with model selection and prompt customization
 - **Service status monitoring** for both OpenAI and fly.io connectivity
-- **API console** with detailed connection and response information (toggle with 'C' key)
-- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar
-- **Space Mono font** for authentic terminal/punch card look and feel
-- **Hotkeys for common functions** including toggling console visibility
-- **Enhanced button layout** to prevent UI elements from being cut off
-- **Improved error handling** for OpenAI connectivity issues
+- **API console** with detailed connection information (toggle with 'C' key)
+- **Keyboard shortcuts** for common functions including console visibility
+- **Improved error handling** for service connectivity issues
+
+#### Security Improvements
+- **API key management** with secure handling and environment variable support
+- **Dedicated secrets directory** excluded from Git via .gitignore
+- **Enhanced settings file structure** to prevent accidental API key exposure
+- **Updated documentation** with security best practices
 
 ### Known Issues:
 - API console sometimes shows messages in terminal instead of GUI
 - Visual consistency issues between different console types
 - Menu bar/button toolbar may not appear in some configurations
 - Occasional style application failures with certain PyQt versions
-- OpenAI API key exposure in settings file (needs to be moved to environment variable)
+- Space Mono font may not be available on all systems, causing fallback to system fonts
 
 ### Future Improvements:
 - Add database viewer for browsing saved messages
 - Standardize all consoles to follow same design language
 - Improve B&W color scheme with future support for additional colors 
 - Planning single-color LED support as stepping stone to full color
-- Moving API keys to secure environment variables instead of settings file
 - Implementing a proper settings dialog for all configuration options
+- Moving all sensitive configuration to environment variables
 
 ## Repository Organization
 
@@ -325,8 +338,8 @@ pip install -r requirements.txt
 
    **Method 1: Using the secrets directory (RECOMMENDED - not synced with GitHub)**
    ```bash
-   # Navigate to the secrets directory
-   cd secrets
+   # Create a copy of the template in the secrets directory
+   cp secrets/api_keys.json.template secrets/api_keys.json
    
    # Edit the api_keys.json file with your actual API key
    # Replace "YOUR_ACTUAL_API_KEY_HERE" with your real key
@@ -344,17 +357,20 @@ pip install -r requirements.txt
    **Method 3: Settings file (LEAST SECURE - not recommended)**
    - Edit the `punch_card_settings.json` file and replace "YOUR_API_KEY_HERE" with your actual key
 
-4. Run the tests to verify functionality:
+4. Run the application with the new black background theme:
 ```bash
-python test_leds.py --test all
+python simple_display.py --black-bg --openai --debug
 ```
 
 ### 🔐 API Key Security
 
-The project now includes enhanced security for API keys:
+The project now includes enhanced security for API keys with v0.5.0:
 
-- A dedicated `secrets/` directory that is excluded from git
-- Secure lookup hierarchy that prioritizes the safest storage methods
+- A dedicated `secrets/` directory that is excluded from git via `.gitignore`
+- Secure lookup hierarchy that prioritizes the safest storage methods:
+  1. First checks the `secrets/api_keys.json` file
+  2. Then falls back to environment variables
+  3. Only uses settings file as a last resort
 - Clear instructions in `secrets/README.md` for proper key management
 - Additional `.gitignore` rules to prevent accidental commits of sensitive data
 
@@ -429,6 +445,20 @@ python test_leds.py --test hardware --hardware-type rpi
 See the `RPiHardwareController` class in `hardware_controller.py` for details on pin mapping and configuration.
 
 ## 🗓️ Version History
+
+- v0.5.0 (2024-03-23): **The GUI Update**
+  - Enhanced GUI with black-background theme for better visibility and authentic punch card aesthetic
+  - Implemented OpenAI integration with model selection and prompt customization
+  - Added real-time service status monitoring for both OpenAI and fly.io connectivity
+  - Created API console with detailed connection information (toggle with 'C' key)
+  - Implemented classic Mac-style menu bar with enhanced button toolbar fallback
+  - Standardized on Space Mono font throughout the interface for consistent terminal-like appearance
+  - Added keyboard shortcuts for common functions including console visibility
+  - Fixed button layout issues to prevent UI elements from being cut off
+  - Significantly improved error handling for service connectivity issues
+  - Enhanced API key security with dedicated secrets directory and secure lookup hierarchy
+  - Updated .gitignore to prevent sensitive information from being committed
+  - *Secret feature: Service status indicators color coding*
 
 - v0.1.1 (2024-08-12): **The Visualization Update**
   - Enhanced terminal display with multiple character sets
