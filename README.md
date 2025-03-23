@@ -1,4 +1,4 @@
-# Punch Card Project v0.5.3 - The Reorganization Update
+# Punch Card Project v0.5.3 - The Branching Update
 
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
@@ -44,9 +44,28 @@
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
-**Status**: Beta - The Reorganization Update improves project structure while building on v0.5.1's design documentation.
+**Status**: Beta - The Branching Update implements a comprehensive Git versioning strategy while building on v0.5.2's project organization.
 
 ### What's New in v0.5.3 (Released March 24, 2024):
+
+This version implements a comprehensive Git branching strategy based on GitFlow while preserving the project's existing version archiving system.
+
+#### Git Versioning Improvements
+- **Modified GitFlow Implementation**: A structured approach to version control
+- **Branch Types**: 
+  - `master`: Main production branch
+  - `develop`: Integration branch for new features
+  - `feature/*`: Feature branches for new development
+  - `release/*`: Release preparation branches
+  - `hotfix/*`: Emergency fix branches
+  - `v*.*.*`: Version branches that preserve each release point
+- **git_version_manager.py**: New command-line tool for branch and version management
+- **Integrated workflow** with existing version_manager.py script
+- **Automated version creation** with commit history analysis
+- **Comprehensive documentation** in VERSION_CONTROL.md
+- **Enhanced GitHub Wiki** with improved organization and navigation
+
+### What's New in v0.5.2 (Released March 24, 2024):
 
 This version significantly reorganizes the project structure for better maintainability and developer experience while building on the design documentation added in v0.5.1.
 
@@ -523,7 +542,16 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 
 ## 🗓️ Version History
 
-- v0.5.3 (2024-03-24): **The Reorganization Update**
+- v0.5.3 (2024-03-24): **The Branching Update**
+  - Implemented comprehensive Git branching strategy based on GitFlow
+  - Created git_version_manager.py for branch and version management
+  - Added detailed branching documentation in VERSION_CONTROL.md
+  - Enhanced GitHub Wiki with improved organization
+  - Added Project Structure documentation to the Wiki
+  - Integrated Git workflow with existing version archiving system
+  - Streamlined documentation for personal project
+  
+- v0.5.2 (2024-03-24): **The Reorganization Update**
   - Complete restructuring of the project for optimal organization
   - Properly separated core, display, and utility modules
   - Enhanced test organization with specialized test directories
@@ -534,7 +562,7 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
   - Archived all legacy and duplicate test files
   - Enhanced documentation with detailed directory structure
   - Standardized directory structure following best practices
-  
+
 - v0.5.1 (2024-03-23): **The Documentation Update**
   - Added comprehensive Interface Design History documentation
   - Created research on Early Apple UI Design Language (1970s-1980s)
