@@ -107,4 +107,11 @@ venv.bak/
 # Project-specific
 *.db
 *_backup/
-temp/ 
+temp/
+
+# API Keys and sensitive information
+# Only commit the template version of this file
+# with placeholder values, never real API keys
+punch_card_settings.json.private
+.env.local
+.api_keys 

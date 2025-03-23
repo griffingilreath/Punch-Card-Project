@@ -1,0 +1,51 @@
+Version: 0.5.0
+Date: 2024-03-23
+Description: The GUI Update - Enhanced black-themed interface with improved service monitoring
+
+Key Features:
+- Black background theme for better contrast and punch card aesthetic
+- OpenAI integration with model selection and API key management
+- Service status monitoring for OpenAI and fly.io services
+- API console with connection and response information
+- Toggle console visibility with 'C' key press
+- Classic Mac-style menu bar or enhanced button toolbar
+- Space Mono font throughout the interface
+- Enhanced button layout to prevent UI elements from being cut off
+- Improved error handling for service connectivity
+
+Files Included:
+- simple_display.py: Main application with GUI enhancements
+- punch_card_settings.json: User settings with secure API key handling
+- src/display/gui_display.py: GUI display components
+- src/display/terminal_display.py: Terminal display components 
+- data/message_database.db: SQLite database for message storage
+- message_history.json: Message history backup
+- punch_card_stats.json: System statistics
+- requirements.txt: Python dependencies
+- README.md: Updated project documentation
+
+Directory Structure:
+/versions/0.5.0/
+├── src/           # Source code files
+├── data/          # Data files and databases
+├── config/        # Configuration files
+├── tests/         # Test files
+├── requirements.txt
+├── README.md
+└── version_info.txt
+
+Dependencies:
+- Python 3.x
+- PyQt6
+- OpenAI
+- Requests
+- SQLite3 (built-in)
+- JSON (built-in)
+
+To Run:
+1. Ensure Python 3.x is installed
+2. Install dependencies: pip install -r requirements.txt
+3. Set your OpenAI API key (environment variable or settings file)
+4. Run: python simple_display.py --black-bg --openai --debug
+
+Notes: This version significantly enhances the GUI with a black background theme and improved service monitoring. Known issues include API console visibility problems and occasional styling inconsistencies. API keys should be stored in environment variables rather than in settings files for security. 

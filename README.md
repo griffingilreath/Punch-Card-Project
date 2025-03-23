@@ -10,27 +10,33 @@
     \|__|    \|_______|\|_______| \|_______|\|_______|\|__|\|__|\|__|         \|__|  \|_______|
 ```
 
-**Status**: Beta - The GUI Update is still buggy and hasn't been thoroughly tested.
+**Status**: Beta - The GUI Update improves visual cohesion but still has pending issues.
 
 ### What's New in v0.5.0:
-- Enhanced GUI with black-background theme for better visibility 
-- OpenAI integration working but API console isn't displaying properly
-- System console works but needs visual improvements (less jittery)
-- Added key press 'C' to toggle console visibility
-- Service status monitoring for OpenAI and fly.io services
-- Button styles updated to avoid being cut off
+- **Enhanced GUI with black-background theme** for better visibility and punch card aesthetic
+- **OpenAI integration** with model selection and prompt customization
+- **Service status monitoring** for both OpenAI and fly.io connectivity
+- **API console** with detailed connection and response information (toggle with 'C' key)
+- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar
+- **Space Mono font** for authentic terminal/punch card look and feel
+- **Hotkeys for common functions** including toggling console visibility
+- **Enhanced button layout** to prevent UI elements from being cut off
+- **Improved error handling** for OpenAI connectivity issues
 
 ### Known Issues:
-- API console is not showing messages correctly - outputs to terminal instead
+- API console sometimes shows messages in terminal instead of GUI
 - Visual consistency issues between different console types
 - Menu bar/button toolbar may not appear in some configurations
-- Occasional style application failures
+- Occasional style application failures with certain PyQt versions
+- OpenAI API key exposure in settings file (needs to be moved to environment variable)
 
 ### Future Improvements:
 - Add database viewer for browsing saved messages
 - Standardize all consoles to follow same design language
 - Improve B&W color scheme with future support for additional colors 
 - Planning single-color LED support as stepping stone to full color
+- Moving API keys to secure environment variables instead of settings file
+- Implementing a proper settings dialog for all configuration options
 
 ## What is the Punch Card Display System?
 
@@ -265,7 +271,20 @@ cd Punch-Card-Project
 pip install -r requirements.txt
 ```
 
-3. Run the tests to verify functionality:
+3. Set up your OpenAI API key:
+
+You can set up your OpenAI API key in one of two ways:
+- Set the `OPENAI_API_KEY` environment variable (recommended):
+  ```bash
+  # On macOS/Linux
+  export OPENAI_API_KEY=your_api_key_here
+  
+  # On Windows
+  set OPENAI_API_KEY=your_api_key_here
+  ```
+- Edit the `punch_card_settings.json` file and replace "YOUR_API_KEY_HERE" with your actual key (less secure)
+
+4. Run the tests to verify functionality:
 ```bash
 python test_leds.py --test all
 ```

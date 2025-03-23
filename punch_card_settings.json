@@ -1,6 +1,6 @@
 {
   "message_source": "openai",
-  "openai_api_key": "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",
+  "openai_api_key": "YOUR_API_KEY_HERE",
   "openai_model": "gpt-3.5-turbo-0125",
   "openai_prompts": [
     "Create a short tech message about IBM punch cards",

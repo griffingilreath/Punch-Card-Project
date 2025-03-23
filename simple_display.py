@@ -647,10 +647,16 @@ def setup_openai_client():
     
     # Third try: Use a default key from enhanced_openai_display.py
     if not api_key:
-        api_key = "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"
-        update_api_console("Using default API key")
+        # Check for environment variable first
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if api_key:
+            update_api_console("Using API key from environment variable")
+        else:
+            # Placeholder for user to fill in
+            api_key = "YOUR_API_KEY_HERE"  # Replace with your actual API key
+            update_api_console("⚠️ No API key found. Please set your API key in the settings file or as an environment variable.")
     
-    if api_key:
+    if api_key and api_key != "YOUR_API_KEY_HERE":
         try:
             openai_client = OpenAI(api_key=api_key)
             print(f"✅ OpenAI client initialized")
