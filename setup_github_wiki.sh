@@ -20,7 +20,11 @@ echo "--------------------------------------------"
 # Check if the wiki content exists in the temporary directory
 if [ ! -d "$TEMP_WIKI_DIR" ]; then
     echo "Error: The temporary wiki content directory ($TEMP_WIKI_DIR) doesn't exist."
-    echo "Please run the wiki content preparation script first."
+    echo "Please prepare your wiki content in $TEMP_WIKI_DIR first."
+    echo "You can do this by running:"
+    echo "mkdir -p $TEMP_WIKI_DIR"
+    echo "cp -r docs/research/*.md $TEMP_WIKI_DIR/"
+    echo "cp -r docs/technical/*.md $TEMP_WIKI_DIR/"
     exit 1
 fi
 
@@ -33,6 +37,13 @@ if [ ! -d "$WIKI_DIR" ]; then
         echo "Make sure you've enabled the Wiki feature in your GitHub repository settings."
         echo "The wiki URL should be: $WIKI_REPO_URL"
         exit 1
+    }
+else
+    echo "Wiki repository already exists at $WIKI_DIR"
+    echo "Pulling latest changes..."
+    cd "$WIKI_DIR"
+    git pull || {
+        echo "Warning: Failed to pull latest changes. Continuing anyway..."
     }
 fi
 
@@ -47,7 +58,7 @@ cp -r "$TEMP_WIKI_DIR"/* "$WIKI_DIR"/ || {
 echo "Committing and pushing changes..."
 cd "$WIKI_DIR"
 git add .
-git commit -m "Initial wiki content setup" || {
+git commit -m "Update wiki content with latest documentation" || {
     echo "Warning: No changes to commit or commit failed."
 }
 git push || {
@@ -58,6 +69,6 @@ git push || {
 
 echo "--------------------------------------------"
 echo "✅ GitHub Wiki setup complete!"
-echo "Your wiki has been populated with the initial content."
+echo "Your wiki has been populated with the latest content."
 echo "You can now visit your wiki at: https://github.com/griffingilreath/Punch-Card-Project/wiki"
 echo "--------------------------------------------" 
