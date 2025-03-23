@@ -1,13 +1,12 @@
 # Punch Card Display System v0.5.0 - The GUI Update
 
 ```
- ________ ___  ___  ___        ___  ___  ________  ________  ________  _________  _______      
-|\  _____\\  \|\  \|\  \      |\  \|\  \|\   __  \|\   __  \|\   __  \|\___   ___\\  ___ \     
-\ \  \__/\ \  \\\  \ \  \     \ \  \\\  \ \  \|\  \ \  \|\  \ \  \|\  \|___ \  \_\ \   __/|    
- \ \   __\\ \  \\\  \ \  \     \ \  \\\  \ \  \\\  \ \   __  \ \   ____\   \ \  \ \ \  \_|/__  
-  \ \  \_| \ \  \\\  \ \  \____ \ \  \\\  \ \  \\\  \ \  \ \  \ \  \___|    \ \  \ \ \  \_|\ \ 
-   \ \__\   \ \_______\ \_______\\ \_______\ \_______\ \__\ \__\ \__\        \ \__\ \ \_______\
-    \|__|    \|_______|\|_______| \|_______|\|_______|\|__|\|__|\|__|         \|__|  \|_______|
+  _____   _    _   _____    _    _   _____    _____           _______ _______ 
+ / ____| | |  | | |_   _|  | |  | | |_   _|  / ____|         |__   __|  ____|
+| |  __  | |  | |   | |    | |  | |   | |   | |  __  _   _      | |  | |__   
+| | |_ | | |  | |   | |    | |  | |   | |   | | |_ || | | |     | |  |  __|  
+| |__| | | |__| |  _| |_   | |__| |  _| |_  | |__| || |_| |     | |  | |____ 
+ \_____|  \____/  |_____|   \____/  |_____|  \_____| \__,_|     |_|  |______|
 ```
 
 **Status**: Beta - The GUI Update improves visual cohesion but still has pending issues.
@@ -37,6 +36,38 @@
 - Planning single-color LED support as stepping stone to full color
 - Moving API keys to secure environment variables instead of settings file
 - Implementing a proper settings dialog for all configuration options
+
+## Repository Organization
+
+The project uses a structured versioning system to preserve development history and ensure past versions remain accessible:
+
+```
+punch_card_project/
+├── src/                    # Current source code
+├── versions/               # Archive of previous versions
+│   ├── 0.1.0/              # The initial version
+│   │   ├── src/            # Source code as of v0.1.0
+│   │   ├── manifest.md     # Detailed version information
+│   │   └── version_info.txt # Version metadata
+│   │
+│   ├── 0.5.0/              # The GUI Update
+│   │   ├── src/            # Source code as of v0.5.0
+│   │   ├── manifest.md     # Detailed version information
+│   │   └── version_info.txt # Version metadata
+│   
+├── scripts/                # Utility scripts including version_manager.py
+├── tests/                  # Test files
+└── README.md               # This file
+```
+
+### Versioning Strategy
+
+- Each version is tagged in Git with the format `v{major}.{minor}.{patch}`
+- Complete snapshots of each version are preserved in the `versions/` directory
+- The version_manager.py script in the scripts directory handles creating new version snapshots
+- Previous versions can be accessed by:
+  1. Git tags: `git checkout v0.1.0`
+  2. Version archives: Explore the `versions/0.1.0/` directory
 
 ## What is the Punch Card Display System?
 

@@ -1,13 +1,12 @@
 # Punch Card Display System v0.5.0 - The GUI Update
 
 ```
- ________ ___  ___  ___        ___  ___  ________  ________  ________  _________  _______      
-|\  _____\\  \|\  \|\  \      |\  \|\  \|\   __  \|\   __  \|\   __  \|\___   ___\\  ___ \     
-\ \  \__/\ \  \\\  \ \  \     \ \  \\\  \ \  \|\  \ \  \|\  \ \  \|\  \|___ \  \_\ \   __/|    
- \ \   __\\ \  \\\  \ \  \     \ \  \\\  \ \  \\\  \ \   __  \ \   ____\   \ \  \ \ \  \_|/__  
-  \ \  \_| \ \  \\\  \ \  \____ \ \  \\\  \ \  \\\  \ \  \ \  \ \  \___|    \ \  \ \ \  \_|\ \ 
-   \ \__\   \ \_______\ \_______\\ \_______\ \_______\ \__\ \__\ \__\        \ \__\ \ \_______\
-    \|__|    \|_______|\|_______| \|_______|\|_______|\|__|\|__|\|__|         \|__|  \|_______|
+  _____   _    _   _____    _    _   _____    _____           _______ _______ 
+ / ____| | |  | | |_   _|  | |  | | |_   _|  / ____|         |__   __|  ____|
+| |  __  | |  | |   | |    | |  | |   | |   | |  __  _   _      | |  | |__   
+| | |_ | | |  | |   | |    | |  | |   | |   | | |_ || | | |     | |  |  __|  
+| |__| | | |__| |  _| |_   | |__| |  _| |_  | |__| || |_| |     | |  | |____ 
+ \_____|  \____/  |_____|   \____/  |_____|  \_____| \__,_|     |_|  |______|
 ```
 
 ## Release Date: March 23, 2024
@@ -53,6 +52,36 @@ This version represents a significant visual overhaul of the Punch Card Display 
 - 'C' keypress event to toggle console visibility.
 - Service status indicators for OpenAI and fly.io.
 - Improved error messages for connection issues.
+
+## Version Management & File Organization
+
+This project implements a comprehensive versioning strategy to preserve the development history and ensure all past versions remain accessible:
+
+### Repository Structure
+```
+punch_card_project/
+├── src/                    # Current source code
+├── versions/               # Archive of previous versions
+│   ├── 0.1.0/              # Initial version snapshot
+│   └── 0.5.0/              # Current GUI Update snapshot
+├── scripts/                # Utility scripts including version_manager.py
+└── data/                   # Data files and resources
+```
+
+### Version Preservation
+Each major version is:
+1. Tagged in Git using `git tag -a v0.5.0 -m "The GUI Update"`
+2. Archived in the versions directory with complete source code and documentation
+3. Documented with a manifest.md (this file) and version_info.txt
+
+### Version Management Tools
+The `scripts/version_manager.py` utility handles:
+- Creating new version snapshots
+- Documenting changes between versions
+- Maintaining the version history
+- Ensuring consistent versioning across the project
+
+This approach ensures that the project maintains a clear history of development and that users can access any previous version if needed.
 
 ## Known Issues
 
