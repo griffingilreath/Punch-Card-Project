@@ -1,4 +1,4 @@
-# Punch Card Project v0.5.2 - The Reorganization Update
+# Punch Card Project v0.5.3 - The Reorganization Update
 
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
@@ -46,7 +46,7 @@
 
 **Status**: Beta - The Reorganization Update improves project structure while building on v0.5.1's design documentation.
 
-### What's New in v0.5.2 (Released March 24, 2024):
+### What's New in v0.5.3 (Released March 24, 2024):
 
 This version significantly reorganizes the project structure for better maintainability and developer experience while building on the design documentation added in v0.5.1.
 
@@ -165,7 +165,7 @@ The project follows a comprehensive versioning approach:
 - Each version is tagged in Git with the format `v{major}.{minor}.{patch}`
 - Complete snapshots of each version are preserved in the `versions/` directory
 - The project follows a modified GitFlow branching strategy
-- Version branches (e.g., `v0.5.2`) provide historical reference points
+- Version branches (e.g., `v0.5.3`) provide historical reference points
 - The `git_version_manager.py` script in the scripts directory manages Git branches and version creation
 
 For details on the branching strategy and version management workflow, see [VERSION_CONTROL.md](docs/VERSION_CONTROL.md).
@@ -523,7 +523,7 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 
 ## 🗓️ Version History
 
-- v0.5.2 (2024-03-24): **The Reorganization Update**
+- v0.5.3 (2024-03-24): **The Reorganization Update**
   - Complete restructuring of the project for optimal organization
   - Properly separated core, display, and utility modules
   - Enhanced test organization with specialized test directories
