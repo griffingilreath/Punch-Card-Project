@@ -856,16 +856,18 @@ def setup_openai_client():
     """Set up the OpenAI client with improved error handling."""
     global openai_client, config
     
+    debug_log("Setting up OpenAI client...", "system")
+    
     # Check if we already have a client
     if openai_client:
-        update_api_console("OpenAI client already initialized", "system")
+        debug_log("OpenAI client already initialized", "system")
         return True
     
     # Check if the OpenAI module is installed
     try:
         from openai import OpenAI, APIError
     except ImportError:
-        update_api_console("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
+        debug_log("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
         return False
     
     # Get API key from config
@@ -878,32 +880,37 @@ def setup_openai_client():
             if os.path.exists(secrets_path):
                 with open(secrets_path, 'r') as f:
                     secrets = json.load(f)
-                    api_key = secrets.get("openai_api_key", "")
+                    if "openai" in secrets and "api_key" in secrets["openai"]:
+                        api_key = secrets["openai"]["api_key"]
+                    elif "openai_api_key" in secrets:
+                        api_key = secrets["openai_api_key"]
+                    
                     # Update config with the key from secrets
                     if api_key and len(api_key.strip()) >= 10:
                         config["openai_api_key"] = api_key
-                        update_api_console("ℹ️ Loaded API key from secrets file", "system")
+                        debug_log("ℹ️ Loaded API key from secrets file", "system")
         except Exception as e:
-            update_api_console(f"⚠️ Could not load API key from secrets: {str(e)}", "warning")
+            debug_log(f"⚠️ Could not load API key from secrets: {str(e)}", "warning")
     
     # Check if API key is valid
     if not api_key or len(api_key.strip()) < 10:
-        update_api_console("❌ Invalid API key. Please set a valid API key in settings.", "error")
+        debug_log("❌ Invalid API key. Please set a valid API key in settings.", "error")
+        debug_log("To set an API key, press 'S' to open settings, go to the OpenAI tab, enter your key and click 'Save API Key'", "system")
         return False
     
     try:
         # Initialize client
-        update_api_console("Initializing OpenAI client...", "system")
+        debug_log("Initializing OpenAI client with your API key...", "system")
         openai_client = OpenAI(api_key=api_key)
         
         # Test API key by listing models (lightweight call)
         try:
-            update_api_console("Testing API key validity...", "system")
+            debug_log("Testing API key validity by listing available models...", "system")
             # Call list models with a small limit
             models = openai_client.models.list(limit=5)
             
             # If we get here, the API key is valid
-            update_api_console(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
+            debug_log(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
             
             # Set default model if not set
             if not config.get("model"):
@@ -915,7 +922,7 @@ def setup_openai_client():
                     for available in available_models:
                         if model in available:
                             config["model"] = available
-                            update_api_console(f"Set default model to {config['model']}", "system")
+                            debug_log(f"Set default model to {config['model']}", "system")
                             break
                     if config.get("model"):
                         break
@@ -923,10 +930,10 @@ def setup_openai_client():
                 # If no preferred model found, use the first available
                 if not config.get("model") and len(models.data) > 0:
                     config["model"] = models.data[0].id
-                    update_api_console(f"Set default model to {config['model']}", "system")
+                    debug_log(f"Set default model to {config['model']}", "system")
                 elif not config.get("model"):
                     config["model"] = "gpt-3.5-turbo"
-                    update_api_console(f"Set default model to {config['model']} (fallback)", "system")
+                    debug_log(f"Set default model to {config['model']} (fallback)", "system")
                 
             # Save the settings with the API key and model
             save_settings()
@@ -934,13 +941,22 @@ def setup_openai_client():
             
         except APIError as e:
             # API errors often relate to authentication
-            update_api_console(f"❌ OpenAI API Error: {str(e)[:150]}", "error")
+            error_message = str(e)[:200]
+            debug_log(f"❌ OpenAI API Error: {error_message}", "error")
+            
+            if "API key" in error_message and "invalid" in error_message.lower():
+                debug_log("The API key you provided appears to be invalid. Please check the key and try again.", "error")
+            elif "exceeded your current quota" in error_message.lower():
+                debug_log("Your OpenAI account has exceeded its quota. Please check your billing information.", "error")
+            elif "rate limit" in error_message.lower():
+                debug_log("You've hit a rate limit. Please wait a moment before trying again.", "warning")
+            
             openai_client = None
             return False
             
     except Exception as e:
         # Generic error handling
-        update_api_console(f"❌ Error setting up OpenAI client: {str(e)[:150]}", "error")
+        debug_log(f"❌ Error setting up OpenAI client: {str(e)[:200]}", "error")
         openai_client = None
         return False
 
@@ -1288,9 +1304,9 @@ class SettingsDialog(QDialog):
         # Set window title
         self.setWindowTitle("Punch Card Settings")
         
-        # Increase fixed width for better readability
-        self.setFixedWidth(600)
-        self.setMinimumHeight(550)
+        # Increase size for better visibility
+        self.setMinimumWidth(700)
+        self.setMinimumHeight(600)
         
         # Create main layout
         main_layout = QVBoxLayout(self)
@@ -1424,10 +1440,20 @@ class SettingsDialog(QDialog):
         self.api_key_status.setStyleSheet("color: #888888;")
         form_layout.addRow("", self.api_key_status)
         
-        # API Key verification button
+        # API Key buttons: Verify and Save
+        api_button_layout = QHBoxLayout()
+        
         verify_button = QPushButton("Verify API Key")
+        verify_button.setMinimumHeight(32)
         verify_button.clicked.connect(self.update_api_key_status)
-        form_layout.addRow("", verify_button)
+        api_button_layout.addWidget(verify_button)
+        
+        save_key_button = QPushButton("Save API Key")
+        save_key_button.setMinimumHeight(32)
+        save_key_button.clicked.connect(self.update_api_key)
+        api_button_layout.addWidget(save_key_button)
+        
+        form_layout.addRow("", api_button_layout)
         
         tab_layout.addWidget(api_group)
         
@@ -1788,7 +1814,7 @@ class SettingsDialog(QDialog):
             self.api_key_status.setStyleSheet("color: #FF5555;")
     
     def update_api_key(self):
-        """Update the API key in the secrets file."""
+        """Update the API key in the configuration."""
         api_key = self.api_key_edit.text()
         
         # Skip if key is just placeholder asterisks
@@ -1808,65 +1834,19 @@ class SettingsDialog(QDialog):
             )
             return
         
-        # Get the root directory and path to secrets
-        root_dir = os.path.dirname(os.path.abspath(__file__))
-        secrets_dir = os.path.join(root_dir, "secrets")
-        api_keys_file = os.path.join(secrets_dir, "api_keys.json")
-        template_file = os.path.join(root_dir, "templates", "api_keys.json.template")
-        
-        # Create the secrets directory if it doesn't exist
-        if not os.path.exists(secrets_dir):
-            os.makedirs(secrets_dir)
-        
-        # Initialize the API keys structure
-        api_keys = {
-            "openai": {
-                "api_key": "",
-                "organization_id": ""
-            },
-            "other_services": {
-                "service1_key": "",
-                "service2_key": ""
-            }
-        }
-        
-        # Try to load from template first
-        if os.path.exists(template_file):
-            try:
-                with open(template_file, 'r') as f:
-                    template_keys = json.load(f)
-                    # Use structure from template but not values
-                    for service in template_keys:
-                        if service not in api_keys:
-                            api_keys[service] = {}
-                        for key in template_keys[service]:
-                            if key not in api_keys[service]:
-                                api_keys[service][key] = ""
-            except Exception as e:
-                print(f"Error loading template: {e}")
-        
-        # Load existing keys if available
-        if os.path.exists(api_keys_file):
-            try:
-                with open(api_keys_file, 'r') as f:
-                    api_keys = json.load(f)
-            except Exception as e:
-                print(f"Error loading existing keys: {e}")
-        
-        # Update the keys
-        api_keys["openai"]["api_key"] = api_key
-        api_keys["openai"]["organization_id"] = org_id
-        
-        # Save to file
+        # Simply update the config directly - this is safer and simpler
         try:
-            with open(api_keys_file, 'w') as f:
-                json.dump(api_keys, f, indent=2)
+            # Update the global config
+            global config
+            config["openai_api_key"] = api_key
+            
+            # Save to settings file
+            save_settings()
             
             QMessageBox.information(
                 self, 
                 "API Key Update", 
-                "✅ API key successfully saved to secrets/api_keys.json\n\n"
-                "This file is excluded from Git to keep your key secure."
+                "✅ API key successfully saved to settings file."
             )
             
             # Update status
@@ -1903,18 +1883,25 @@ class SettingsDialog(QDialog):
         else:
             settings["message_source"] = "local"
         
+        # Get OpenAI API key if set
+        api_key = self.api_key_edit.text()
+        if api_key and len(api_key) > 0 and api_key != "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            settings["openai_api_key"] = api_key
+            
         # Get OpenAI model
         model = self.model_combo.currentText()
         
+        # Get temperature
+        temperature = float(self.temperature_slider.value()) / 100.0
+        
         # Get config settings
-        settings["config"] = {
-            "interval": self.interval_spin.value(),
-            "delay_factor": float(self.delay_factor_spin.value()),
-            "display_stats": self.display_stats_check.isChecked(),
-            "save_to_database": self.save_db_check.isChecked(),
-            "debug_mode": self.debug_check.isChecked(),
-            "model": model
-        }
+        settings["interval"] = self.interval_spin.value()
+        settings["delay_factor"] = float(self.delay_factor_spin.value())
+        settings["display_stats"] = self.display_stats_check.isChecked()
+        settings["save_to_database"] = self.save_db_check.isChecked()
+        settings["debug_mode"] = self.debug_check.isChecked()
+        settings["model"] = model
+        settings["temperature"] = temperature
         
         return settings
 
