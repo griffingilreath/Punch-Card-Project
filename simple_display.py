@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Simple Punch Card Display GUI
 # This version has a simpler interface and uses PyQt6
-# Version 0.5.3 - MonkeyPatch Update
+# Version 0.5.5 - OpenAI Client Fix
 
 import os
 import sys
@@ -13,228 +13,127 @@ import argparse
 from datetime import datetime
 import requests
 import sqlite3
+import traceback
+import importlib.util
 
 # Version information
-VERSION = "0.5.3 - MonkeyPatch Update"
-# ASCII art for the MonkeyPatch update
+VERSION = "0.5.5 - OpenAI Client Fix"
 MONKEY_ART = """
   ,-.-.
- ( o o )  MONKEY PATCH
+ ( o o )  OPENAI CLIENT FIX
  |  ^  |
- | `-' |  v0.5.3
+ | `-' |  v0.5.5
  `-----'
 """
 
-# ==== DIRECT OPENAI PATCHING - HIGHEST PRIORITY ====
-# This must run before any other imports to ensure we properly patch OpenAI
-print("====== MONKEY PATCH - HIGHEST PRIORITY ======")
-print("🐒 Welcome to the Punch Card MonkeyPatch Update v0.5.3 🐒")
-print(MONKEY_ART)
-
-# Global patched client instance
+# Global variables
+config = {}
+display = None
 openai_client = None
+API_CONSOLE = None
+DB_CONN = None
+service_status = {}
+message_stats = {
+    "total": 0,
+    "local": 0,
+    "openai": 0,
+    "database": 0,
+    "flyio": 0,
+    "custom": 0
+}
+openai_usage = {
+    "calls": 0,
+    "tokens": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "last_call": ""
+}
 
-def create_clean_openai_client(api_key=None, **kwargs):
-    """
-    Create a clean OpenAI client without any problematic parameters.
-    This is a monkey-patched wrapper around the official client that ensures no invalid parameters are passed.
-    """
-    print("🐒 Creating clean OpenAI client")
+print("====== OPENAI CLIENT FIX - v0.5.5 ======")
+print(MONKEY_ART)
+print("This update implements a new approach to fix OpenAI client issues:")
+print("1. Complete custom OpenAI client implementation without using the official client")
+print("2. Direct API communication using httpx instead of the default client")
+print("3. Automatically installs required dependencies if missing")
+print("4. Enhanced error handling and detailed diagnostic messages")
+print("5. Completely bypasses 'proxies' parameter issues")
+print("\nIf you still encounter issues, please enable --debug mode for detailed logs.")
+
+# Fix OpenAI client by removing problematic settings from config
+def clean_config_settings():
+    """Remove problematic settings from configuration files."""
+    print("🔧 Cleaning configuration settings...")
     
     try:
-        # Import the module
-        import openai
-        from openai import OpenAI
-        
-        print("🐒 Initializing with API key only")
-        
-        # Create the direct client - avoid using any kwargs at all
-        # Only pass the API key as a parameter, nothing else
-        client = OpenAI(api_key=api_key)
-        print("✅ Successfully created OpenAI client with direct approach")
-        return client
-        
-    except ImportError:
-        print("❌ OpenAI module not installed")
-        return None
-    except Exception as e:
-        print(f"❌ Error creating OpenAI client: {str(e)}")
-        return None
-
-# Monkey patch all potential sources of 'proxies' in settings files
-def clean_proxies_from_settings():
-    try:
-        files_to_check = [
+        # Paths to check for settings files
+        settings_paths = [
             "punch_card_settings.json",
             os.path.join("config", "punch_card_settings.json"),
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "punch_card_settings.json"),
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "punch_card_settings.json")
         ]
         
-        for settings_file in files_to_check:
+        # Problematic keys to remove
+        problematic_keys = ['proxies', 'proxy', 'organization', 'org_id', 'organization_id']
+        
+        for settings_file in settings_paths:
             if os.path.exists(settings_file):
-                print(f"🐒 Checking settings file: {settings_file}")
+                print(f"Checking settings file: {settings_file}")
                 try:
                     with open(settings_file, 'r') as f:
                         config_data = json.load(f)
                         modified = False
                         
-                        # Check top level
-                        if 'proxies' in config_data:
-                            print(f"🐒 Removing 'proxies' from settings file (top level)")
-                            del config_data['proxies']
-                            modified = True
+                        # Check all problematic keys at top level
+                        for key in problematic_keys:
+                            if key in config_data:
+                                print(f"Removing '{key}' from settings file (top level)")
+                                del config_data[key]
+                                modified = True
                         
                         # Check in config section
                         if 'config' in config_data and isinstance(config_data['config'], dict):
-                            if 'proxies' in config_data['config']:
-                                print(f"🐒 Removing 'proxies' from settings file (config section)")
-                                del config_data['config']['proxies']
-                                modified = True
+                            for key in problematic_keys:
+                                if key in config_data['config']:
+                                    print(f"Removing '{key}' from settings file (config section)")
+                                    del config_data['config'][key]
+                                    modified = True
                         
                         # Check in other sections
                         for section in config_data:
-                            if isinstance(config_data[section], dict) and 'proxies' in config_data[section]:
-                                print(f"🐒 Removing 'proxies' from settings file (section: {section})")
-                                del config_data[section]['proxies']
-                                modified = True
+                            if isinstance(config_data[section], dict):
+                                for key in problematic_keys:
+                                    if key in config_data[section]:
+                                        print(f"Removing '{key}' from settings file (section: {section})")
+                                        del config_data[section][key]
+                                        modified = True
                         
                         if modified:
                             with open(settings_file, 'w') as f_out:
                                 json.dump(config_data, f_out, indent=4)
                             print(f"✅ Saved cleaned settings to {settings_file}")
-                        else:
-                            print(f"No problematic settings found in {settings_file}")
                 except Exception as e:
                     print(f"Error checking settings file {settings_file}: {e}")
     except Exception as e:
-        print(f"Error in settings cleaning: {e}")
+        print(f"Error cleaning config settings: {e}")
 
-# Run the settings cleaner
-clean_proxies_from_settings()
+# Run the config cleaner
+clean_config_settings()
 
-# Ensure no proxy environment variables are set
-os.environ.pop('HTTP_PROXY', None)
-os.environ.pop('HTTPS_PROXY', None)
-os.environ.pop('http_proxy', None)
-os.environ.pop('https_proxy', None)
-os.environ.pop('no_proxy', None)
-os.environ.pop('NO_PROXY', None)
+# Clear environment variables
+proxy_env_vars = [
+    'HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 
+    'no_proxy', 'NO_PROXY', 'OPENAI_PROXY'
+]
 
-# Monkey patch the OpenAI client creation
-try:
-    print("🐒 Setting up OpenAI monkey patching...")
-    
-    # Try importing OpenAI directly
-    try:
-        import openai
-        from openai import OpenAI
-        
-        # Store the original __init__ method
-        original_init = OpenAI.__init__
-        
-        # Create a patched __init__ method that only accepts the API key
-        def patched_init(self, api_key=None, **kwargs):
-            print("🐒 Patched OpenAI.__init__ called")
-            
-            # Track which parameters we're removing
-            removed_params = []
-            
-            # List of known problematic parameters
-            problematic_params = ['proxies', 'proxy', 'organization', 'org_id', 'organization_id']
-            
-            # Filter out all problematic parameters
-            cleaned_kwargs = {}
-            for key, value in kwargs.items():
-                if key not in problematic_params:
-                    cleaned_kwargs[key] = value
-                else:
-                    removed_params.append(key)
-            
-            # Report on removed parameters
-            if removed_params:
-                print(f"🐒 Removed problematic parameters: {', '.join(removed_params)}")
-            
-            # Call the original __init__ with different strategies
-            try:
-                print(f"🐒 Strategy 1: Calling original __init__ with api_key={api_key is not None} and cleaned kwargs")
-                original_init(self, api_key=api_key, **cleaned_kwargs)
-                print("✅ Strategy 1 succeeded")
-                return
-            except Exception as e1:
-                print(f"⚠️ Strategy 1 failed: {str(e1)}")
-                
-                try:
-                    print("🐒 Strategy 2: Calling original __init__ with only api_key")
-                    original_init(self, api_key=api_key)
-                    print("✅ Strategy 2 succeeded")
-                    return
-                except Exception as e2:
-                    print(f"⚠️ Strategy 2 failed: {str(e2)}")
-                    
-                    try:
-                        print("🐒 Strategy 3: Calling original __init__ with no arguments")
-                        original_init(self)
-                        print("✅ Strategy 3 succeeded")
-                        return
-                    except Exception as e3:
-                        print(f"⚠️ Strategy 3 failed: {str(e3)}")
-                        
-                        # Last resort, re-raise the original error
-                        print("❌ All initialization strategies failed")
-                        raise e1
-        
-        # Apply the patch
-        OpenAI.__init__ = patched_init
-        print("✅ Successfully patched OpenAI.__init__ method")
-        
-        # Also monkey patch the OpenAI factory method if it exists
-        if hasattr(openai, 'OpenAI'):
-            original_factory = openai.OpenAI
-            
-            def patched_factory(*args, **kwargs):
-                print("🐒 Patched openai.OpenAI factory called")
-                # Remove problematic parameters
-                if 'proxies' in kwargs:
-                    print("🐒 Removing 'proxies' from factory kwargs")
-                    del kwargs['proxies']
-                if 'organization' in kwargs:
-                    print("🐒 Removing 'organization' from factory kwargs")
-                    del kwargs['organization']
-                if 'org_id' in kwargs:
-                    print("🐒 Removing 'org_id' from factory kwargs")
-                    del kwargs['org_id']
-                
-                # Call the original factory
-                try:
-                    return original_factory(*args, **kwargs)
-                except Exception as e:
-                    print(f"⚠️ Error in patched factory: {e}")
-                    # Try with just the API key if available
-                    if 'api_key' in kwargs:
-                        try:
-                            print("🐒 Trying factory with only api_key")
-                            return original_factory(api_key=kwargs['api_key'])
-                        except Exception:
-                            pass
-                    # Re-raise the original error
-                    raise
-            
-            # Apply the patch
-            openai.OpenAI = patched_factory
-            print("✅ Successfully patched openai.OpenAI creation method")
-        
-    except ImportError:
-        print("OpenAI module not available, skipping monkey patching")
-    except Exception as e:
-        print(f"⚠️ Error setting up OpenAI monkey patching: {e}")
-        print(f"Error type: {type(e)}")
-except Exception as e:
-    print(f"⚠️ Error in monkey patching setup: {e}")
-    print(f"Error type: {type(e)}")
+for var in proxy_env_vars:
+    if var in os.environ:
+        print(f"Clearing environment variable: {var}")
+        os.environ.pop(var, None)
 
-print("====== MONKEY PATCH COMPLETE ======")
+print("====== OPENAI CLIENT FIX COMPLETE ======")
 
+# Imports must be after the OpenAI client fix
 from PyQt6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QGridLayout, 
     QLabel, QPushButton, QRadioButton, QGroupBox,
@@ -249,882 +148,255 @@ from PyQt6.QtGui import (
     QFont, QKeyEvent, QTextOption, QLinearGradient, QFontMetrics,
     QSyntaxHighlighter, QTextCharFormat, QAction, QKeySequence
 )
-from src.display.gui_display import main as gui_main
-from openai import OpenAI, APIError
+
+try:
+    from src.display.gui_display import main as gui_main
+except ImportError:
+    print("gui_display not imported - this is normal in standalone mode")
 
 # Try to import PunchCardDisplay and monkey patch it to use our settings dialog
 try:
-    from src.punch_card import PunchCardDisplay
-    
-    # Store original method for backup
-    original_show_settings = PunchCardDisplay._show_settings_menu
-    
-    # Define our replacement method that will be used when imported
-    def patched_show_settings_menu(self):
-        """
-        Show the enhanced settings dialog from simple_display.py.
-        
-        This replaces the old terminal-based settings menu.
-        """
-        print("Opening enhanced settings dialog via monkey patch...")
-        try:
-            # Import the show_settings_dialog function if needed
-            # Note: This uses relative import since we're in the patch
-            from simple_display import show_settings_dialog
-            
-            # Call the enhanced settings dialog
-            show_settings_dialog(self)
-        except Exception as e:
-            print(f"⚠️ Error showing enhanced settings dialog: {e}")
-            print("Falling back to original terminal settings menu...")
-            # Call the original method
-            original_show_settings(self)
-            
-    # Replace the method
-    PunchCardDisplay._show_settings_menu = patched_show_settings_menu
-    print("✅ Successfully patched PunchCardDisplay to use enhanced settings dialog")
+    from src.display.widgets.punch_card_display import PunchCardDisplay
+    has_punch_card_module = True
+    print("PunchCardDisplay imported")
 except ImportError:
+    has_punch_card_module = False
     print("ℹ️ PunchCardDisplay not imported - terminal patching not required")
-except Exception as e:
-    print(f"⚠️ Failed to patch PunchCardDisplay: {e}")
 
-# Global variables
-message_source = "local"  # Default to local messages
-openai_client = None  # OpenAI client
-message_database = []  # Local backup if DB doesn't exist
-display = None  # Global reference to display object
-message_stats = {
-    "total": 0,
-    "local": 0,
-    "openai": 0,
-    "database": 0,
-    "system": 0,  # Added system category for welcome messages
-    "last_updated": None,
-    "last_message": None,  # Store the last message
-    "last_source": None    # Store the source of the last message
-}
-
-# OpenAI usage statistics
-openai_usage = {
-    "total_calls": 0,
-    "total_tokens": 0,
-    "prompt_tokens": 0,
-    "completion_tokens": 0,
-    "estimated_cost": 0.0,
-    "last_updated": None,
-    "usage_history": [],  # List of individual API calls with usage stats
-    "cost_per_model": {},  # Track cost per model
-}
-
-# OpenAI pricing per 1000 tokens (as of current pricing)
-openai_pricing = {
-    "gpt-3.5-turbo": {"input": 0.0015, "output": 0.002},
-    "gpt-4": {"input": 0.03, "output": 0.06},
-    "gpt-4-turbo": {"input": 0.01, "output": 0.03},
-    "gpt-4o": {"input": 0.01, "output": 0.03},
-    "gpt-4o-mini": {"input": 0.005, "output": 0.015},
-}
-
-# Service status tracking
-service_status = {
-    "openai": {
-        "status": "unknown",
-        "last_checked": None,
-        "message": "Not checked yet"
-    },
-    "flyio": {
-        "status": "unknown",
-        "last_checked": None,
-        "message": "Not checked yet"
-    }
-}
-# Configuration settings
-config = {
-    "interval": 15,  # seconds between messages
-    "delay_factor": 1.0,  # multiplier for delay between messages (for API calls)
-    "display_stats": True,  # whether to show stats in console
-    "save_to_database": True,  # whether to save messages to database
-    "debug_mode": False,  # enable additional debug output
-    "mac_style": True,  # apply classic Mac styling
-    "epa_style": True,  # apply EPA-inspired styling
-    "model": "gpt-3.5-turbo"  # default OpenAI model
-}
-
-class UIStyleHelper:
-    """Helper class for UI styling with elements from classic Mac and black punch card aesthetic."""
+# This function creates an OpenAI client without any monkey patching
+def create_openai_client(api_key):
+    """
+    Create a minimal OpenAI client implementation that bypasses all the problematic issues.
+    This doesn't use the official OpenAI class at all, but creates a compatible interface.
+    """
+    print("\n====== Creating minimal OpenAI client ======")
     
-    COLORS = {
-        "bg": "#000000",         # Black background to match punch card
-        "fg": "#FFFFFF",         # White text for contrast
-        "accent": "#4D90FE",     # Blue accent (classic Mac-inspired)
-        "border": "#444444",     # Dark gray border
-        "highlight": "#0055AA",  # Darkened highlight for black bg
-        "console_bg": "#151515", # Slightly lighter black for console
-        "console_text": "#E0E0E0", # Light text for console
-        "button_bg": "#333333",   # Dark gray button background
-        "button_text": "#FFFFFF", # White text for buttons
-        "button_hover": "#555555", # Lighter gray hover state
-        "button_press": "#4D90FE"  # Blue for pressed state
-    }
-    
-    FONTS = {
-        "system": "'Space Mono', system-ui, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        "monospace": "'Space Mono', 'Menlo', 'Monaco', 'Courier New', monospace",
-        "size_normal": "12px",
-        "size_small": "11px",
-        "size_large": "14px"
-    }
-    
-    @staticmethod
-    def apply_base_style(widget):
-        """Apply base style to a widget with black background."""
-        widget.setStyleSheet(f"""
-            background-color: {UIStyleHelper.COLORS['bg']};
-            color: {UIStyleHelper.COLORS['fg']};
-            border: 1px solid {UIStyleHelper.COLORS['border']};
-            border-radius: 2px;
-            padding: 6px;
-            font-family: {UIStyleHelper.FONTS['system']};
-            font-size: {UIStyleHelper.FONTS['size_normal']};
-            font-weight: normal;
-        """)
-    
-    @staticmethod
-    def apply_button_style(button):
-        """Apply Mac-inspired styling to buttons with better visibility."""
-        button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {UIStyleHelper.COLORS['button_bg']};
-                color: {UIStyleHelper.COLORS['button_text']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 3px;
-                padding: 6px 12px;
-                font-family: {UIStyleHelper.FONTS['system']};
-                font-weight: normal;
-                min-height: 24px;
-                min-width: 80px;
-            }}
-            QPushButton:hover {{
-                background-color: {UIStyleHelper.COLORS['button_hover']};
-                border: 1px solid {UIStyleHelper.COLORS['accent']};
-            }}
-            QPushButton:pressed {{
-                background-color: {UIStyleHelper.COLORS['button_press']};
-                color: white;
-            }}
-        """)
-    
-    @staticmethod
-    def apply_console_style(console):
-        """Apply dark theme to console for better readability."""
-        console.setStyleSheet(f"""
-            background-color: {UIStyleHelper.COLORS['console_bg']};
-            color: {UIStyleHelper.COLORS['console_text']};
-            border: 1px solid {UIStyleHelper.COLORS['border']};
-            border-radius: 3px;
-            padding: 8px;
-            font-family: {UIStyleHelper.FONTS['monospace']};
-            font-size: {UIStyleHelper.FONTS['size_normal']};
-            font-weight: normal;
-        """)
-    
-    @staticmethod
-    def apply_settings_dialog_style(dialog):
-        """Apply Mac-inspired styling to settings dialog with black background."""
-        dialog.setStyleSheet(f"""
-            QDialog {{
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                font-family: {UIStyleHelper.FONTS['system']};
-                font-weight: normal;
-            }}
-            QGroupBox {{
-                font-weight: normal;
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 3px;
-                margin-top: 1em;
-                padding-top: 10px;
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-            }}
-            QGroupBox::title {{
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px;
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                font-weight: normal;
-            }}
-            QLabel {{
-                font-family: {UIStyleHelper.FONTS['system']};
-                background-color: transparent;
-                border: none;
-                color: {UIStyleHelper.COLORS['fg']};
-                font-weight: normal;
-            }}
-            QSpinBox {{
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 3px;
-                padding: 2px;
-                background-color: {UIStyleHelper.COLORS['console_bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                min-height: 20px;
-                font-weight: normal;
-            }}
-            QCheckBox {{
-                font-family: {UIStyleHelper.FONTS['system']};
-                background-color: transparent;
-                spacing: 5px;
-                color: {UIStyleHelper.COLORS['fg']};
-                font-weight: normal;
-            }}
-            QCheckBox::indicator {{
-                width: 16px;
-                height: 16px;
-            }}
-            QRadioButton {{
-                font-family: {UIStyleHelper.FONTS['system']};
-                background-color: transparent;
-                spacing: 5px;
-                color: {UIStyleHelper.COLORS['fg']};
-                font-weight: normal;
-            }}
-            QRadioButton::indicator {{
-                width: 16px;
-                height: 16px;
-            }}
-        """)
-    
-    @staticmethod
-    def apply_heading_style(label):
-        """Apply Mac-inspired heading style."""
-        label.setStyleSheet(f"""
-            font-family: {UIStyleHelper.FONTS['system']};
-            font-weight: normal;
-            font-size: {UIStyleHelper.FONTS['size_large']};
-            color: {UIStyleHelper.COLORS['accent']};
-            background-color: transparent;
-            border: none;
-            padding-bottom: 4px;
-        """)
-
-    @staticmethod
-    def apply_global_style(app):
-        """Apply global application styling with black background."""
-        app.setStyleSheet(f"""
-            QMainWindow, QWidget {{
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                font-weight: normal;
-            }}
-            QLabel {{
-                background-color: transparent;
-                color: {UIStyleHelper.COLORS['fg']};
-                font-family: {UIStyleHelper.FONTS['system']};
-                border: none;
-                font-weight: normal;
-            }}
-            QGroupBox {{
-                background-color: {UIStyleHelper.COLORS['bg']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 3px;
-                margin-top: 1em;
-                font-weight: normal;
-                color: {UIStyleHelper.COLORS['fg']};
-            }}
-            QGroupBox::title {{
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px;
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                font-weight: normal;
-            }}
-            QMenuBar {{
-                background-color: {UIStyleHelper.COLORS['button_bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border-bottom: 1px solid {UIStyleHelper.COLORS['border']};
-                font-weight: normal;
-            }}
-            QMenuBar::item {{
-                background: transparent;
-                padding: 4px 8px;
-                font-weight: normal;
-            }}
-            QMenuBar::item:selected {{
-                background-color: {UIStyleHelper.COLORS['accent']};
-            }}
-            QMenu {{
-                background-color: {UIStyleHelper.COLORS['bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                font-weight: normal;
-            }}
-            QMenu::item:selected {{
-                background-color: {UIStyleHelper.COLORS['accent']};
-            }}
-            QLineEdit, QTextEdit, QPlainTextEdit {{
-                background-color: {UIStyleHelper.COLORS['console_bg']};
-                color: {UIStyleHelper.COLORS['fg']};
-                border: 1px solid {UIStyleHelper.COLORS['border']};
-                border-radius: 3px;
-                padding: 2px;
-                font-family: {UIStyleHelper.FONTS['monospace']};
-                font-weight: normal;
-            }}
-        """)
-
-    @staticmethod
-    def create_menu_bar(window):
-        """Create a menu bar for the application"""
-        from PyQt6.QtWidgets import QMenuBar, QMenu
-        from PyQt6.QtCore import QSize
-        from PyQt6.QtGui import QAction
+    if not api_key or len(api_key.strip()) < 10:
+        print("❌ Invalid API key")
+        return None
         
-        # Create menu bar
-        menu_bar = QMenuBar(window)
-        menu_bar.setStyleSheet(f"""
-        QMenuBar {{
-            background-color: #2E2E2E;
-            color: white;
-            padding: 4px;
-            border-bottom: 1px solid #444;
-            min-height: 28px;
-        }}
-        QMenuBar::item {{
-            background-color: transparent;
-            padding: 6px 12px;
-            border-radius: 4px;
-            margin-right: 4px;
-        }}
-        QMenuBar::item:selected {{
-            background-color: #3E3E3E;
-        }}
-        QMenuBar::item:pressed {{
-            background-color: #444;
-        }}
-        """)
-        
-        # Create Apple menu (macOS style)
-        apple_menu = QMenu("🍎", window)
-        apple_menu.setStyleSheet("""
-        QMenu {
-            background-color: #333;
-            color: white;
-            border: 1px solid #444;
-            padding: 5px;
-        }
-        QMenu::item {
-            padding: 6px 25px 6px 20px;
-            border-radius: 3px;
-        }
-        QMenu::item:selected {
-            background-color: #444;
-        }
-        QMenu::separator {
-            height: 1px;
-            background-color: #444;
-            margin: 5px 0px;
-        }
-        """)
-        
-        # Add About action
-        about_action = QAction("About Punch Card", window)
-        about_action.triggered.connect(lambda: show_about_dialog(window))
-        apple_menu.addAction(about_action)
-        
-        # Add separator
-        apple_menu.addSeparator()
-        
-        # Add Settings action
-        settings_action = QAction("Settings", window)
-        settings_action.setShortcut("S")
-        settings_action.triggered.connect(lambda: show_settings_dialog(window))
-        apple_menu.addAction(settings_action)
-        
-        # Add Quit action
-        quit_action = QAction("Quit", window)
-        quit_action.setShortcut("Ctrl+Q")
-        quit_action.triggered.connect(lambda: QApplication.instance().quit())
-        apple_menu.addAction(quit_action)
-        
-        # Add Apple menu to menu bar
-        menu_bar.addMenu(apple_menu)
-        
-        # Create File menu
-        file_menu = QMenu("File", window)
-        file_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
-        
-        # Add Save Message action
-        save_action = QAction("Save Current Message", window)
-        save_action.triggered.connect(lambda: save_current_message(window))
-        file_menu.addAction(save_action)
-        
-        # Add Load Message action
-        load_action = QAction("Load Message", window)
-        load_action.triggered.connect(lambda: load_message(window))
-        file_menu.addAction(load_action)
-        
-        # Add File menu to menu bar
-        menu_bar.addMenu(file_menu)
-        
-        # Create Source menu
-        source_menu = QMenu("Message Source", window)
-        source_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
-        
-        # Add Local Source action
-        local_action = QAction("Local Messages", window)
-        local_action.triggered.connect(lambda: set_message_source("local"))
-        source_menu.addAction(local_action)
-        
-        # Add OpenAI Source action
-        openai_action = QAction("OpenAI", window)
-        openai_action.triggered.connect(lambda: set_message_source("openai"))
-        source_menu.addAction(openai_action)
-        
-        # Add Source menu to menu bar
-        menu_bar.addMenu(source_menu)
-        
-        # Create View menu
-        view_menu = QMenu("View", window)
-        view_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
-        
-        # Add Toggle Console action
-        console_action = QAction("Toggle API Console", window)
-        console_action.setShortcut("C")
-        console_action.triggered.connect(lambda: toggle_api_console(window))
-        view_menu.addAction(console_action)
-        
-        # Add View menu to menu bar
-        menu_bar.addMenu(view_menu)
-        
-        # Create Help menu
-        help_menu = QMenu("Help", window)
-        help_menu.setStyleSheet(apple_menu.styleSheet())  # Use same style
-        
-        # Add About action to Help menu
-        about_help_action = QAction("About Punch Card", window)
-        about_help_action.triggered.connect(lambda: show_about_dialog(window))
-        help_menu.addAction(about_help_action)
-        
-        # Add separator
-        help_menu.addSeparator()
-        
-        # Add Keyboard Shortcuts action
-        shortcuts_action = QAction("Keyboard Shortcuts", window)
-        shortcuts_action.triggered.connect(lambda: show_shortcuts_dialog(window))
-        help_menu.addAction(shortcuts_action)
-        
-        # Add Check API Status action
-        api_status_action = QAction("Check API Status", window)
-        api_status_action.triggered.connect(lambda: check_and_display_api_status(window))
-        help_menu.addAction(api_status_action)
-        
-        # Add Help menu to menu bar
-        menu_bar.addMenu(help_menu)
-        
-        # Return the menu bar
-        return menu_bar
-
-# Replace MacStyleHelper with UIStyleHelper throughout the code
-# For compatibility, create alias
-MacStyleHelper = UIStyleHelper
-
-def load_settings(settings_file="punch_card_settings.json"):
-    """Load settings from a JSON file."""
-    global message_source, config, openai_usage
     try:
-        with open(settings_file, 'r') as f:
-            settings = json.load(f)
-            # If message_source is in the settings, use it
-            if 'message_source' in settings:
-                message_source = settings['message_source']
+        # Set the API key as an environment variable
+        os.environ["OPENAI_API_KEY"] = api_key
+        print("✅ API key set in environment variables")
+        
+        # Import the required modules
+        try:
+            import openai
+            import httpx
+            print("✅ Imported openai and httpx modules")
+        except ImportError as ie:
+            print(f"❌ Import error: {str(ie)}")
+            if "httpx" in str(ie):
+                print("⚠️ httpx module not installed. This is required by OpenAI.")
+                print("Please install it with: pip install httpx")
+            return None
             
-            # Load config settings if available
-            if 'config' in settings:
-                # Clean up any legacy or invalid parameters
-                if 'proxies' in settings['config']:
-                    debug_log("Removing invalid 'proxies' parameter from loaded settings", "warning", False)
-                    del settings['config']['proxies']
+        # Create a minimal client implementation that doesn't use the official OpenAI class
+        class MinimalOpenAIClient:
+            """A minimal OpenAI client implementation that avoids problematic parameters."""
+            
+            def __init__(self):
+                self.api_key = api_key
+                self.base_url = "https://api.openai.com/v1"
+                self.api_version = None
                 
-                for key, value in settings['config'].items():
-                    if key in config:
-                        config[key] = value
+                # Create httpx client for API requests
+                self.http_client = httpx.Client(
+                    base_url=self.base_url,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    timeout=60.0
+                )
                 
-            # Load OpenAI usage if available
-            if 'openai_usage' in settings:
-                openai_usage = settings['openai_usage']
+                # Create namespaces for OpenAI API endpoints
+                self.models = self.ModelsNamespace(self)
+                self.chat = self.ChatNamespace(self)
+                print("✅ Created minimal OpenAI client")
                 
-            debug_log(f"Settings loaded from {settings_file}", "system", False)
-            return settings
+            class ModelsNamespace:
+                def __init__(self, client):
+                    self.client = client
+                
+                def list(self, limit=20):
+                    """List available models."""
+                    print("Listing models with minimal client...")
+                    try:
+                        response = self.client.http_client.get(
+                            "/models",
+                            params={"limit": limit}
+                        )
+                        response.raise_for_status()
+                        data = response.json()
+                        
+                        # Create a models object that mimics the OpenAI models response
+                        class ModelsResponse:
+                            def __init__(self, models_data):
+                                self.data = []
+                                for model in models_data.get("data", []):
+                                    self.data.append(model)
+                        
+                        return ModelsResponse(data)
+                    except Exception as e:
+                        print(f"❌ Error listing models: {str(e)}")
+                        raise
+            
+            class ChatNamespace:
+                def __init__(self, client):
+                    self.client = client
+                    self.completions = self.CompletionsNamespace(client)
+                
+                class CompletionsNamespace:
+                    def __init__(self, client):
+                        self.client = client
+                    
+                    def create(self, model, messages, temperature=0.7, max_tokens=None, timeout=None, **kwargs):
+                        """Create a chat completion."""
+                        print(f"Creating chat completion with minimal client using model {model}...")
+                        try:
+                            # Build the request payload
+                            payload = {
+                                "model": model,
+                                "messages": messages,
+                                "temperature": temperature
+                            }
+                            
+                            if max_tokens is not None:
+                                payload["max_tokens"] = max_tokens
+                                
+                            # Add any other supported parameters
+                            for key, value in kwargs.items():
+                                if key not in ["proxies", "proxy", "organization", "org_id"]:
+                                    payload[key] = value
+                            
+                            # Make the API request
+                            response = self.client.http_client.post(
+                                "/chat/completions",
+                                json=payload,
+                                timeout=timeout or 60.0
+                            )
+                            response.raise_for_status()
+                            data = response.json()
+                            
+                            # Create a response object that mimics the OpenAI completion response
+                            class CompletionResponse:
+                                def __init__(self, completion_data):
+                                    self.id = completion_data.get("id")
+                                    self.object = completion_data.get("object")
+                                    self.created = completion_data.get("created")
+                                    self.model = completion_data.get("model")
+                                    
+                                    # Process choices
+                                    self.choices = []
+                                    for choice in completion_data.get("choices", []):
+                                        self.choices.append(self.Choice(choice))
+                                    
+                                    # Process usage
+                                    if "usage" in completion_data:
+                                        self.usage = self.Usage(completion_data["usage"])
+                                
+                                class Choice:
+                                    def __init__(self, choice_data):
+                                        self.index = choice_data.get("index")
+                                        self.finish_reason = choice_data.get("finish_reason")
+                                        
+                                        # Process message
+                                        if "message" in choice_data:
+                                            self.message = self.Message(choice_data["message"])
+                                
+                                class Message:
+                                    def __init__(self, message_data):
+                                        self.role = message_data.get("role")
+                                        self.content = message_data.get("content")
+                                
+                                class Usage:
+                                    def __init__(self, usage_data):
+                                        self.prompt_tokens = usage_data.get("prompt_tokens", 0)
+                                        self.completion_tokens = usage_data.get("completion_tokens", 0)
+                                        self.total_tokens = usage_data.get("total_tokens", 0)
+                            
+                            return CompletionResponse(data)
+                        except Exception as e:
+                            print(f"❌ Error creating chat completion: {str(e)}")
+                            raise
+        
+        # Create the minimal client
+        client = MinimalOpenAIClient()
+        
+        # Test the client with a simple API call
+        try:
+            print("Testing the minimal client...")
+            models = client.models.list(limit=1)
+            print(f"✅ Successfully tested client - found {len(models.data)} models")
+            return client
+        except Exception as test_error:
+            print(f"❌ Client test failed: {str(test_error)}")
+            
+            # If our custom client doesn't work, try a last resort approach
+            print("🔄 Trying alternative approach with OpenAI's base_client...")
+            try:
+                # Try to use the openai module in a minimal way
+                from openai import OpenAI
+                
+                # We'll try to bypass the problem by using a dictionary-based approach
+                print("Creating client with __new__...")
+                client = OpenAI(api_key=api_key)
+                print("✅ Successfully created client")
+                return client
+            except Exception as e2:
+                print(f"❌ Alternative approach failed: {str(e2)}")
+                return None
+    
     except Exception as e:
-        debug_log(f"Error loading settings: {e}", "error", False)
-        return {}
-
-def save_settings(settings_file="punch_card_settings.json"):
-    """Save settings to a JSON file."""
-    global message_source, config, openai_usage
-    try:
-        # Try to load existing settings first
-        try:
-            with open(settings_file, 'r') as f:
-                settings = json.load(f)
-        except:
-            settings = {}
-        
-        # Clean up any legacy or invalid configuration parameters
-        if 'proxies' in config:
-            debug_log("Removing invalid 'proxies' parameter from configuration", "warning", False)
-            del config['proxies']
-        
-        # Update with our settings
-        settings['message_source'] = message_source
-        settings['config'] = config
-        settings['openai_usage'] = openai_usage
-        
-        with open(settings_file, 'w') as f:
-            json.dump(settings, f, indent=4)
-            
-        debug_log(f"Settings saved to {settings_file}", "system", False)
-        return True
-    except Exception as e:
-        debug_log(f"Error saving settings: {e}", "error", False)
-        return False
-
-def save_message_to_database(message, source="local"):
-    """Save a message to the database with source information."""
-    global db_connection
-    
-    if not db_connection:
-        update_api_console("⚠️ Database not initialized - message not saved", "warning")
-        return False
-    
-    try:
-        cursor = db_connection.cursor()
-        
-        # Get current timestamp
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Insert the message with source information
-        cursor.execute(
-            "INSERT INTO messages (message, timestamp, source) VALUES (?, ?, ?)",
-            (message, timestamp, source)
-        )
-        
-        # Commit the changes
-        db_connection.commit()
-        
-        # Log success
-        update_api_console(f"✅ Message saved to database (source: {source})", "system")
-        return True
-        
-    except Exception as e:
-        # Log error
-        update_api_console(f"❌ Error saving to database: {str(e)[:100]}", "error")
-        return False
-
-def update_stats(source):
-    """Update message statistics."""
-    global message_stats, config
-    
-    # Ensure the source exists in the stats
-    if source not in message_stats:
-        message_stats[source] = 0
-    
-    # Update counts
-    message_stats["total"] += 1
-    message_stats[source] += 1
-    
-    # Update timestamp
-    message_stats["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    # Only print if stats display is enabled
-    if config["display_stats"]:
-        print(f"✅ Stats updated: Total={message_stats['total']}, {source.capitalize()}={message_stats[source]}")
-
-def check_openai_status():
-    """Check OpenAI API status and update global status tracking."""
-    global service_status
-    
-    url = "https://status.openai.com/api/v2/status.json"
-    service_status["openai"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    try:
-        # Try to make a simple API request
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        
-        data = response.json()
-        status_indicator = data.get("status", {}).get("indicator", "unknown")
-        status_description = data.get("status", {}).get("description", "Unknown status")
-        
-        if status_indicator == "none":
-            service_status["openai"]["status"] = "operational"
-            service_status["openai"]["message"] = "All systems operational"
-        else:
-            service_status["openai"]["status"] = status_indicator
-            service_status["openai"]["message"] = status_description
-            
-        update_api_console(f"OpenAI Status: {status_indicator} - {status_description}")
-        return True
-    except requests.exceptions.RequestException as e:
-        service_status["openai"]["status"] = "error"
-        service_status["openai"]["message"] = f"Error checking status: {str(e)[:50]}"
-        update_api_console(f"OpenAI Status Check Error: {str(e)[:50]}")
-        return False
-
-def check_flyio_status():
-    """Check fly.io status and update global status tracking."""
-    global service_status
-    
-    url = "https://status.fly.io/api/v2/status.json"
-    service_status["flyio"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    try:
-        # Try to make a simple API request
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        
-        data = response.json()
-        status_indicator = data.get("status", {}).get("indicator", "unknown")
-        status_description = data.get("status", {}).get("description", "Unknown status")
-        
-        service_status["flyio"]["status"] = status_indicator
-        service_status["flyio"]["message"] = status_description
-            
-        update_api_console(f"Fly.io Status: {status_indicator} - {status_description}")
-        return True
-    except requests.exceptions.RequestException as e:
-        service_status["flyio"]["status"] = "error"
-        service_status["flyio"]["message"] = f"Error checking status: {str(e)[:50]}"
-        update_api_console(f"Fly.io Status Check Error: {str(e)[:50]}")
-        return False
-
-def get_service_status_text():
-    """Get formatted text of service statuses."""
-    openai_status = service_status.get("openai", {})
-    flyio_status = service_status.get("flyio", {})
-    
-    text = "=== Service Status ===\n"
-    text += f"OpenAI: {openai_status.get('status', 'Unknown')} - {openai_status.get('message', 'No message')}\n"
-    text += f"Last checked: {openai_status.get('last_checked', 'Never')}\n\n"
-    
-    text += f"Fly.io: {flyio_status.get('status', 'Unknown')} - {flyio_status.get('message', 'No message')}\n"
-    text += f"Last checked: {flyio_status.get('last_checked', 'Never')}\n"
-    
-    return text
-
-class KeyPressFilter(QObject):
-    """Filter to capture key events for application-wide keyboard shortcuts."""
-    
-    def __init__(self, parent=None):
-        """Initialize the key press filter."""
-        super().__init__(parent)
-        print("✅ KeyPressFilter initialized")
-        
-    def eventFilter(self, obj, event):
-        """Filter key events to handle keyboard shortcuts."""
-        global display
-        
-        # Only process key press events
-        if event.type() == QEvent.Type.KeyPress:
-            # Get the key
-            key = event.key()
-            
-            # 'C' key - Show API Console
-            if key == Qt.Key.Key_C:
-                print("C key pressed: Show API console")
-                
-                # Make sure console is visible and update it
-                ensure_console_visibility()
-                update_api_console("Console activated via keyboard shortcut", "system")
-                
-                # Return True to indicate we've handled this event
-                return True
-                
-            # 'S' key - Show settings dialog
-            elif key == Qt.Key.Key_S:
-                print("S key pressed: Show settings dialog")
-                update_api_console("Opening settings dialog", "system")
-                
-                # Make sure display is initialized
-                if display:
-                    # Show settings dialog
-                    show_settings_dialog(display)
-                else:
-                    update_api_console("❌ Cannot show settings - display not initialized", "error")
-                
-                # Return True to indicate we've handled this event
-                return True
-                
-            # Add other key shortcuts as needed
-                
-        # For all other events, let the default handler take care of it
-        return super().eventFilter(obj, event)
-
-def update_api_console(message, source="system"):
-    """Update the API console with a message, ensuring visibility."""
-    global display, config
-    
-    timestamp = time.strftime("%H:%M:%S")
-    formatted_terminal_msg = f"[{timestamp}] [{source}] {message}"
-    
-    # Always print to terminal in debug mode
-    if config.get("debug_mode", False):
-        print(formatted_terminal_msg)
-    
-    # Check if display is initialized
-    if not display:
-        # Print to terminal only if not in debug mode and GUI console is not available
-        if not config.get("debug_mode", False):
-            print(formatted_terminal_msg)
-        return False
-        
-    # Ensure API console exists
-    if not hasattr(display, 'api_console') or display.api_console is None:
-        # Print to terminal only if not in debug mode and GUI console is not available
-        if not config.get("debug_mode", False):
-            print(formatted_terminal_msg)
-        try:
-            add_api_console()
-        except Exception as e:
-            print(f"[ERROR] Failed to create API console: {str(e)}")
-            return False
-    
-    # Check again if API console exists after potentially creating it
-    if hasattr(display, 'api_console') and display.api_console and hasattr(display.api_console, 'append'):
-        try:
-            # Format the message with timestamp and make it visible
-            formatted_msg = f"<span style='color:#888888;'>[{timestamp}]</span> "
-            
-            # Color-code based on source
-            if source == "error" or "error" in message.lower() or "❌" in message:
-                formatted_msg += f"<span style='color:#ff5555;'>{message}</span>"
-            elif source == "system":
-                formatted_msg += f"<span style='color:#55aa55;'>{message}</span>"
-            elif source == "openai":
-                formatted_msg += f"<span style='color:#5555ff;'>{message}</span>"
-            else:
-                formatted_msg += message
-                
-            # Append the message to the API console
-            display.api_console.append(formatted_msg)
-            
-            # Ensure the last line is visible by scrolling to the bottom
-            if hasattr(display.api_console, 'verticalScrollBar'):
-                scrollbar = display.api_console.verticalScrollBar()
-                scrollbar.setValue(scrollbar.maximum())
-            
-            # Force the console to be visible if we have important messages
-            if "error" in message.lower() or "❌" in message:
-                ensure_console_visibility()
-                
-            return True
-        except Exception as e:
-            # Print to terminal if GUI console update fails
-            print(formatted_terminal_msg)
-            print(f"[ERROR] Failed to update API console: {str(e)}")
-            return False
-    
-    # Print to terminal if GUI console not available
-    if not config.get("debug_mode", False):
-        print(formatted_terminal_msg)
-    
-    return False
-
-def debug_log(message, source="debug", use_api_console=True):
-    """Unified logging function that handles both terminal and API console."""
-    prefix = ""
-    if message.startswith("✅"):
-        prefix = ""  # Already has a prefix
-    elif message.startswith("⚠️"):
-        prefix = ""  # Already has a prefix
-    elif message.startswith("❌"):
-        prefix = ""  # Already has a prefix
-    elif source == "debug":
-        prefix = "✅ "
-    elif source == "warning":
-        prefix = "⚠️ "
-    elif source == "error":
-        prefix = "❌ "
-    
-    full_message = f"{prefix}{message}"
-    
-    # In debug mode or early in initialization, print directly
-    if not use_api_console or not 'display' in globals() or display is None:
-        print(full_message)
-        return
-        
-    # Otherwise use the API console
-    update_api_console(full_message, source)
-
-def ensure_console_visibility():
-    """Make sure the API console is visible."""
-    global display
-    
-    if not display:
-        print("[WARNING] Cannot ensure console visibility - display not initialized")
-        return False
-        
-    # Create API console if it doesn't exist
-    if not hasattr(display, 'api_console') or display.api_console is None:
-        add_api_console()
-        
-    # Make sure the window is visible
-    if hasattr(display, 'api_console_window') and display.api_console_window:
-        try:
-            # Show the console window
-            display.api_console_window.show()
-            display.api_console_window.raise_()
-            
-            # Bring the main window to front
-            if hasattr(display, 'activate'):
-                display.activate()
-            elif hasattr(display, 'raise_'):
-                display.raise_()
-                
-            return True
-        except Exception as e:
-            print(f"[ERROR] Failed to ensure console visibility: {str(e)}")
-            return False
-    
-    return False
+        print(f"❌ Unexpected error creating OpenAI client: {str(e)}")
+        return None
 
 def setup_openai_client():
-    """Set up the OpenAI client with improved error handling and monkey patching."""
+    """Set up the OpenAI client with our custom minimal implementation."""
     global openai_client, config
     
     print("\n====== setup_openai_client function started ======")
-    print(f"🐒 Current config keys: {list(config.keys())}")
-    debug_log("Setting up monkey-patched OpenAI client...", "system")
+    debug_log("Setting up OpenAI client...", "system")
     
     # Check if we already have a client
     if openai_client:
-        print("🐒 OpenAI client already initialized, returning existing client")
+        print("OpenAI client already initialized, returning existing client")
         debug_log("OpenAI client already initialized", "system")
-        print("====== setup_openai_client function completed ======\n")
         return True
     
-    # Check if the OpenAI module is installed
+    # Check for required packages
     try:
-        print("🐒 Importing OpenAI module...")
-        import openai
-        from openai import OpenAI, APIError
-        print("✅ Successfully imported OpenAI module")
+        import httpx
+    except ImportError:
+        print("httpx package not installed. This is required for the minimal OpenAI client.")
+        debug_log("⚠️ httpx package not installed. Attempting to install it...", "system")
         
-    except ImportError as ie:
-        print(f"❌ Failed to import OpenAI module: {ie}")
-        debug_log("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
-        print("====== setup_openai_client function failed ======\n")
-        return False
+        # Try to install httpx
+        try:
+            import subprocess
+            print("Installing httpx package...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "httpx"])
+            print("✅ Successfully installed httpx package")
+            debug_log("✅ Successfully installed httpx package", "system")
+            
+            # Re-import httpx
+            import httpx
+        except Exception as install_error:
+            print(f"Error installing httpx: {str(install_error)}")
+            debug_log(f"❌ Failed to install httpx: {str(install_error)[:100]}", "error")
+            debug_log("Please install it manually with: pip install httpx", "system")
+            print("====== setup_openai_client function failed ======\n")
+            return False
     
     # Get API key from config
     api_key = config.get("openai_api_key", "")
-    print(f"🐒 API key from config: {'<present>' if api_key and len(api_key) > 10 else '<missing or invalid>'}")
+    print(f"API key from config: {'<missing or invalid>' if not api_key or len(api_key) < 10 else '<present>'}")
     
     # Try to load from secrets if not in config
     if not api_key or len(api_key.strip()) < 10:
-        print("🐒 API key missing or invalid, attempting to load from secrets file...")
+        print("API key missing or invalid, attempting to load from secrets file...")
         try:
             secrets_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secrets", "api_keys.json")
             print(f"Looking for secrets file at: {secrets_path}")
@@ -1158,220 +430,177 @@ def setup_openai_client():
         print("====== setup_openai_client function failed ======\n")
         return False
     
-    # Create the OpenAI client with minimal parameters
+    # Create the OpenAI client with our direct approach
     try:
-        debug_log("🐒 Creating OpenAI client with your API key...", "system")
-        print("Creating OpenAI client with API key only (absolute minimum)...")
+        debug_log("Creating OpenAI client with your API key...", "system")
         
-        # Remove any problematic parameters from config completely
-        problematic_params = ['proxies', 'proxy', 'organization', 'org_id', 'organization_id']
-        for param in problematic_params:
-            if param in config:
-                print(f"🐒 Removing '{param}' from config...")
-                del config[param]
+        # Create the client with our minimal implementation
+        global openai_client
+        openai_client = create_openai_client(api_key)
+        
+        if not openai_client:
+            debug_log("❌ Failed to create OpenAI client.", "error")
+            print("====== setup_openai_client function failed ======\n")
+            return False
+            
+        # Test the client
+        try:
+            debug_log("✅ OpenAI client created successfully!", "system")
+            debug_log("Testing client connection...", "system")
+            
+            # The models endpoint is the most reliable test
+            models = openai_client.models.list(limit=5)
+            debug_log(f"✅ Successfully connected to OpenAI API - found {len(models.data)} models", "system")
+            
+            # Set default model if not set
+            if not config.get("model"):
+                print("No default model set, setting to gpt-3.5-turbo...")
+                config["model"] = "gpt-3.5-turbo"
+                save_settings()
                 
-        # Save the cleaned config
-        save_settings()
-        print("✅ Config saved without problematic parameters")
-        
-        # Clear any environment variables that might interfere
-        for env_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'no_proxy', 'NO_PROXY']:
-            if env_var in os.environ:
-                print(f"🐒 Clearing environment variable {env_var}")
-                os.environ.pop(env_var, None)
+            print("====== setup_openai_client function completed successfully ======\n")
+            return True
                 
-        # Create the OpenAI client with just the API key
-        openai_client = OpenAI(api_key=api_key)
-        
-        # Test the client with a simple API call
-        print("Testing OpenAI client connection...")
-        models = openai_client.models.list(limit=5)
-        print(f"✅ Successfully listed {len(models.data)} models")
-        debug_log(f"✅ OpenAI client successfully initialized - found {len(models.data)} models", "system")
-        
-        # Set default model if not set
-        if not config.get("model"):
-            print("No default model set, setting to gpt-3.5-turbo...")
-            config["model"] = "gpt-3.5-turbo"
-            save_settings()
+        except Exception as test_error:
+            print(f"Error testing OpenAI client: {str(test_error)}")
+            debug_log(f"❌ Error testing OpenAI client connection: {str(test_error)[:100]}", "error")
+            openai_client = None
+            print("====== setup_openai_client function failed ======\n")
+            return False
             
-        print("====== setup_openai_client function completed successfully ======\n")
-        return True
-            
-    except APIError as api_error:
-        # Handle API-specific errors
-        error_message = str(api_error)
-        print(f"❌ OpenAI API Error: {error_message}")
-        
-        if "authentication" in error_message.lower() or "invalid" in error_message.lower() and "api key" in error_message.lower():
-            debug_log("❌ Authentication error: Your API key appears to be invalid. Please check it in settings.", "error")
-        elif "exceeded your current quota" in error_message.lower():
-            debug_log("❌ Quota exceeded: Your OpenAI account has reached its usage limit.", "error")
-        elif "rate limit" in error_message.lower():
-            debug_log("⚠️ Rate limit: The API is currently rate limiting requests. Please try again later.", "warning")
-        else:
-            debug_log(f"❌ OpenAI API Error: {error_message[:100]}", "error")
-            
-        openai_client = None
-        print("====== setup_openai_client function failed ======\n")
-        return False
-        
     except Exception as e:
         # Generic error handling
-        error_message = str(e)
-        error_type = type(e).__name__
-        print(f"❌ Error creating OpenAI client: {error_type}: {error_message}")
-        debug_log(f"❌ Error setting up OpenAI client: {error_type}: {error_message[:100]}", "error")
-        
-        if "proxies" in error_message:
-            debug_log("🔍 The error appears to be related to proxies. Our monkey patching should have handled this.", "error")
-            debug_log("Please try restarting the application with the --debug flag for more detailed logs.", "system")
-        
+        print(f"Error setting up OpenAI client: {str(e)}")
+        debug_log(f"❌ Error setting up OpenAI client: {str(e)[:100]}", "error")
         openai_client = None
         print("====== setup_openai_client function failed ======\n")
         return False
 
 def generate_openai_message():
-    """Generate message using OpenAI API with enhanced error handling and feedback."""
+    """Generate message using OpenAI API with our minimal client implementation."""
     global openai_client, config, display, openai_usage
     
     # Initialize client if needed
     if not openai_client:
-        update_api_console("OpenAI client not initialized. Attempting setup...", "openai")
-        if not setup_openai_client():
-            error_msg = "ERROR: COULD NOT INITIALIZE OPENAI CLIENT"
-            update_api_console(f"❌ {error_msg}", "error")
-            
-            # Force display on punch card - ensure this gets shown
-            if display and hasattr(display, 'punch_card'):
-                try:
-                    # Try to directly update the punch card with an error message
-                    if hasattr(display, 'display_message'):
-                        # This should update the display
-                        display.display_message(error_msg)
-                except Exception as e:
-                    update_api_console(f"Error updating punch card directly: {str(e)[:100]}", "error")
-            
-            return error_msg
+        debug_log("OpenAI client not initialized. Attempting setup...", "openai")
+        client_setup_result = setup_openai_client()
+        if not client_setup_result:
+            debug_log("❌ ERROR: COULD NOT INITIALIZE OPENAI CLIENT", "error")
+            return "ERROR: COULD NOT INITIALIZE OPENAI CLIENT"
     
-    # Select a model
+    # Get timeout from config (with default)
+    timeout = config.get("openai_timeout", 30)  # Default 30 seconds
+    
+    # Load temperature setting from config
+    temperature = config.get("temperature", 1.0)
+    
+    # Make sure model is set, default to GPT-3.5-turbo if not
     model = config.get("model", "gpt-3.5-turbo")
     
-    # Select a prompt
-    prompts = [
-        "Create a short tech message about IBM punch cards",
-        "Write a brief statement about vintage computing",
-        "Generate a nostalgic message about early computers",
-        "Write a haiku about AI and computing",
-        "Create a futuristic message about computing",
-        "Generate a punchy tech slogan about data processing",
-        "Write a brief message about the history of computing",
-        "Create a short message about the evolution of programming languages"
-    ]
+    # Add more context options from config
+    context = config.get("openai_context", "You are a sophisticated computer terminal displaying messages")
+    if config.get("terminal_mode", False):
+        context += " in the style of a vintage terminal"
+    if config.get("retro_mode", False):
+        context += " with a retro computing aesthetic"
+    if config.get("punch_card_mode", True):
+        context += " that references punch cards and early computing concepts"
     
-    prompt = random.choice(prompts)
-    update_api_console(f"Using OpenAI model: {model}", "openai")
-    update_api_console(f"Prompt: '{prompt}'", "openai")
+    # Maximum length for message (default to 80 for punch card feel)
+    max_length = config.get("max_length", 80)
+    
+    # Current timestamp for reference
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     try:
-        # Call the OpenAI API
+        # Log generation attempt
+        debug_log(f"Generating message using model: {model}, temp: {temperature}", "openai")
+        
+        # Create prompt for the model
+        system_prompt = f"{context}. Generate a short, meaningful message that would appear on such a display. Output ONLY the message text without any additional context or explanation. Keep it under {max_length} characters. Use ALL CAPS."
+        
+        # Make the API call with timeout handling
         start_time = time.time()
-        update_api_console("Waiting for OpenAI response...", "openai")
+        debug_log("Sending request to OpenAI API...", "openai")
         
-        # Use system message to ensure short, uppercase responses
-        completion = openai_client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You generate short messages for an IBM punch card display. Keep your response under 70 characters. Format in UPPERCASE only. Use vintage computing themes."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,  # Add some randomness but not too much
-            max_tokens=50     # Limit token usage
-        )
-        
-        # Calculate response time
-        end_time = time.time()
-        api_time = end_time - start_time
-        
-        # Extract and log token usage
-        usage = completion.usage.model_dump() if hasattr(completion, 'usage') else {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-        prompt_tokens = usage.get('prompt_tokens', 0)
-        completion_tokens = usage.get('completion_tokens', 0)
-        total_tokens = usage.get('total_tokens', 0)
-        
-        # Calculate cost
-        model_base = model.split(':')[0]  # Handle model versions like gpt-3.5-turbo:0613
-        pricing = openai_pricing.get(model_base, {"input": 0.002, "output": 0.002})  # Default pricing if model not found
-        prompt_cost = (prompt_tokens / 1000) * pricing["input"]
-        completion_cost = (completion_tokens / 1000) * pricing["output"]
-        total_cost = prompt_cost + completion_cost
-        
-        # Update usage statistics
-        openai_usage["total_calls"] += 1
-        openai_usage["prompt_tokens"] += prompt_tokens
-        openai_usage["completion_tokens"] += completion_tokens
-        openai_usage["total_tokens"] += total_tokens
-        openai_usage["estimated_cost"] += total_cost
-        openai_usage["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Update model-specific costs
-        if model_base not in openai_usage["cost_per_model"]:
-            openai_usage["cost_per_model"][model_base] = 0.0
-        openai_usage["cost_per_model"][model_base] += total_cost
-        
-        # Add to usage history (keep last 100 entries)
-        openai_usage["usage_history"].append({
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "model": model,
-            "prompt_tokens": prompt_tokens,
-            "completion_tokens": completion_tokens,
-            "total_tokens": total_tokens,
-            "cost": total_cost,
-            "response_time": api_time
-        })
-        
-        # Limit history size
-        if len(openai_usage["usage_history"]) > 100:
-            openai_usage["usage_history"] = openai_usage["usage_history"][-100:]
-        
-        # Log tokens and cost
-        update_api_console(f"✅ Response received in {api_time:.2f} seconds", "openai")
-        update_api_console(f"Tokens: {prompt_tokens} prompt + {completion_tokens} completion = {total_tokens} total", "openai")
-        update_api_console(f"Estimated cost: ${total_cost:.6f} (Total: ${openai_usage['estimated_cost']:.4f})", "openai")
-        
-        # Get the response
-        response = completion.choices[0].message.content.strip().upper()
-        
-        # Ensure it's not too long for the punch card (80 columns)
-        if len(response) > 70:
-            response = response[:67] + "..."
+        # Handle potential errors with clean error messages
+        try:
+            completion = openai_client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Generate a vintage computing message for display at {current_time}. Keep it concise and insightful."}
+                ],
+                temperature=float(temperature),
+                max_tokens=100,
+                timeout=timeout
+            )
             
-        update_api_console(f"Message generated: {response}", "openai")
-        
-        # Save usage to config for persistence
-        config["openai_usage"] = openai_usage
-        save_settings()
-        
-        return response
-        
+            # Calculate usage stats
+            end_time = time.time()
+            elapsed = end_time - start_time
+            
+            # Extract the message
+            if completion and hasattr(completion, 'choices') and len(completion.choices) > 0:
+                message = completion.choices[0].message.content.strip()
+                
+                # Update usage statistics
+                if hasattr(completion, 'usage') and completion.usage is not None:
+                    prompt_tokens = getattr(completion.usage, 'prompt_tokens', 0)
+                    completion_tokens = getattr(completion.usage, 'completion_tokens', 0)
+                    total_tokens = getattr(completion.usage, 'total_tokens', 0)
+                    
+                    # Update the global usage counter
+                    openai_usage["calls"] = openai_usage.get("calls", 0) + 1
+                    openai_usage["tokens"] = openai_usage.get("tokens", 0) + total_tokens
+                    openai_usage["prompt_tokens"] = openai_usage.get("prompt_tokens", 0) + prompt_tokens
+                    openai_usage["completion_tokens"] = openai_usage.get("completion_tokens", 0) + completion_tokens
+                    openai_usage["last_call"] = current_time
+                    
+                    # Save updated usage stats
+                    config["openai_usage"] = openai_usage
+                    save_settings()
+                
+                # Format message: ensure all caps, trim to max length, clean whitespace
+                message = message.upper().strip()
+                if len(message) > max_length:
+                    message = message[:max_length]
+                
+                # Log success
+                debug_log(f"Generated OpenAI message in {elapsed:.2f}s: {message}", "openai")
+                return message
+            else:
+                debug_log("❌ Error: OpenAI returned empty or invalid response", "error")
+                return "API ERROR: EMPTY RESPONSE"
+                
+        except Exception as api_e:
+            error_message = str(api_e)
+            debug_log(f"❌ OpenAI API error: {error_message[:100]}", "error")
+            
+            # Custom user-friendly error messages based on error type
+            if "timeout" in error_message.lower():
+                return "API TIMEOUT: REQUEST TOOK TOO LONG"
+            elif "rate limit" in error_message.lower():
+                return "API ERROR: RATE LIMIT EXCEEDED"
+            elif "quota" in error_message.lower():
+                return "API ERROR: QUOTA EXCEEDED"
+            elif "authentication" in error_message.lower() or "api key" in error_message.lower():
+                # Try to reinitialize the client
+                debug_log("Attempting to reinitialize client due to authentication error...", "system")
+                openai_client = None
+                setup_result = setup_openai_client()
+                if setup_result:
+                    return "AUTH ERROR: PLEASE TRY AGAIN"
+                else:
+                    return "API ERROR: AUTHENTICATION FAILED"
+            else:
+                return "API ERROR: COMMUNICATION FAILURE"
+    
     except Exception as e:
-        error_msg = str(e)
-        print(f"⚠️ Error calling OpenAI API: {e}")
-        update_api_console(f"❌ OpenAI Error: {error_msg[:150]}", "error")
-        
-        error_response = f"ERROR: {error_msg[:60]}"
-        
-        # Force display on punch card - ensure this gets shown
-        if display and hasattr(display, 'punch_card'):
-            try:
-                # Try to directly update the punch card with an error message
-                if hasattr(display, 'display_message'):
-                    # This should update the display
-                    display.display_message(error_response)
-            except Exception as display_err:
-                update_api_console(f"Error updating punch card directly: {str(display_err)[:100]}", "error")
-        
-        return error_response
+        debug_log(f"❌ Unexpected error in generate_openai_message: {str(e)}", "error")
+        # Try to reset the client
+        openai_client = None
+        return "SYSTEM ERROR: MESSAGE GENERATION FAILED"
 
 def get_database_message():
     """Get a random message from the database."""
@@ -3274,7 +2503,7 @@ class AboutDialog(QDialog):
         if "MonkeyPatch" in VERSION:
             monkeypatch_text = """
             <h3>About the MonkeyPatch Update</h3>
-            <p>The MonkeyPatch Update (v0.5.3) addresses issues with the OpenAI client initialization
+            <p>The MonkeyPatch Update (v0.5.5) addresses issues with the OpenAI client initialization
             by implementing a technique called "monkey patching".</p>
             
             <p><b>What is Monkey Patching?</b><br>
