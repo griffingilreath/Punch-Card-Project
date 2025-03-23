@@ -530,10 +530,10 @@ def load_settings(settings_file="punch_card_settings.json"):
             if 'openai_usage' in settings:
                 openai_usage = settings['openai_usage']
                 
-            print(f"✅ Settings loaded from {settings_file}")
+            debug_log(f"Settings loaded from {settings_file}", "system", False)
             return settings
     except Exception as e:
-        print(f"⚠️ Error loading settings: {e}")
+        debug_log(f"Error loading settings: {e}", "error", False)
         return {}
 
 def save_settings(settings_file="punch_card_settings.json"):
@@ -552,12 +552,14 @@ def save_settings(settings_file="punch_card_settings.json"):
         settings['config'] = config
         settings['openai_usage'] = openai_usage
         
-        # Save back to file
         with open(settings_file, 'w') as f:
-            json.dump(settings, f, indent=2)
-        print(f"✅ Settings saved to {settings_file}")
+            json.dump(settings, f, indent=4)
+            
+        debug_log(f"Settings saved to {settings_file}", "system", False)
+        return True
     except Exception as e:
-        print(f"⚠️ Error saving settings: {e}")
+        debug_log(f"Error saving settings: {e}", "error", False)
+        return False
 
 def save_message_to_database(message, source="local"):
     """Save a message to the database with source information."""
@@ -670,17 +672,15 @@ def check_flyio_status():
 
 def get_service_status_text():
     """Get formatted text of service statuses."""
-    openai_status = service_status["openai"]
-    flyio_status = service_status["flyio"]
+    openai_status = service_status.get("openai", {})
+    flyio_status = service_status.get("flyio", {})
     
     text = "=== Service Status ===\n"
-    text += f"OpenAI: {openai_status['status']}\n"
-    text += f"Message: {openai_status['message']}\n"
-    text += f"Last checked: {openai_status['last_checked'] or 'Never'}\n\n"
+    text += f"OpenAI: {openai_status.get('status', 'Unknown')} - {openai_status.get('message', 'No message')}\n"
+    text += f"Last checked: {openai_status.get('last_checked', 'Never')}\n\n"
     
-    text += f"Fly.io: {flyio_status['status']}\n"
-    text += f"Message: {flyio_status['message']}\n"
-    text += f"Last checked: {flyio_status['last_checked'] or 'Never'}\n"
+    text += f"Fly.io: {flyio_status.get('status', 'Unknown')} - {flyio_status.get('message', 'No message')}\n"
+    text += f"Last checked: {flyio_status.get('last_checked', 'Never')}\n"
     
     return text
 
@@ -734,21 +734,27 @@ class KeyPressFilter(QObject):
 
 def update_api_console(message, source="system"):
     """Update the API console with a message, ensuring visibility."""
-    global display
+    global display, config
     
     timestamp = time.strftime("%H:%M:%S")
+    formatted_terminal_msg = f"[{timestamp}] [{source}] {message}"
+    
+    # Always print to terminal in debug mode
+    if config.get("debug_mode", False):
+        print(formatted_terminal_msg)
     
     # Check if display is initialized
     if not display or not hasattr(display, 'api_console'):
-        # Print to terminal only if GUI console is not available
-        print(f"[{timestamp}] [{source}] {message}")
-        print(f"[WARNING] Cannot update API console - display not properly initialized")
+        # Print to terminal only if not in debug mode and GUI console is not available
+        if not config.get("debug_mode", False):
+            print(formatted_terminal_msg)
         return False
         
     # Ensure API console exists and is visible
     if display.api_console is None:
-        # Print to terminal only if GUI console is not available
-        print(f"[{timestamp}] [{source}] {message}")
+        # Print to terminal only if not in debug mode and GUI console is not available
+        if not config.get("debug_mode", False):
+            print(formatted_terminal_msg)
         ensure_console_visibility()
         
     if display.api_console:
@@ -779,14 +785,41 @@ def update_api_console(message, source="system"):
                 
             return True
         except Exception as e:
-            # If we encounter an error updating the GUI console, fall back to terminal
-            print(f"[{timestamp}] [{source}] {message}")
+            # Print to terminal if GUI console update fails
+            print(formatted_terminal_msg)
             print(f"[ERROR] Failed to update API console: {str(e)}")
             return False
-    else:
-        # Print to terminal only if GUI console is still not available after trying to ensure visibility
-        print(f"[{timestamp}] [{source}] {message}")
-        return False
+    
+    # Print to terminal if GUI console not available
+    if not config.get("debug_mode", False):
+        print(formatted_terminal_msg)
+    return False
+
+def debug_log(message, source="debug", use_api_console=True):
+    """Unified logging function that handles both terminal and API console."""
+    prefix = ""
+    if message.startswith("✅"):
+        prefix = ""  # Already has a prefix
+    elif message.startswith("⚠️"):
+        prefix = ""  # Already has a prefix
+    elif message.startswith("❌"):
+        prefix = ""  # Already has a prefix
+    elif source == "debug":
+        prefix = "✅ "
+    elif source == "warning":
+        prefix = "⚠️ "
+    elif source == "error":
+        prefix = "❌ "
+    
+    full_message = f"{prefix}{message}"
+    
+    # In debug mode or early in initialization, print directly
+    if not use_api_console or not 'display' in globals() or display is None:
+        print(full_message)
+        return
+        
+    # Otherwise use the API console
+    update_api_console(full_message, source)
 
 def ensure_console_visibility():
     """Make sure the API console is visible."""
@@ -828,8 +861,30 @@ def setup_openai_client():
         update_api_console("OpenAI client already initialized", "system")
         return True
     
+    # Check if the OpenAI module is installed
+    try:
+        from openai import OpenAI, APIError
+    except ImportError:
+        update_api_console("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
+        return False
+    
     # Get API key from config
     api_key = config.get("openai_api_key", "")
+    
+    # Try to load from secrets if not in config
+    if not api_key or len(api_key.strip()) < 10:
+        try:
+            secrets_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secrets", "api_keys.json")
+            if os.path.exists(secrets_path):
+                with open(secrets_path, 'r') as f:
+                    secrets = json.load(f)
+                    api_key = secrets.get("openai_api_key", "")
+                    # Update config with the key from secrets
+                    if api_key and len(api_key.strip()) >= 10:
+                        config["openai_api_key"] = api_key
+                        update_api_console("ℹ️ Loaded API key from secrets file", "system")
+        except Exception as e:
+            update_api_console(f"⚠️ Could not load API key from secrets: {str(e)}", "warning")
     
     # Check if API key is valid
     if not api_key or len(api_key.strip()) < 10:
@@ -837,9 +892,6 @@ def setup_openai_client():
         return False
     
     try:
-        # Import OpenAI
-        from openai import OpenAI, APIError
-        
         # Initialize client
         update_api_console("Initializing OpenAI client...", "system")
         openai_client = OpenAI(api_key=api_key)
@@ -848,16 +900,36 @@ def setup_openai_client():
         try:
             update_api_console("Testing API key validity...", "system")
             # Call list models with a small limit
-            models = openai_client.models.list(limit=1)
+            models = openai_client.models.list(limit=5)
             
             # If we get here, the API key is valid
             update_api_console(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
             
             # Set default model if not set
             if not config.get("model"):
-                config["model"] = "gpt-3.5-turbo"
-                update_api_console(f"Set default model to {config['model']}", "system")
+                # Find an appropriate model from the available models
+                available_models = [model.id for model in models.data]
+                preferred_models = ["gpt-4", "gpt-3.5-turbo"]
                 
+                for model in preferred_models:
+                    for available in available_models:
+                        if model in available:
+                            config["model"] = available
+                            update_api_console(f"Set default model to {config['model']}", "system")
+                            break
+                    if config.get("model"):
+                        break
+                
+                # If no preferred model found, use the first available
+                if not config.get("model") and len(models.data) > 0:
+                    config["model"] = models.data[0].id
+                    update_api_console(f"Set default model to {config['model']}", "system")
+                elif not config.get("model"):
+                    config["model"] = "gpt-3.5-turbo"
+                    update_api_console(f"Set default model to {config['model']} (fallback)", "system")
+                
+            # Save the settings with the API key and model
+            save_settings()
             return True
             
         except APIError as e:
@@ -866,10 +938,6 @@ def setup_openai_client():
             openai_client = None
             return False
             
-    except ImportError:
-        # Module not installed
-        update_api_console("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
-        return False
     except Exception as e:
         # Generic error handling
         update_api_console(f"❌ Error setting up OpenAI client: {str(e)[:150]}", "error")
@@ -1103,7 +1171,7 @@ def display_next_message():
     global display, config
     
     if not display:
-        print("[ERROR] Display object not initialized")
+        debug_log("Display object not initialized", "error")
         return False
     
     # Get a message based on current source setting
@@ -1118,7 +1186,7 @@ def display_next_message():
         message = message.strip().upper()
         
         # Debug info
-        print(f"Displaying message: {message}")
+        debug_log(f"Displaying message: {message}", "system", True)
         
         # Display the message in multiple ways
         display_success = False
@@ -1131,22 +1199,22 @@ def display_next_message():
                 update_api_console(f"✅ Message displayed via display_message(): {message}", "system")
             except Exception as e:
                 update_api_console(f"❌ Error in display_message(): {str(e)[:100]}", "error")
-                
-        # Method 2: Update punch_card directly if available
-        elif hasattr(display, 'punch_card'):
+        
+        # Method 2: Try to update the display via the punch_card object
+        # This is the more modern approach with the enhanced UI
+        if not display_success and hasattr(display, 'punch_card'):
             try:
-                # Try to set display data directly
+                # Try the preferred update_data method
                 if hasattr(display.punch_card, 'update_data'):
-                    # Preferred method
                     display.punch_card.update_data(message)
                     display_success = True
                     update_api_console(f"✅ Message displayed via punch_card.update_data(): {message}", "system")
-                # Or try setting text
+                # Fall back to setText
                 elif hasattr(display.punch_card, 'setText'):
                     display.punch_card.setText(message)
                     display_success = True
                     update_api_console(f"✅ Message displayed via punch_card.setText(): {message}", "system")
-                # Or try setting plain text
+                # Fall back to setPlainText
                 elif hasattr(display.punch_card, 'setPlainText'):
                     display.punch_card.setPlainText(message)
                     display_success = True
@@ -1154,30 +1222,31 @@ def display_next_message():
             except Exception as e:
                 update_api_console(f"❌ Error updating punch_card directly: {str(e)[:100]}", "error")
         
-        # Log failure
+        # Last resort: Check if we have display widgets directly
         if not display_success:
             update_api_console("❌ FAILED to display message - no suitable display method found", "error")
             
-            # Emergency fallback - try to find any text display widget
-            for widget_name in ['message_display', 'textEdit', 'textBrowser', 'label']:
+            # Emergency fallback to any text widget we can find
+            for widget_name in ['text_display', 'textEdit', 'textBrowser', 'label']:
                 if hasattr(display, widget_name):
                     try:
                         widget = getattr(display, widget_name)
                         if hasattr(widget, 'setText'):
                             widget.setText(message)
-                            update_api_console(f"✅ Emergency fallback: displayed via {widget_name}.setText()", "system")
                             display_success = True
+                            update_api_console(f"✅ Emergency fallback: displayed via {widget_name}.setText()", "system")
                             break
                         elif hasattr(widget, 'setPlainText'):
                             widget.setPlainText(message)
-                            update_api_console(f"✅ Emergency fallback: displayed via {widget_name}.setPlainText()", "system")
                             display_success = True
+                            update_api_console(f"✅ Emergency fallback: displayed via {widget_name}.setPlainText()", "system")
                             break
                     except Exception as e:
                         update_api_console(f"❌ Emergency fallback failed for {widget_name}: {str(e)[:100]}", "error")
         
-        # Save the message to the database
-        save_message_to_database(message, source=msg_source)
+        # Save the message to the database if successful
+        if display_success:
+            save_message_to_database(message, msg_source)
         
         return display_success
     else:
@@ -2135,52 +2204,54 @@ def calculate_message_interval():
     return base_interval
 
 def add_api_console():
-    """Add an API console to the display."""
+    """Add an API console to the display for viewing API messages."""
     global display
     
-    # Check if display exists
+    # Verify display is initialized
     if not display:
-        print("[ERROR] Cannot add API console - display not initialized")
+        debug_log("Cannot add API console - display not initialized", "error")
         return False
-        
+    
     try:
-        # Create a console text edit
+        # Create a QTextEdit as console
         console = QTextEdit()
-        console.setObjectName("api_console")
         console.setReadOnly(True)
         console.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
         
-        # Set some styling
-        console.setStyleSheet("""
-            QTextEdit {
-                background-color: #1a1a1a;
-                color: #ffffff;
-                font-family: 'Consolas', 'Courier New', monospace;
-                font-size: 12px;
-                border: 1px solid #444444;
-                border-radius: 4px;
-            }
-        """)
+        # Apply console styling
+        UIStyleHelper.apply_console_style(console)
         
-        # Simple floating window approach
+        # Create a main window for the console
         console_window = QMainWindow()
         console_window.setWindowTitle("API Console")
+        console_window.resize(800, 400)
         console_window.setCentralWidget(console)
-        console_window.resize(600, 300)
         
-        # Store references
+        # Store the console and window in the display
         display.api_console = console
         display.api_console_window = console_window
         
-        # Add welcome message
-        console.append("<span style='color:#5555ff;'>API Console initialized. Messages will appear here.</span>")
+        # Load console messages if there are any in history buffer
+        if hasattr(display, 'console_history') and display.console_history:
+            for msg in display.console_history:
+                console.append(msg)
+            display.console_history = []  # Clear history after adding to console
         
-        # Show the window
-        console_window.show()
+        # Add welcome message to console
+        current_time = time.strftime("%H:%M:%S")
+        console.append(f"<span style='color:#888888;'>[{current_time}]</span> <span style='color:#55aa55;'>API Console Initialized</span>")
         
+        # Show the console if debug mode is enabled
+        if config.get("debug_mode", False):
+            console_window.show()
+            console_window.raise_()
+        
+        # Log success
+        update_api_console("Console styling applied")
         return True
+        
     except Exception as e:
-        print(f"[ERROR] Failed to add API console: {str(e)}")
+        debug_log(f"Failed to add API console: {str(e)}", "error")
         return False
 
 def style_ui_elements(display):
@@ -2332,7 +2403,6 @@ def main():
     if args.openai:
         global message_source
         message_source = "openai"
-        setup_openai_client()
     
     # Start the GUI
     try:
@@ -2341,21 +2411,36 @@ def main():
         
         # Apply global style to the application
         UIStyleHelper.apply_global_style(app)
+        debug_log("Applied global styling to application")
         
         # Install an event filter to capture key presses
         key_filter = KeyPressFilter(app)
         app.installEventFilter(key_filter)
+        debug_log("KeyPressFilter initialized")
         
         # Set window title to include source
         if hasattr(display, 'setWindowTitle'):
             display.setWindowTitle(f"Punch Card Display - {message_source.upper()} Mode")
     except Exception as e:
-        print(f"⚠️ Error starting GUI: {e}")
+        debug_log(f"Error starting GUI: {e}", "error")
         return
     
     # Add API console for message display - do this before adding menu bar
     # to ensure console is available for status updates
     add_api_console()
+    
+    # Initialize OpenAI if configured to use it
+    if args.openai or message_source == "openai":
+        if setup_openai_client():
+            update_api_console("OpenAI client initialized successfully", "system")
+        else:
+            update_api_console("❌ Failed to initialize OpenAI client. Check your API key in settings.", "error")
+            # Fall back to local mode if OpenAI fails
+            if message_source == "openai":
+                message_source = "local"
+                update_api_console("⚠️ Falling back to local message source due to OpenAI initialization failure", "warning")
+                if hasattr(display, 'setWindowTitle'):
+                    display.setWindowTitle(f"Punch Card Display - {message_source.upper()} Mode")
     
     # Check service statuses
     check_openai_status()
@@ -2385,7 +2470,7 @@ def main():
     
     # Set up signal handling for graceful termination
     def signal_handler(sig, frame):
-        print("Signal received, shutting down...")
+        debug_log("Signal received, shutting down...")
         update_api_console("Shutting down...")
         app.quit()
     
@@ -2395,37 +2480,37 @@ def main():
     # Display initial message
     try:
         if hasattr(display, 'display_message'):
-            print("✅ Display has display_message method")
+            debug_log("Display has display_message method")
             welcome_message = f"PUNCH CARD - {message_source.upper()} MODE"
             display.display_message(welcome_message)
             update_api_console(f"Welcome to Punch Card - {message_source.upper()} mode")
             
-            # Save welcome message to database with correct source format
+            # Save welcome message to database
             try:
-                save_message_to_database(welcome_message, "system")
-                print("✅ Welcome message saved to database")
+                save_message_to_database(welcome_message, source="system")
+                debug_log("Welcome message saved to database")
             except Exception as e:
-                print(f"⚠️ Error saving welcome message: {e}")
+                debug_log(f"Error saving welcome message: {e}", "error")
         else:
-            print("⚠️ Display does not have display_message method")
+            debug_log("Display does not have display_message method", "warning")
     except Exception as e:
-        print(f"⚠️ Error displaying initial message: {e}")
+        debug_log(f"Error displaying initial message: {e}", "error")
     
-    # Create a message counter that persists across timer callbacks
-    message_count = [0]
+    # Set up message timer
+    interval = int(config.get("interval", 15) * 1000)  # Convert seconds to milliseconds
+    message_timer = QTimer()
+    message_timer.timeout.connect(display_next_message)
+    message_timer.start(interval)
+    display.message_timer = message_timer
+    debug_log(f"Message timer started with interval: {interval/1000:.1f} seconds")
     
-    # Set up a timer for displaying messages with dynamic interval
-    display.message_timer = QTimer()
-    display.message_timer.setInterval(calculate_message_interval())
-    display.message_timer.timeout.connect(display_next_message)
-    display.message_timer.start()
-    print(f"✅ Message timer started with interval: {display.message_timer.interval()/1000:.1f} seconds")
+    # Show information about shortcuts
     update_api_console(f"Message timer started - next message in {display.message_timer.interval()/1000:.1f} seconds")
     update_api_console("Press 'C' to show API console at any time")
     update_api_console("Press 'S' to show settings dialog at any time")
-    print("✅ Running event loop. Press Ctrl+C to exit.")
     
-    # Start the event loop
+    # Run the event loop
+    debug_log("Running event loop. Press Ctrl+C to exit.")
     sys.exit(app.exec())
 
 # Menu helper functions
