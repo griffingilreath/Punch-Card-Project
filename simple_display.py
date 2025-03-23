@@ -13,6 +13,48 @@ from datetime import datetime
 import requests
 import sqlite3
 
+# OpenAI client monkey patch to handle legacy proxies parameter
+try:
+    from openai import OpenAI
+    
+    # Store the original __init__ method
+    original_init = OpenAI.__init__
+    
+    # Define a wrapper that filters out 'proxies' parameter
+    def patched_init(self, *args, **kwargs):
+        # Remove proxies parameter if present
+        if 'proxies' in kwargs:
+            print("✅ Removed unsupported 'proxies' parameter from OpenAI client init")
+            del kwargs['proxies']
+        # Call the original init
+        return original_init(self, *args, **kwargs)
+    
+    # Apply the monkey patch
+    OpenAI.__init__ = patched_init
+    print("✅ Successfully patched OpenAI client to handle legacy parameters")
+except ImportError:
+    print("ℹ️ OpenAI module not imported - no patching required")
+except Exception as e:
+    print(f"⚠️ Failed to patch OpenAI client: {e}")
+
+# Additional monkey patch to catch the client creation itself
+try:
+    import openai
+    original_client = openai.OpenAI
+    
+    def patched_client(*args, **kwargs):
+        # Remove proxies if present
+        if 'proxies' in kwargs:
+            print("✅ Intercepted OpenAI client creation and removed 'proxies' parameter")
+            del kwargs['proxies']
+        return original_client(*args, **kwargs)
+    
+    # Replace the OpenAI client class
+    openai.OpenAI = patched_client
+    print("✅ Successfully patched OpenAI client creation method")
+except Exception as e:
+    print(f"⚠️ Failed to patch OpenAI client creation: {e}")
+
 from PyQt6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QGridLayout, 
     QLabel, QPushButton, QRadioButton, QGroupBox,
@@ -522,6 +564,11 @@ def load_settings(settings_file="punch_card_settings.json"):
             
             # Load config settings if available
             if 'config' in settings:
+                # Clean up any legacy or invalid parameters
+                if 'proxies' in settings['config']:
+                    debug_log("Removing invalid 'proxies' parameter from loaded settings", "warning", False)
+                    del settings['config']['proxies']
+                
                 for key, value in settings['config'].items():
                     if key in config:
                         config[key] = value
@@ -546,6 +593,11 @@ def save_settings(settings_file="punch_card_settings.json"):
                 settings = json.load(f)
         except:
             settings = {}
+        
+        # Clean up any legacy or invalid configuration parameters
+        if 'proxies' in config:
+            debug_log("Removing invalid 'proxies' parameter from configuration", "warning", False)
+            del config['proxies']
         
         # Update with our settings
         settings['message_source'] = message_source
@@ -744,20 +796,25 @@ def update_api_console(message, source="system"):
         print(formatted_terminal_msg)
     
     # Check if display is initialized
-    if not display or not hasattr(display, 'api_console'):
+    if not display:
         # Print to terminal only if not in debug mode and GUI console is not available
         if not config.get("debug_mode", False):
             print(formatted_terminal_msg)
         return False
         
-    # Ensure API console exists and is visible
-    if display.api_console is None:
+    # Ensure API console exists
+    if not hasattr(display, 'api_console') or display.api_console is None:
         # Print to terminal only if not in debug mode and GUI console is not available
         if not config.get("debug_mode", False):
             print(formatted_terminal_msg)
-        ensure_console_visibility()
-        
-    if display.api_console:
+        try:
+            add_api_console()
+        except Exception as e:
+            print(f"[ERROR] Failed to create API console: {str(e)}")
+            return False
+    
+    # Check again if API console exists after potentially creating it
+    if hasattr(display, 'api_console') and display.api_console and hasattr(display.api_console, 'append'):
         try:
             # Format the message with timestamp and make it visible
             formatted_msg = f"<span style='color:#888888;'>[{timestamp}]</span> "
@@ -776,8 +833,9 @@ def update_api_console(message, source="system"):
             display.api_console.append(formatted_msg)
             
             # Ensure the last line is visible by scrolling to the bottom
-            scrollbar = display.api_console.verticalScrollBar()
-            scrollbar.setValue(scrollbar.maximum())
+            if hasattr(display.api_console, 'verticalScrollBar'):
+                scrollbar = display.api_console.verticalScrollBar()
+                scrollbar.setValue(scrollbar.maximum())
             
             # Force the console to be visible if we have important messages
             if "error" in message.lower() or "❌" in message:
@@ -793,6 +851,7 @@ def update_api_console(message, source="system"):
     # Print to terminal if GUI console not available
     if not config.get("debug_mode", False):
         print(formatted_terminal_msg)
+    
     return False
 
 def debug_log(message, source="debug", use_api_console=True):
@@ -833,11 +892,12 @@ def ensure_console_visibility():
     if not hasattr(display, 'api_console') or display.api_console is None:
         add_api_console()
         
-    # Make sure it's visible
-    if hasattr(display, 'api_console') and display.api_console:
+    # Make sure the window is visible
+    if hasattr(display, 'api_console_window') and display.api_console_window:
         try:
-            # Show the console
-            display.api_console.setVisible(True)
+            # Show the console window
+            display.api_console_window.show()
+            display.api_console_window.raise_()
             
             # Bring the main window to front
             if hasattr(display, 'activate'):
@@ -899,7 +959,7 @@ def setup_openai_client():
         return False
     
     try:
-        # Initialize client
+        # Initialize client with a clean approach - no extra parameters
         debug_log("Initializing OpenAI client with your API key...", "system")
         openai_client = OpenAI(api_key=api_key)
         
@@ -1315,6 +1375,11 @@ class SettingsDialog(QDialog):
         self.tab_widget = QTabWidget()
         main_layout.addWidget(self.tab_widget)
         
+        # Create the tab widgets first
+        self.general_tab = QWidget()
+        self.openai_tab = QWidget()
+        self.stats_tab = QWidget()
+        
         # Setup tabs
         self._setup_general_tab()  # ⚙️ General tab
         self._setup_openai_tab()   # 🤖 OpenAI API tab
@@ -1334,8 +1399,7 @@ class SettingsDialog(QDialog):
     
     def _setup_general_tab(self):
         """Set up the general settings tab."""
-        # Create tab and add to tab widget
-        self.general_tab = QWidget()
+        # Add the tab to the tab widget
         self.tab_widget.addTab(self.general_tab, "⚙️ General")
         
         layout = QVBoxLayout()
@@ -1409,11 +1473,10 @@ class SettingsDialog(QDialog):
     
     def _setup_openai_tab(self):
         """Set up the OpenAI API tab."""
-        # Create tab and layout
-        openai_tab = QWidget()
-        self.tab_widget.addTab(openai_tab, "🤖 OpenAI API")
+        # Add tab to widget
+        self.tab_widget.addTab(self.openai_tab, "🤖 OpenAI API")
         
-        tab_layout = QVBoxLayout(openai_tab)
+        tab_layout = QVBoxLayout(self.openai_tab)
         
         # API Key section with toggle visibility button
         api_group = QGroupBox("API Configuration")
@@ -1969,10 +2032,9 @@ class SettingsDialog(QDialog):
     
     def _setup_stats_tab(self):
         """Set up the statistics tab."""
-        stats_tab = QWidget()
-        self.tab_widget.addTab(stats_tab, "📊 Statistics")
+        self.tab_widget.addTab(self.stats_tab, "📊 Statistics")
         
-        layout = QVBoxLayout(stats_tab)
+        layout = QVBoxLayout(self.stats_tab)
         
         # Statistics data
         stats_group = QGroupBox("Message Statistics")
@@ -2193,12 +2255,20 @@ def calculate_message_interval():
 
 def add_api_console():
     """Add an API console to the display for viewing API messages."""
-    global display
+    global display, config
     
     # Verify display is initialized
     if not display:
-        debug_log("Cannot add API console - display not initialized", "error")
+        print("[ERROR] Cannot add API console - display not initialized")
         return False
+    
+    # Check if console already exists to avoid duplication
+    if hasattr(display, 'api_console') and display.api_console and hasattr(display, 'api_console_window') and display.api_console_window:
+        # Console already exists, just make it visible
+        display.api_console_window.show()
+        display.api_console_window.raise_()
+        print("[INFO] API console already exists - making it visible")
+        return True
     
     try:
         # Create a QTextEdit as console
@@ -2222,24 +2292,39 @@ def add_api_console():
         # Load console messages if there are any in history buffer
         if hasattr(display, 'console_history') and display.console_history:
             for msg in display.console_history:
-                console.append(msg)
+                try:
+                    console.append(msg)
+                except Exception:
+                    pass  # Ignore errors when appending old messages
             display.console_history = []  # Clear history after adding to console
         
         # Add welcome message to console
         current_time = time.strftime("%H:%M:%S")
         console.append(f"<span style='color:#888888;'>[{current_time}]</span> <span style='color:#55aa55;'>API Console Initialized</span>")
         
+        # Set console font - make it easier to read
+        try:
+            font = console.font()
+            font.setFamily("Courier New")
+            font.setPointSize(10)
+            console.setFont(font)
+        except Exception:
+            pass  # Ignore font setting errors
+        
         # Show the console if debug mode is enabled
         if config.get("debug_mode", False):
             console_window.show()
             console_window.raise_()
+            print("[INFO] API console created and shown")
+        else:
+            print("[INFO] API console created (not shown - debug mode disabled)")
         
-        # Log success
-        update_api_console("Console styling applied")
+        # Add a note to the console with keyboard shortcut info
+        console.append(f"<span style='color:#888888;'>[{current_time}]</span> <span style='color:#55aa55;'>Press 'C' to toggle console visibility at any time</span>")
+        
         return True
-        
     except Exception as e:
-        debug_log(f"Failed to add API console: {str(e)}", "error")
+        print(f"[ERROR] Failed to create API console: {str(e)}")
         return False
 
 def style_ui_elements(display):
@@ -2364,11 +2449,14 @@ def set_message_source(display, source):
     return False
 
 def main():
-    """Main application entry point."""
-    global statistics_timer, display, openai_client, config, args
+    """Main application function."""
+    global message_source, config, openai_client, display
+    
+    # Clean legacy settings before loading
+    clean_legacy_settings()
     
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Simple Punch Card Display')
+    parser = argparse.ArgumentParser(description='Punch Card Display')
     parser.add_argument('--interval', type=int, default=15, help='Interval between messages in seconds')
     parser.add_argument('--openai', action='store_true', help='Start with OpenAI message source')
     parser.add_argument('--debug', action='store_true', help='Enable debug mode')
@@ -2852,6 +2940,34 @@ def generate_local_message():
     update_api_console(f"Generated local message: {message}", "system")
     
     return message
+
+def clean_legacy_settings(settings_file="punch_card_settings.json"):
+    """Clean up any legacy or invalid parameters in the settings file."""
+    try:
+        if not os.path.exists(settings_file):
+            return
+            
+        # Load the settings file
+        with open(settings_file, 'r') as f:
+            settings = json.load(f)
+            
+        needs_save = False
+        
+        # Check for legacy parameters in config
+        if 'config' in settings:
+            if 'proxies' in settings['config']:
+                debug_log("Removing invalid 'proxies' parameter from settings file", "warning", False)
+                del settings['config']['proxies']
+                needs_save = True
+                
+        # Save the cleaned settings if needed
+        if needs_save:
+            with open(settings_file, 'w') as f:
+                json.dump(settings, f, indent=4)
+            debug_log("✅ Legacy settings cleaned successfully", "system", False)
+            
+    except Exception as e:
+        debug_log(f"Error cleaning legacy settings: {e}", "error", False)
 
 if __name__ == '__main__':
     main() 
