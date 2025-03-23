@@ -629,50 +629,53 @@ def setup_openai_client():
     # Find a suitable API key
     api_key = None
     
-    # First try: Look in environment variables
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if api_key:
-        update_api_console("Found API key in environment variables")
+    # First try: Check our dedicated secrets file (this will not be committed to GitHub)
+    try:
+        secrets_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secrets", "api_keys.json")
+        if os.path.exists(secrets_file):
+            with open(secrets_file, 'r') as f:
+                secrets = json.load(f)
+                api_key = secrets.get("openai", {}).get("api_key")
+                if api_key and api_key != "YOUR_ACTUAL_API_KEY_HERE":
+                    update_api_console("Found API key in secrets file")
+    except Exception as e:
+        update_api_console(f"Error reading secrets file: {str(e)[:50]}")
     
-    # Second try: Look in settings file
+    # Second try: Look in environment variables
+    if not api_key:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if api_key:
+            update_api_console("Found API key in environment variables")
+    
+    # Third try: Look in settings file (not recommended for security)
     if not api_key:
         try:
             with open("punch_card_settings.json", 'r') as f:
                 settings = json.load(f)
                 api_key = settings.get("openai_api_key")
-                if api_key:
-                    update_api_console("Found API key in settings file")
+                if api_key and api_key != "YOUR_API_KEY_HERE":
+                    update_api_console("Found API key in settings file (consider moving to secrets)")
         except:
             update_api_console("No settings file found with API key")
     
-    # Third try: Use a default key from enhanced_openai_display.py
-    if not api_key:
-        # Check for environment variable first
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if api_key:
-            update_api_console("Using API key from environment variable")
-        else:
-            # Placeholder for user to fill in
-            api_key = "YOUR_API_KEY_HERE"  # Replace with your actual API key
-            update_api_console("⚠️ No API key found. Please set your API key in the settings file or as an environment variable.")
+    # Safety check
+    if not api_key or api_key in ["YOUR_API_KEY_HERE", "YOUR_ACTUAL_API_KEY_HERE"]:
+        update_api_console("⚠️ No valid API key found. Please set your API key in the secrets file or as an environment variable.")
+        return False
     
-    if api_key and api_key != "YOUR_API_KEY_HERE":
-        try:
-            openai_client = OpenAI(api_key=api_key)
-            print(f"✅ OpenAI client initialized")
-            update_api_console("✅ OpenAI client initialized successfully")
-            
-            # Check OpenAI API status
-            check_openai_status()
-            
-            return True
-        except Exception as e:
-            error_msg = str(e)
-            print(f"⚠️ Error initializing OpenAI client: {e}")
-            update_api_console(f"⚠️ Error initializing OpenAI client: {error_msg[:50]}")
-    else:
-        print("⚠️ No OpenAI API key found")
-        update_api_console("⚠️ No OpenAI API key found")
+    try:
+        openai_client = OpenAI(api_key=api_key)
+        print(f"✅ OpenAI client initialized")
+        update_api_console("✅ OpenAI client initialized successfully")
+        
+        # Check OpenAI API status
+        check_openai_status()
+        
+        return True
+    except Exception as e:
+        error_msg = str(e)
+        print(f"⚠️ Error initializing OpenAI client: {e}")
+        update_api_console(f"⚠️ Error initializing OpenAI client: {error_msg[:50]}")
     
     return False
 

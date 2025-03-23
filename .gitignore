@@ -114,4 +114,14 @@ temp/
 # with placeholder values, never real API keys
 punch_card_settings.json.private
 .env.local
-.api_keys 
+.api_keys
+
+# New dedicated secret files that should never be committed
+secrets/
+*_secret.json
+*_secrets.json
+api_keys.json
+.env
+config/secrets.json
+config/sensitive.json
+openai_api_key.txt 
