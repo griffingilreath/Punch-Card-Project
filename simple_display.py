@@ -13,47 +13,136 @@ from datetime import datetime
 import requests
 import sqlite3
 
-# OpenAI client monkey patch to handle legacy proxies parameter
-try:
-    from openai import OpenAI
-    
-    # Store the original __init__ method
-    original_init = OpenAI.__init__
-    
-    # Define a wrapper that filters out 'proxies' parameter
-    def patched_init(self, *args, **kwargs):
-        # Remove proxies parameter if present
-        if 'proxies' in kwargs:
-            print("✅ Removed unsupported 'proxies' parameter from OpenAI client init")
-            del kwargs['proxies']
-        # Call the original init
-        return original_init(self, *args, **kwargs)
-    
-    # Apply the monkey patch
-    OpenAI.__init__ = patched_init
-    print("✅ Successfully patched OpenAI client to handle legacy parameters")
-except ImportError:
-    print("ℹ️ OpenAI module not imported - no patching required")
-except Exception as e:
-    print(f"⚠️ Failed to patch OpenAI client: {e}")
+# ==== DIRECT OPENAI PATCHING - HIGHEST PRIORITY ====
+# This must run before any other imports to ensure we properly patch OpenAI
+print("====== Direct OpenAI client wrapper - HIGHEST PRIORITY ======")
 
-# Additional monkey patch to catch the client creation itself
+# Define a clean wrapper function for creating OpenAI clients
+openai_client = None  # Global client instance
+
+def create_clean_openai_client(api_key=None, **kwargs):
+    """
+    Create a clean OpenAI client without any problematic parameters.
+    This is a wrapper around the official client that ensures no invalid parameters are passed.
+    """
+    global openai_client
+    
+    # Only create once if the client exists
+    if openai_client is not None:
+        print("Returning existing OpenAI client instance")
+        return openai_client
+    
+    print(f"Creating clean OpenAI client with provided API key")
+    
+    try:
+        # Import the module
+        import openai
+        
+        # Clean the parameters - keep ONLY valid parameters
+        valid_params = {
+            'api_key': api_key
+        }
+        
+        # Only add parameters that are not None
+        valid_params = {k: v for k, v in valid_params.items() if v is not None}
+        
+        print(f"Creating OpenAI client with parameters: {list(valid_params.keys())}")
+        
+        # Create the client with minimal parameters
+        openai_client = openai.OpenAI(**valid_params)
+        print("✅ Successfully created OpenAI client")
+        return openai_client
+        
+    except ImportError:
+        print("❌ OpenAI module not installed")
+        return None
+    except Exception as e:
+        print(f"❌ Error creating OpenAI client: {str(e)}")
+        return None
+
+# Clean any settings files to ensure no proxies
 try:
-    import openai
-    original_client = openai.OpenAI
-    
-    def patched_client(*args, **kwargs):
-        # Remove proxies if present
-        if 'proxies' in kwargs:
-            print("✅ Intercepted OpenAI client creation and removed 'proxies' parameter")
-            del kwargs['proxies']
-        return original_client(*args, **kwargs)
-    
-    # Replace the OpenAI client class
-    openai.OpenAI = patched_client
-    print("✅ Successfully patched OpenAI client creation method")
+    settings_file = "punch_card_settings.json"
+    if os.path.exists(settings_file):
+        print(f"Checking settings file: {settings_file}")
+        try:
+            with open(settings_file, 'r') as f:
+                config_data = json.load(f)
+                modified = False
+                
+                if 'proxies' in config_data:
+                    print(f"Removing 'proxies' from settings file")
+                    del config_data['proxies']
+                    modified = True
+                
+                if modified:
+                    with open(settings_file, 'w') as f_out:
+                        json.dump(config_data, f_out, indent=2)
+                    print(f"✅ Saved cleaned settings")
+                else:
+                    print("No problematic settings found")
+        except Exception as e:
+            print(f"Error checking settings file: {e}")
 except Exception as e:
-    print(f"⚠️ Failed to patch OpenAI client creation: {e}")
+    print(f"Error in initialization: {e}")
+
+print("====== Direct OpenAI client wrapper complete ======")
+
+print("====== Starting OpenAI client monkey patching ======")
+
+# Try to directly fix the configuration by modifying the config file
+try:
+    settings_file = "punch_card_settings.json"
+    if os.path.exists(settings_file):
+        print(f"Loading settings from {settings_file} to check for proxies...")
+        with open(settings_file, 'r') as f:
+            try:
+                config_data = json.load(f)
+                if 'proxies' in config_data:
+                    print(f"⚠️ Found 'proxies' in settings file, removing it...")
+                    del config_data['proxies']
+                    with open(settings_file, 'w') as f_out:
+                        json.dump(config_data, f_out, indent=2)
+                    print(f"✅ Saved settings without 'proxies' parameter")
+                else:
+                    print(f"No 'proxies' key found in settings file")
+            except json.JSONDecodeError:
+                print(f"⚠️ Error parsing settings file")
+    else:
+        print(f"Settings file {settings_file} not found")
+except Exception as e:
+    print(f"⚠️ Error cleaning settings file: {e}")
+
+# Redirect all OpenAI client creation to our clean wrapper function
+try:
+    print("Setting up OpenAI redirection to clean wrapper...")
+    import openai
+    
+    # Replace the OpenAI class with our wrapper function
+    original_OpenAI = openai.OpenAI
+    
+    def wrapped_OpenAI(*args, **kwargs):
+        print("Redirecting OpenAI client creation to our clean wrapper")
+        
+        # Log the arguments we received
+        if kwargs:
+            print(f"Original parameters: {list(kwargs.keys())}")
+        
+        # Extract the API key if present
+        api_key = kwargs.get('api_key')
+        
+        # Use our clean wrapper instead
+        return create_clean_openai_client(api_key=api_key)
+    
+    # Replace the OpenAI class
+    openai.OpenAI = wrapped_OpenAI
+    print("✅ Successfully redirected OpenAI client creation to our clean wrapper")
+except ImportError:
+    print("OpenAI module not available, skipping redirection")
+except Exception as e:
+    print(f"⚠️ Error setting up OpenAI redirection: {e}")
+
+print("====== Finished OpenAI client monkey patching ======")
 
 from PyQt6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QGridLayout, 
@@ -916,64 +1005,108 @@ def setup_openai_client():
     """Set up the OpenAI client with improved error handling."""
     global openai_client, config
     
+    print("\n====== setup_openai_client function started ======")
+    print(f"Current config keys: {list(config.keys())}")
     debug_log("Setting up OpenAI client...", "system")
     
     # Check if we already have a client
     if openai_client:
+        print("OpenAI client already initialized, returning existing client")
         debug_log("OpenAI client already initialized", "system")
+        print("====== setup_openai_client function completed ======\n")
         return True
     
     # Check if the OpenAI module is installed
     try:
+        print("Importing OpenAI and APIError...")
         from openai import OpenAI, APIError
-    except ImportError:
+        print("Successfully imported OpenAI module")
+        
+    except ImportError as ie:
+        print(f"Failed to import OpenAI module: {ie}")
         debug_log("❌ OpenAI module not installed. Run 'pip install openai' to install it.", "error")
+        print("====== setup_openai_client function failed ======\n")
         return False
     
     # Get API key from config
     api_key = config.get("openai_api_key", "")
+    print(f"API key from config: {'<present>' if api_key and len(api_key) > 10 else '<missing or invalid>'}")
     
     # Try to load from secrets if not in config
     if not api_key or len(api_key.strip()) < 10:
+        print("API key missing or invalid, attempting to load from secrets file...")
         try:
             secrets_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "secrets", "api_keys.json")
+            print(f"Looking for secrets file at: {secrets_path}")
             if os.path.exists(secrets_path):
+                print("Secrets file found, loading...")
                 with open(secrets_path, 'r') as f:
                     secrets = json.load(f)
                     if "openai" in secrets and "api_key" in secrets["openai"]:
                         api_key = secrets["openai"]["api_key"]
+                        print("Found API key in secrets['openai']['api_key']")
                     elif "openai_api_key" in secrets:
                         api_key = secrets["openai_api_key"]
+                        print("Found API key in secrets['openai_api_key']")
                     
                     # Update config with the key from secrets
                     if api_key and len(api_key.strip()) >= 10:
                         config["openai_api_key"] = api_key
+                        print("Updated config with API key from secrets")
                         debug_log("ℹ️ Loaded API key from secrets file", "system")
+            else:
+                print(f"Secrets file not found at {secrets_path}")
         except Exception as e:
+            print(f"Error loading API key from secrets: {e}")
             debug_log(f"⚠️ Could not load API key from secrets: {str(e)}", "warning")
     
     # Check if API key is valid
     if not api_key or len(api_key.strip()) < 10:
+        print("API key still missing or invalid after attempting to load from secrets")
         debug_log("❌ Invalid API key. Please set a valid API key in settings.", "error")
         debug_log("To set an API key, press 'S' to open settings, go to the OpenAI tab, enter your key and click 'Save API Key'", "system")
+        print("====== setup_openai_client function failed ======\n")
         return False
     
     try:
-        # Initialize client with a clean approach - no extra parameters
+        # Initialize client with our clean wrapper function
         debug_log("Initializing OpenAI client with your API key...", "system")
-        openai_client = OpenAI(api_key=api_key)
+        print("Creating OpenAI client using clean wrapper function...")
         
+        # Ensure all keys in the settings object are compatible with the OpenAI client
+        print("Checking for 'proxies' in config object...")
+        if 'proxies' in config:
+            print("Found 'proxies' in config, removing it...")
+            del config['proxies']
+            # Save the cleaned config
+            print("Saving cleaned config...")
+            save_settings()
+            print("Config saved without 'proxies' parameter")
+        
+        # Create with minimal parameters using our wrapper
+        print("Using create_clean_openai_client wrapper function...")
+        openai_client = create_clean_openai_client(api_key=api_key)
+        
+        if not openai_client:
+            print("Failed to create OpenAI client using wrapper")
+            debug_log("❌ Failed to create OpenAI client", "error")
+            print("====== setup_openai_client function failed ======\n")
+            return False
+            
         # Test API key by listing models (lightweight call)
         try:
+            print("Testing API key by calling models.list()...")
             debug_log("Testing API key validity by listing available models...", "system")
             # Call list models with a small limit
             models = openai_client.models.list(limit=5)
+            print(f"Successfully listed models: found {len(models.data)} models")
             
             # If we get here, the API key is valid
             debug_log(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
             
             # Set default model if not set
             if not config.get("model"):
+                print("No default model set, selecting one...")
                 # Find an appropriate model from the available models
                 available_models = [model.id for model in models.data]
                 preferred_models = ["gpt-4", "gpt-3.5-turbo"]
@@ -982,6 +1115,7 @@ def setup_openai_client():
                     for available in available_models:
                         if model in available:
                             config["model"] = available
+                            print(f"Set default model to {config['model']}")
                             debug_log(f"Set default model to {config['model']}", "system")
                             break
                     if config.get("model"):
@@ -990,34 +1124,47 @@ def setup_openai_client():
                 # If no preferred model found, use the first available
                 if not config.get("model") and len(models.data) > 0:
                     config["model"] = models.data[0].id
+                    print(f"Set default model to first available: {config['model']}")
                     debug_log(f"Set default model to {config['model']}", "system")
                 elif not config.get("model"):
                     config["model"] = "gpt-3.5-turbo"
+                    print(f"Set default model to fallback: {config['model']}")
                     debug_log(f"Set default model to {config['model']} (fallback)", "system")
                 
             # Save the settings with the API key and model
+            print("Saving settings with updated model...")
             save_settings()
+            print("Settings saved successfully")
+            print("====== setup_openai_client function completed successfully ======\n")
             return True
             
         except APIError as e:
             # API errors often relate to authentication
             error_message = str(e)[:200]
+            print(f"API Error: {error_message}")
             debug_log(f"❌ OpenAI API Error: {error_message}", "error")
             
             if "API key" in error_message and "invalid" in error_message.lower():
+                print("Invalid API key error detected")
                 debug_log("The API key you provided appears to be invalid. Please check the key and try again.", "error")
             elif "exceeded your current quota" in error_message.lower():
+                print("Quota exceeded error detected")
                 debug_log("Your OpenAI account has exceeded its quota. Please check your billing information.", "error")
             elif "rate limit" in error_message.lower():
+                print("Rate limit error detected")
                 debug_log("You've hit a rate limit. Please wait a moment before trying again.", "warning")
             
             openai_client = None
+            print("====== setup_openai_client function failed ======\n")
             return False
             
     except Exception as e:
         # Generic error handling
-        debug_log(f"❌ Error setting up OpenAI client: {str(e)[:200]}", "error")
+        error_message = str(e)[:200]
+        print(f"Unexpected error: {error_message}")
+        debug_log(f"❌ Error setting up OpenAI client: {error_message}", "error")
         openai_client = None
+        print("====== setup_openai_client function failed ======\n")
         return False
 
 def generate_openai_message():
@@ -1878,33 +2025,44 @@ class SettingsDialog(QDialog):
     
     def update_api_key(self):
         """Update the API key in the configuration."""
+        print("\n====== update_api_key method started ======")
         api_key = self.api_key_edit.text()
+        print(f"API key length: {len(api_key)}")
         
         # Skip if key is just placeholder asterisks
         if api_key == "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            print("User provided placeholder API key, showing warning")
             QMessageBox.warning(
                 self, 
                 "API Key Update", 
                 "Please enter your actual API key, not the placeholder."
             )
+            print("====== update_api_key method aborted - placeholder provided ======\n")
             return
         
         if not api_key:
+            print("User provided empty API key, showing warning")
             QMessageBox.warning(
                 self, 
                 "API Key Update", 
                 "API key cannot be empty."
             )
+            print("====== update_api_key method aborted - empty key provided ======\n")
             return
         
         # Simply update the config directly - this is safer and simpler
         try:
+            print("Updating API key in configuration...")
             # Update the global config
             global config
+            print(f"Config keys before update: {list(config.keys())}")
             config["openai_api_key"] = api_key
+            print(f"Config keys after update: {list(config.keys())}")
             
             # Save to settings file
+            print("Saving configuration with new API key...")
             save_settings()
+            print("Configuration saved successfully")
             
             QMessageBox.information(
                 self, 
@@ -1913,26 +2071,48 @@ class SettingsDialog(QDialog):
             )
             
             # Update status
+            print("Updating API key status...")
             self.update_api_key_status()
             
             # Attempt to initialize the OpenAI client with the new key
+            print("Setting up new OpenAI client with updated API key...")
             global openai_client
             old_client = openai_client
-            setup_openai_client()
+            print(f"Old client exists: {old_client is not None}")
+            
+            # Clear the client first to force reinitialization
+            print("Clearing existing OpenAI client...")
+            openai_client = None
+            
+            # Set up a new client with the new key
+            setup_result = setup_openai_client()
+            print(f"setup_openai_client() result: {setup_result}")
             
             if openai_client and openai_client != old_client:
+                print("New OpenAI client successfully initialized")
                 QMessageBox.information(
                     self,
                     "OpenAI Client",
                     "✅ OpenAI client successfully initialized with your new API key."
                 )
+            else:
+                print("Failed to initialize a new OpenAI client")
+                if not setup_result:
+                    QMessageBox.warning(
+                        self,
+                        "OpenAI Client",
+                        "⚠️ Failed to initialize OpenAI client with your API key. Please check the console for errors."
+                    )
             
+            print("====== update_api_key method completed ======\n")
         except Exception as e:
+            print(f"Error updating API key: {str(e)}")
             QMessageBox.critical(
-                self, 
-                "API Key Update", 
-                f"❌ Error saving API key: {str(e)}"
+                self,
+                "API Key Update Error",
+                f"An error occurred while updating your API key: {str(e)}"
             )
+            print("====== update_api_key method failed ======\n")
     
     def get_settings(self):
         """Get all settings from the dialog."""
