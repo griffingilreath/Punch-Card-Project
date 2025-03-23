@@ -134,9 +134,14 @@ punch_card_project/
 │   └── technical/          # Technical documentation
 ├── tests/                  # Test files
 │   ├── unit/               # Unit tests
-│   └── integration/        # Integration tests  
+│   ├── integration/        # Integration tests
+│   ├── api/                # API and external service tests
+│   ├── display/            # Display and UI tests
+│   └── legacy/             # Older tests kept for reference
 ├── config/                 # Configuration files
+│   └── templates/          # Configuration templates
 ├── data/                   # Data storage
+│   └── local/              # Local data files
 ├── logs/                   # Log files
 ├── scripts/                # Utility scripts
 ├── versions/               # Archive of previous versions
@@ -145,6 +150,9 @@ punch_card_project/
 │   ├── 0.5.1/              # The Documentation Update
 │   └── 0.5.2/              # The Reorganization Update
 ├── secrets/                # API keys (git-ignored)
+├── simple_display.py       # Main application entry point
+├── update_api_key.py       # API key management utility
+├── requirements.txt        # Python dependencies
 └── README.md               # This file
 ```
 
@@ -510,12 +518,15 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 ## 🗓️ Version History
 
 - v0.5.2 (2024-03-24): **The Reorganization Update**
-  - Reorganized project structure for better maintainability
+  - Complete restructuring of the project for optimal organization
   - Properly separated core, display, and utility modules
-  - Improved test organization with unit and integration directories
+  - Enhanced test organization with specialized test directories
+  - Consolidated and archived all display-related modules
   - Created proper configuration and data directories
-  - Enhanced import structure with proper module organization
-  - Fixed duplicate files by archiving older versions
+  - Reduced root directory to only essential files
+  - Moved database and JSON files to dedicated data directory
+  - Archived all legacy and duplicate test files
+  - Enhanced documentation with detailed directory structure
   - Standardized directory structure following best practices
   
 - v0.5.1 (2024-03-23): **The Documentation Update**
