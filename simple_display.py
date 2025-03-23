@@ -113,6 +113,14 @@ def clean_proxies_from_settings():
 # Run the settings cleaner
 clean_proxies_from_settings()
 
+# Ensure no proxy environment variables are set
+os.environ.pop('HTTP_PROXY', None)
+os.environ.pop('HTTPS_PROXY', None)
+os.environ.pop('http_proxy', None)
+os.environ.pop('https_proxy', None)
+os.environ.pop('no_proxy', None)
+os.environ.pop('NO_PROXY', None)
+
 # Monkey patch the OpenAI client creation
 try:
     print("🐒 Setting up OpenAI monkey patching...")
@@ -128,35 +136,93 @@ try:
         # Create a patched __init__ method that only accepts the API key
         def patched_init(self, api_key=None, **kwargs):
             print("🐒 Patched OpenAI.__init__ called")
-            # Filter out problematic parameters
-            if 'proxies' in kwargs:
-                print("🐒 Removing 'proxies' from kwargs")
-                del kwargs['proxies']
-            if 'organization' in kwargs:
-                print("🐒 Removing 'organization' from kwargs")
-                del kwargs['organization']
-            if 'org_id' in kwargs:
-                print("🐒 Removing 'org_id' from kwargs")
-                del kwargs['org_id']
-                
-            # Call the original __init__ with only the clean parameters
-            try:
-                # First try with just the API key
-                if api_key:
-                    print("🐒 Calling original __init__ with api_key only")
-                    original_init(self, api_key=api_key)
+            
+            # Track which parameters we're removing
+            removed_params = []
+            
+            # List of known problematic parameters
+            problematic_params = ['proxies', 'proxy', 'organization', 'org_id', 'organization_id']
+            
+            # Filter out all problematic parameters
+            cleaned_kwargs = {}
+            for key, value in kwargs.items():
+                if key not in problematic_params:
+                    cleaned_kwargs[key] = value
                 else:
-                    print("🐒 Calling original __init__ with no parameters")
-                    original_init(self)
-            except Exception as e:
-                print(f"⚠️ Error in patched OpenAI.__init__: {e}")
-                # Last resort - call with no arguments
-                print("🐒 Trying base initialization with no arguments")
-                original_init(self)
+                    removed_params.append(key)
+            
+            # Report on removed parameters
+            if removed_params:
+                print(f"🐒 Removed problematic parameters: {', '.join(removed_params)}")
+            
+            # Call the original __init__ with different strategies
+            try:
+                print(f"🐒 Strategy 1: Calling original __init__ with api_key={api_key is not None} and cleaned kwargs")
+                original_init(self, api_key=api_key, **cleaned_kwargs)
+                print("✅ Strategy 1 succeeded")
+                return
+            except Exception as e1:
+                print(f"⚠️ Strategy 1 failed: {str(e1)}")
+                
+                try:
+                    print("🐒 Strategy 2: Calling original __init__ with only api_key")
+                    original_init(self, api_key=api_key)
+                    print("✅ Strategy 2 succeeded")
+                    return
+                except Exception as e2:
+                    print(f"⚠️ Strategy 2 failed: {str(e2)}")
+                    
+                    try:
+                        print("🐒 Strategy 3: Calling original __init__ with no arguments")
+                        original_init(self)
+                        print("✅ Strategy 3 succeeded")
+                        return
+                    except Exception as e3:
+                        print(f"⚠️ Strategy 3 failed: {str(e3)}")
+                        
+                        # Last resort, re-raise the original error
+                        print("❌ All initialization strategies failed")
+                        raise e1
         
         # Apply the patch
         OpenAI.__init__ = patched_init
         print("✅ Successfully patched OpenAI.__init__ method")
+        
+        # Also monkey patch the OpenAI factory method if it exists
+        if hasattr(openai, 'OpenAI'):
+            original_factory = openai.OpenAI
+            
+            def patched_factory(*args, **kwargs):
+                print("🐒 Patched openai.OpenAI factory called")
+                # Remove problematic parameters
+                if 'proxies' in kwargs:
+                    print("🐒 Removing 'proxies' from factory kwargs")
+                    del kwargs['proxies']
+                if 'organization' in kwargs:
+                    print("🐒 Removing 'organization' from factory kwargs")
+                    del kwargs['organization']
+                if 'org_id' in kwargs:
+                    print("🐒 Removing 'org_id' from factory kwargs")
+                    del kwargs['org_id']
+                
+                # Call the original factory
+                try:
+                    return original_factory(*args, **kwargs)
+                except Exception as e:
+                    print(f"⚠️ Error in patched factory: {e}")
+                    # Try with just the API key if available
+                    if 'api_key' in kwargs:
+                        try:
+                            print("🐒 Trying factory with only api_key")
+                            return original_factory(api_key=kwargs['api_key'])
+                        except Exception:
+                            pass
+                    # Re-raise the original error
+                    raise
+            
+            # Apply the patch
+            openai.OpenAI = patched_factory
+            print("✅ Successfully patched openai.OpenAI creation method")
         
     except ImportError:
         print("OpenAI module not available, skipping monkey patching")
@@ -1043,6 +1109,7 @@ def setup_openai_client():
     try:
         print("🐒 Importing OpenAI module...")
         import openai
+        from openai import OpenAI, APIError
         print("✅ Successfully imported OpenAI module")
         
     except ImportError as ie:
@@ -1091,117 +1158,75 @@ def setup_openai_client():
         print("====== setup_openai_client function failed ======\n")
         return False
     
+    # Create the OpenAI client with minimal parameters
     try:
-        # Initialize client with extremely minimal approach
-        debug_log("🐒 Initializing monkey-patched OpenAI client...", "system")
-        print("🐒 Creating OpenAI client with minimal approach...")
+        debug_log("🐒 Creating OpenAI client with your API key...", "system")
+        print("Creating OpenAI client with API key only (absolute minimum)...")
         
         # Remove any problematic parameters from config completely
-        problematic_params = ['proxies', 'proxy', 'organization', 'org_id']
+        problematic_params = ['proxies', 'proxy', 'organization', 'org_id', 'organization_id']
         for param in problematic_params:
             if param in config:
                 print(f"🐒 Removing '{param}' from config...")
                 del config[param]
-        
+                
         # Save the cleaned config
         save_settings()
         print("✅ Config saved without problematic parameters")
         
-        try:
-            # The most direct approach possible - create directly with the API key only
-            print("🐒 Creating OpenAI client with API key only (maximum simplicity)")
-            import openai
-            
-            # Create client with only the API key - nothing else
-            openai_client = openai.OpenAI(api_key=api_key)
-            print("✅ OpenAI client created successfully with direct approach")
-            
-        except Exception as client_error:
-            print(f"❌ Direct approach failed: {str(client_error)}")
-            print(f"Error type: {type(client_error)}")
-            print("Trying with create_clean_openai_client function...")
-            
-            # Try our clean wrapper
-            openai_client = create_clean_openai_client(api_key=api_key)
-            
-            if not openai_client:
-                print("❌ All client creation methods failed")
-                debug_log("❌ Failed to create OpenAI client after multiple attempts", "error")
-                print("====== setup_openai_client function failed ======\n")
-                return False
+        # Clear any environment variables that might interfere
+        for env_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'no_proxy', 'NO_PROXY']:
+            if env_var in os.environ:
+                print(f"🐒 Clearing environment variable {env_var}")
+                os.environ.pop(env_var, None)
+                
+        # Create the OpenAI client with just the API key
+        openai_client = OpenAI(api_key=api_key)
         
-        # Test API key by listing models (lightweight call)
-        try:
-            print("🐒 Testing API key by calling models.list()...")
-            debug_log("Testing API key validity...", "system")
-            
-            # Call list models with a small limit
-            models = openai_client.models.list(limit=5)
-            print(f"✅ Successfully listed models: found {len(models.data)} models")
-            
-            # If we get here, the API key is valid
-            debug_log(f"✅ OpenAI API key valid - found {len(models.data)} models", "system")
-            
-            # Set default model if not set
-            if not config.get("model"):
-                print("No default model set, selecting one...")
-                # Find an appropriate model from the available models
-                available_models = [model.id for model in models.data]
-                preferred_models = ["gpt-4", "gpt-3.5-turbo"]
-                
-                for model in preferred_models:
-                    for available in available_models:
-                        if model in available:
-                            config["model"] = available
-                            print(f"Set default model to {config['model']}")
-                            debug_log(f"Set default model to {config['model']}", "system")
-                            break
-                    if config.get("model"):
-                        break
-                
-                # If no preferred model found, use the first available
-                if not config.get("model") and len(models.data) > 0:
-                    config["model"] = models.data[0].id
-                    print(f"Set default model to first available: {config['model']}")
-                    debug_log(f"Set default model to {config['model']}", "system")
-                elif not config.get("model"):
-                    config["model"] = "gpt-3.5-turbo"
-                    print(f"Set default model to fallback: {config['model']}")
-                    debug_log(f"Set default model to {config['model']} (fallback)", "system")
-                
-            # Save the settings with the API key and model
-            print("Saving settings with updated model...")
+        # Test the client with a simple API call
+        print("Testing OpenAI client connection...")
+        models = openai_client.models.list(limit=5)
+        print(f"✅ Successfully listed {len(models.data)} models")
+        debug_log(f"✅ OpenAI client successfully initialized - found {len(models.data)} models", "system")
+        
+        # Set default model if not set
+        if not config.get("model"):
+            print("No default model set, setting to gpt-3.5-turbo...")
+            config["model"] = "gpt-3.5-turbo"
             save_settings()
-            print("Settings saved successfully")
-            print("====== setup_openai_client function completed successfully ======\n")
-            return True
             
-        except Exception as api_error:
-            # More generic error handling
-            error_message = str(api_error)[:200]
-            print(f"❌ API Error: {error_message}")
-            debug_log(f"❌ OpenAI API Error: {error_message}", "error")
+        print("====== setup_openai_client function completed successfully ======\n")
+        return True
             
-            if "API key" in error_message and "invalid" in error_message.lower():
-                print("❌ Invalid API key error detected")
-                debug_log("The API key you provided appears to be invalid. Please check the key and try again.", "error")
-            elif "exceeded your current quota" in error_message.lower():
-                print("❌ Quota exceeded error detected")
-                debug_log("Your OpenAI account has exceeded its quota. Please check your billing information.", "error")
-            elif "rate limit" in error_message.lower():
-                print("⚠️ Rate limit error detected")
-                debug_log("You've hit a rate limit. Please wait a moment before trying again.", "warning")
+    except APIError as api_error:
+        # Handle API-specific errors
+        error_message = str(api_error)
+        print(f"❌ OpenAI API Error: {error_message}")
+        
+        if "authentication" in error_message.lower() or "invalid" in error_message.lower() and "api key" in error_message.lower():
+            debug_log("❌ Authentication error: Your API key appears to be invalid. Please check it in settings.", "error")
+        elif "exceeded your current quota" in error_message.lower():
+            debug_log("❌ Quota exceeded: Your OpenAI account has reached its usage limit.", "error")
+        elif "rate limit" in error_message.lower():
+            debug_log("⚠️ Rate limit: The API is currently rate limiting requests. Please try again later.", "warning")
+        else:
+            debug_log(f"❌ OpenAI API Error: {error_message[:100]}", "error")
             
-            openai_client = None
-            print("====== setup_openai_client function failed ======\n")
-            return False
-            
+        openai_client = None
+        print("====== setup_openai_client function failed ======\n")
+        return False
+        
     except Exception as e:
         # Generic error handling
-        error_message = str(e)[:200]
-        print(f"❌ Unexpected error: {error_message}")
-        print(f"Error type: {type(e)}")
-        debug_log(f"❌ Error setting up OpenAI client: {error_message}", "error")
+        error_message = str(e)
+        error_type = type(e).__name__
+        print(f"❌ Error creating OpenAI client: {error_type}: {error_message}")
+        debug_log(f"❌ Error setting up OpenAI client: {error_type}: {error_message[:100]}", "error")
+        
+        if "proxies" in error_message:
+            debug_log("🔍 The error appears to be related to proxies. Our monkey patching should have handled this.", "error")
+            debug_log("Please try restarting the application with the --debug flag for more detailed logs.", "system")
+        
         openai_client = None
         print("====== setup_openai_client function failed ======\n")
         return False
@@ -1662,7 +1687,17 @@ class SettingsDialog(QDialog):
         # Add tab to widget
         self.tab_widget.addTab(self.openai_tab, "🤖 OpenAI API")
         
-        tab_layout = QVBoxLayout(self.openai_tab)
+        # Use a scroll area to ensure everything is visible regardless of screen size
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_contents = QWidget()
+        tab_layout = QVBoxLayout(scroll_contents)
+        scroll_area.setWidget(scroll_contents)
+        
+        # Set the scroll area as the main widget for the tab
+        main_layout = QVBoxLayout(self.openai_tab)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(scroll_area)
         
         # API Key section with toggle visibility button
         api_group = QGroupBox("API Configuration")
@@ -1687,6 +1722,7 @@ class SettingsDialog(QDialog):
         # API Key verification status
         self.api_key_status = QLabel("API key status: Not verified")
         self.api_key_status.setStyleSheet("color: #888888;")
+        self.api_key_status.setWordWrap(True)
         form_layout.addRow("", self.api_key_status)
         
         # API Key buttons: Verify and Save
@@ -1816,13 +1852,17 @@ class SettingsDialog(QDialog):
         service_group.setLayout(service_layout)
         
         self.service_status_label = QLabel("Status: Not checked")
-        service_layout.addWidget(self.service_status_label)
+        self.service_status_label.setWordWrap(True)
+        service_layout.addWidget(self.service_status_label, 1)
         
         check_status_btn = QPushButton("Check Status")
         check_status_btn.clicked.connect(self.check_openai_service)
         service_layout.addWidget(check_status_btn)
         
         tab_layout.addWidget(service_group)
+        
+        # Add stretch at the end to push everything up
+        tab_layout.addStretch()
         
         # Initialize the usage stats
         self.update_usage_stats()
@@ -1994,18 +2034,40 @@ class SettingsDialog(QDialog):
         """Refresh the service status display."""
         global service_status
         
-        # Update the status
-        check_openai_status()
-        check_flyio_status()
-        
-        # Update the display
-        self.service_status_text.setText(get_service_status_text())
-        
-        QMessageBox.information(
-            self,
-            "Service Status",
-            "Service status has been refreshed."
-        )
+        try:
+            # Update the status
+            check_openai_status()
+            check_flyio_status()
+            
+            # Update the display with error handling
+            try:
+                if hasattr(self, 'service_status_text') and self.service_status_text is not None:
+                    status_text = get_service_status_text()
+                    self.service_status_text.setText(status_text)
+                    
+                    # Show confirmation only if the update was successful
+                    QMessageBox.information(
+                        self,
+                        "Service Status",
+                        "Service status has been refreshed."
+                    )
+                else:
+                    print("Warning: service_status_text is None or not available")
+            except Exception as e:
+                print(f"Error updating service status text: {e}")
+                # Try to show an error message if possible
+                QMessageBox.warning(
+                    self,
+                    "Service Status Update Error",
+                    f"Error updating service status: {str(e)}"
+                )
+        except Exception as e:
+            print(f"Error refreshing service status: {e}")
+            QMessageBox.critical(
+                self,
+                "Service Status Error",
+                f"Failed to check service status: {str(e)}"
+            )
     
     def toggle_key_visibility(self):
         """Toggle visibility of the API key."""
@@ -2061,7 +2123,7 @@ class SettingsDialog(QDialog):
         except Exception as e:
             self.api_key_status.setText(f"Status: Error - {str(e)[:60]}")
             self.api_key_status.setStyleSheet("color: #FF5555;")
-    
+
     def update_api_key(self):
         """Update the API key in the configuration."""
         print("\n====== update_api_key method started ======")
@@ -2253,7 +2315,17 @@ class SettingsDialog(QDialog):
         """Set up the statistics tab."""
         self.tab_widget.addTab(self.stats_tab, "📊 Statistics")
         
-        layout = QVBoxLayout(self.stats_tab)
+        # Use a scroll area to ensure everything is visible regardless of screen size
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_contents = QWidget()
+        layout = QVBoxLayout(scroll_contents)
+        scroll_area.setWidget(scroll_contents)
+        
+        # Set the scroll area as the main widget for the tab
+        main_layout = QVBoxLayout(self.stats_tab)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(scroll_area)
         
         # Statistics data
         stats_group = QGroupBox("Message Statistics")
@@ -2296,7 +2368,13 @@ class SettingsDialog(QDialog):
         
         # Load initial stats
         self.stats_text.setText(get_stats_text())
-        self.service_status_text.setText(get_service_status_text())
+        
+        # Load initial service status - with error handling
+        try:
+            self.service_status_text.setText(get_service_status_text())
+        except Exception as e:
+            self.service_status_text.setText(f"Error getting service status: {str(e)}")
+            print(f"Error loading service status: {e}")
     
     def reset_stats(self):
         """Reset the message statistics."""
