@@ -28,6 +28,20 @@
 └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+> **⚠️ IMPORTANT API KEY SECURITY NOTICE ⚠️**
+> 
+> This project now includes enhanced security measures for API keys:
+> 
+> 1. Run the new `update_api_key.py` script to securely store your OpenAI API key
+> 2. Your key will be saved in the `secrets/` directory which is **excluded from Git**
+> 3. All test scripts have been updated to use this secure method
+> 4. **Never commit API keys to GitHub** - the project is configured to help prevent this
+>
+> **If you previously had an API key in the codebase:**
+> 1. Consider that key compromised and regenerate a new one
+> 2. Update your key using the `update_api_key.py` script 
+> 3. Only use the secure methods described in the installation section
+
 **Status**: Beta - The GUI Update improves visual cohesion but still has pending issues.
 
 ### What's New in v0.5.0 (Released March 23, 2024):
@@ -336,16 +350,22 @@ pip install -r requirements.txt
 
 3. Set up your OpenAI API key (choose one method):
 
-   **Method 1: Using the secrets directory (RECOMMENDED - not synced with GitHub)**
+   **Method 1: Using the update_api_key.py script (RECOMMENDED)**
+   ```bash
+   # Run the script and follow the prompts - your key will never be displayed
+   python update_api_key.py
+   ```
+
+   **Method 2: Manually edit the secrets file**
    ```bash
    # Create a copy of the template in the secrets directory
    cp secrets/api_keys.json.template secrets/api_keys.json
    
    # Edit the api_keys.json file with your actual API key
-   # Replace "YOUR_ACTUAL_API_KEY_HERE" with your real key
+   # Replace "YOUR_OPENAI_API_KEY_HERE" with your real key
    ```
 
-   **Method 2: Environment variables**
+   **Method 3: Environment variables**
    ```bash
    # On macOS/Linux
    export OPENAI_API_KEY=your_api_key_here
@@ -354,7 +374,7 @@ pip install -r requirements.txt
    set OPENAI_API_KEY=your_api_key_here
    ```
    
-   **Method 3: Settings file (LEAST SECURE - not recommended)**
+   **Method 4: Settings file (LEAST SECURE - not recommended)**
    - Edit the `punch_card_settings.json` file and replace "YOUR_API_KEY_HERE" with your actual key
 
 4. Run the application with the new black background theme:
@@ -371,6 +391,7 @@ The project now includes enhanced security for API keys with v0.5.0:
   1. First checks the `secrets/api_keys.json` file
   2. Then falls back to environment variables
   3. Only uses settings file as a last resort
+- The new `update_api_key.py` script for securely updating your API key
 - Clear instructions in `secrets/README.md` for proper key management
 - Additional `.gitignore` rules to prevent accidental commits of sensitive data
 
