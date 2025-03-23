@@ -736,17 +736,19 @@ def update_api_console(message, source="system"):
     """Update the API console with a message, ensuring visibility."""
     global display
     
-    # First, print to terminal for debugging
     timestamp = time.strftime("%H:%M:%S")
-    print(f"[{timestamp}] [{source}] {message}")
     
     # Check if display is initialized
     if not display or not hasattr(display, 'api_console'):
+        # Print to terminal only if GUI console is not available
+        print(f"[{timestamp}] [{source}] {message}")
         print(f"[WARNING] Cannot update API console - display not properly initialized")
         return False
         
     # Ensure API console exists and is visible
     if display.api_console is None:
+        # Print to terminal only if GUI console is not available
+        print(f"[{timestamp}] [{source}] {message}")
         ensure_console_visibility()
         
     if display.api_console:
@@ -777,10 +779,13 @@ def update_api_console(message, source="system"):
                 
             return True
         except Exception as e:
+            # If we encounter an error updating the GUI console, fall back to terminal
+            print(f"[{timestamp}] [{source}] {message}")
             print(f"[ERROR] Failed to update API console: {str(e)}")
             return False
     else:
-        print(f"[WARNING] API console is not available")
+        # Print to terminal only if GUI console is still not available after trying to ensure visibility
+        print(f"[{timestamp}] [{source}] {message}")
         return False
 
 def ensure_console_visibility():
