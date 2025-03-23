@@ -1,0 +1,28 @@
+{
+  "message_source": "openai",
+  "openai_api_key": "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",
+  "openai_model": "gpt-3.5-turbo-0125",
+  "openai_prompts": [
+    "Create a short tech message about IBM punch cards",
+    "Write a brief statement about vintage computing",
+    "Generate a nostalgic message about early computers",
+    "Write a haiku about AI and computing",
+    "Create a futuristic message about computing",
+    "Generate a punchy tech slogan",
+    "Create a message about data processing"
+  ],
+  "message_prefix": "",
+  "display_delay": 150,
+  "message_interval": 15,
+  "save_to_database": true,
+  "message_limit": 1000,
+  "config": {
+    "interval": 15,
+    "delay_factor": 1.0,
+    "display_stats": true,
+    "save_to_database": true,
+    "debug_mode": true,
+    "mac_style": true,
+    "epa_style": true
+  }
+}

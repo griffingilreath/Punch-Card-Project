@@ -1,3 +1,41 @@
+# Punch Card Display System v0.5.0 - The GUI Update
+
+```
+ ________ ___  ___  ___        ___  ___  ________  ________  ________  _________  _______      
+|\  _____\\  \|\  \|\  \      |\  \|\  \|\   __  \|\   __  \|\   __  \|\___   ___\\  ___ \     
+\ \  \__/\ \  \\\  \ \  \     \ \  \\\  \ \  \|\  \ \  \|\  \ \  \|\  \|___ \  \_\ \   __/|    
+ \ \   __\\ \  \\\  \ \  \     \ \  \\\  \ \  \\\  \ \   __  \ \   ____\   \ \  \ \ \  \_|/__  
+  \ \  \_| \ \  \\\  \ \  \____ \ \  \\\  \ \  \\\  \ \  \ \  \ \  \___|    \ \  \ \ \  \_|\ \ 
+   \ \__\   \ \_______\ \_______\\ \_______\ \_______\ \__\ \__\ \__\        \ \__\ \ \_______\
+    \|__|    \|_______|\|_______| \|_______|\|_______|\|__|\|__|\|__|         \|__|  \|_______|
+```
+
+**Status**: Beta - The GUI Update is still buggy and hasn't been thoroughly tested.
+
+### What's New in v0.5.0:
+- Enhanced GUI with black-background theme for better visibility 
+- OpenAI integration working but API console isn't displaying properly
+- System console works but needs visual improvements (less jittery)
+- Added key press 'C' to toggle console visibility
+- Service status monitoring for OpenAI and fly.io services
+- Button styles updated to avoid being cut off
+
+### Known Issues:
+- API console is not showing messages correctly - outputs to terminal instead
+- Visual consistency issues between different console types
+- Menu bar/button toolbar may not appear in some configurations
+- Occasional style application failures
+
+### Future Improvements:
+- Add database viewer for browsing saved messages
+- Standardize all consoles to follow same design language
+- Improve B&W color scheme with future support for additional colors 
+- Planning single-color LED support as stepping stone to full color
+
+## What is the Punch Card Display System?
+
+A modern project that pays homage to the punch card era of computing through a simulated display system. It combines vintage computing aesthetics with modern technologies like AI-generated content.
+
 # 💾 Punch Card Project 💾
 
 This project implements a punch card display system with LED integration for both simulated and physical hardware.
