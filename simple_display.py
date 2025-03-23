@@ -1318,6 +1318,10 @@ class SettingsDialog(QDialog):
     
     def _setup_general_tab(self):
         """Set up the general settings tab."""
+        # Create tab and add to tab widget
+        self.general_tab = QWidget()
+        self.tab_widget.addTab(self.general_tab, "⚙️ General")
+        
         layout = QVBoxLayout()
         self.general_tab.setLayout(layout)
         
@@ -1668,24 +1672,22 @@ class SettingsDialog(QDialog):
             self.openai_radio.setChecked(True)
         elif source == "database":
             self.database_radio.setChecked(True)
-        elif source == "stats":
-            self.stats_radio.setChecked(True)
         
         # Set message interval
         interval = config.get("interval", 15)
-        self.interval_spinbox.setValue(interval)
+        self.interval_spin.setValue(interval)
         
         # Set delay factor
         delay_factor = config.get("delay_factor", 1.0)
-        self.delay_factor_spinbox.setValue(delay_factor)
+        self.delay_factor_spin.setValue(delay_factor)
         
         # Set save to database checkbox
         save_to_db = config.get("save_to_database", True)
-        self.save_checkbox.setChecked(save_to_db)
+        self.save_db_check.setChecked(save_to_db)
         
         # Set debug mode checkbox
         debug_mode = config.get("debug_mode", False)
-        self.debug_checkbox.setChecked(debug_mode)
+        self.debug_check.setChecked(debug_mode)
         
         # OpenAI tab
         # Set API key if it exists (only display placeholder if it exists)
@@ -1787,8 +1789,7 @@ class SettingsDialog(QDialog):
     
     def update_api_key(self):
         """Update the API key in the secrets file."""
-        api_key = self.api_key_input.text()
-        org_id = self.org_id_input.text()
+        api_key = self.api_key_edit.text()
         
         # Skip if key is just placeholder asterisks
         if api_key == "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
