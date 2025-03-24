@@ -130,4 +130,4 @@ openai_api_key.txt
 *.bak
 punch_card_settings.json.bak
 *.backup
-*~ 
+*~ secrets/*
