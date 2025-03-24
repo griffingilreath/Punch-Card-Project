@@ -46,102 +46,6 @@
 
 **Status**: Beta - The Branching Update implements a comprehensive Git versioning strategy while building on v0.5.2's project organization.
 
-### What's New in v0.5.3 (Released March 24, 2024):
-
-This version implements a comprehensive Git branching strategy based on GitFlow while preserving the project's existing version archiving system. It also includes a critical fix for the IBM 026 punch card encoding display.
-
-#### Punch Card Display Fix
-- **Corrected IBM 026 Encoding**: Fixed the mapping between characters and punch patterns to accurately reflect the IBM 026 keypunch standard
-- **New Display Script**: Added `ibm_026_punch_card.py` script for reliable visualization of punch card patterns 
-- **Command Line Options**:
-  - `--test-encoding`: Displays all characters and their corresponding punch patterns
-  - `--show-alphabet`: Shows just the alphabet (A-Z) on the punch card display
-  - `--show-alphanumeric`: Shows both the alphabet and numbers on the punch card
-  - Direct text input: Pass any text as an argument to display it on the punch card
-- **Improved Documentation**: Added clear comments about the IBM 026 row mapping (rows 12, 11, 0-9) and character patterns
-
-#### Git Versioning Improvements
-- **Modified GitFlow Implementation**: A structured approach to version control
-- **Branch Types**: 
-  - `master`: Main production branch
-  - `develop`: Integration branch for new features
-  - `feature/*`: Feature branches for new development
-  - `release/*`: Release preparation branches
-  - `hotfix/*`: Emergency fix branches
-  - `v*.*.*`: Version branches that preserve each release point
-- **git_version_manager.py**: New command-line tool for branch and version management
-- **Integrated workflow** with existing version_manager.py script
-- **Automated version creation** with commit history analysis
-- **Comprehensive documentation** in VERSION_CONTROL.md
-- **Enhanced GitHub Wiki** with improved organization and navigation
-
-### What's New in v0.5.2 (Released March 24, 2024):
-
-This version significantly reorganizes the project structure for better maintainability and developer experience while building on the design documentation added in v0.5.1.
-
-#### Project Structure Improvements
-- **Reorganized code architecture**:
-  - Properly separated core, display, and utility modules
-  - Consolidated similar functionality
-  - Enhanced import structure with proper module organization
-- **Improved testing organization** with dedicated unit and integration test directories
-- **Better configuration management** with centralized config directory
-- **Streamlined data handling** with consolidated data storage
-- **Standardized logging** with dedicated logs directory
-- **Cleaner version archiving** with proper structure for previous versions
-- **Fixed duplicate files** by archiving older versions
-
-### What's New in v0.5.1 (Released March 23, 2024):
-
-This version adds extensive documentation on early computer interface design history and enhances the internal design language research that informs the project's aesthetic.
-
-#### Documentation Enhancements
-- **Comprehensive Interface Design History** document covering early computing design languages
-- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
-- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
-- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
-- **Design Language summary document** acting as an index to design research resources
-- **Updated references in README** with links to all research documentation
-
-### What's New in v0.5.0 (Released March 23, 2024):
-
-This version represents a significant visual overhaul of the Punch Card Project, focusing on improved GUI elements, better visibility with a black background theme, and enhanced service monitoring for OpenAI and fly.io connections.
-
-#### Visual Interface Improvements
-- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
-- **Space Mono font** for consistent terminal-like appearance throughout the interface
-- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
-- **Fixed button layout issues** to prevent UI elements from being cut off
-- **Improved widget visibility** with enhanced contrast for all UI elements
-
-#### Functionality Enhancements
-- **OpenAI integration** with model selection and prompt customization
-- **Service status monitoring** for both OpenAI and fly.io connectivity
-- **API console** with detailed connection information (toggle with 'C' key)
-- **Keyboard shortcuts** for common functions including console visibility
-- **Improved error handling** for service connectivity issues
-
-#### Security Improvements
-- **API key management** with secure handling and environment variable support
-- **Dedicated secrets directory** excluded from Git via .gitignore
-- **Enhanced settings file structure** to prevent accidental API key exposure
-- **Updated documentation** with security best practices
-
-### Known Issues:
-- API console sometimes shows messages in terminal instead of GUI
-- Visual consistency issues between different console types
-- Menu bar/button toolbar may not appear in some configurations
-- Occasional style application failures with certain PyQt versions
-- Space Mono font may not be available on all systems, causing fallback to system fonts
-
-### Future Improvements:
-- Add database viewer for browsing saved messages
-- Standardize all consoles to follow same design language
-- Improve B&W color scheme with future support for additional colors 
-- Planning single-color LED support as stepping stone to full color
-- Implementing a proper settings dialog for all configuration options
-- Moving all sensitive configuration to environment variables
-
 ## Repository Organization
 
 The project now uses a standardized directory structure that follows best practices for Python projects:
@@ -602,6 +506,53 @@ A summary of version changes is provided below. For more detailed information, s
 - **Testing Functions**: Built-in tests for validating encoding accuracy
 - **Character Encoding Display**: Visual representation of character-to-punch mapping 
 - [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
+### v0.5.3 (March 24, 2024) - The Branching Update
+- **Complete restructuring** of the project for optimal organization
+- **Properly separated** core, display, and utility modules
+- **Enhanced test organization** with specialized test directories
+- **Consolidated and archived** all display-related modules
+- **Created proper configuration and data directories** 
+- **Reduced root directory** to only essential files
+- **Moved database and JSON files** to dedicated data directory
+- **Archived all legacy and duplicate test files** 
+- **Comprehensive documentation** in VERSION_CONTROL.md
+- **Enhanced GitHub Wiki** with improved organization and navigation
+
+### v0.5.2 (March 24, 2024) - Project Structure Improvements
+- **Reorganized code architecture**:
+  - Properly separated core, display, and utility modules
+  - Consolidated similar functionality
+  - Enhanced import structure with proper module organization
+- **Improved testing organization** with dedicated unit and integration test directories
+- **Better configuration management** with centralized config directory
+- **Streamlined data handling** with consolidated data storage
+- **Standardized logging** with dedicated logs directory
+- **Cleaner version archiving** with proper structure for previous versions
+- **Fixed duplicate files** by archiving older versions
+
+### v0.5.1 (March 23, 2024) - Documentation Enhancements
+- **Comprehensive Interface Design History** document covering early computing design languages
+- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
+- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
+- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
+- **Design Language summary document** acting as an index to design research resources
+- **Updated references in README** with links to all research documentation
+
+### v0.5.0 (March 23, 2024) - Visual Interface Overhaul
+- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
+- **Space Mono font** for consistent terminal-like appearance throughout the interface
+- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
+- **Fixed button layout issues** to prevent UI elements from being cut off
+- **Improved widget visibility** with enhanced contrast for all UI elements
+- **OpenAI integration** with model selection and prompt customization
+- **Service status monitoring** for both OpenAI and fly.io connectivity
+- **API console** with detailed connection information (toggle with 'C' key)
+- **Keyboard shortcuts** for common functions including console visibility
+- **Improved error handling** for service connectivity issues
+- **API key management** with secure handling and environment variable support
+- **Dedicated secrets directory** excluded from Git via .gitignore
+- **Enhanced settings file structure** to prevent accidental API key exposure
+- **Updated documentation** with security best practices
 - [Columbia University Computing History Archive](https://www.columbia.edu/cu/computinghistory/)
 - [Two-Bit History: The Punched Card Tabulator](https://twobithistory.org)
 - [The Craft of Coding: Understanding Historical Computing](https://craftofcoding.wordpress.com/)
