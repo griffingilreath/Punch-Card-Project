@@ -552,67 +552,55 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 
 ## 🗓️ Version History
 
-- v0.5.3 (2024-03-24): **The Branching Update**
-  - Complete restructuring of the project for optimal organization
-  - Properly separated core, display, and utility modules
-  - Enhanced test organization with specialized test directories
-  - Consolidated and archived all display-related modules
-  - Created proper configuration and data directories
-  - Reduced root directory to only essential files
-  - Moved database and JSON files to dedicated data directory
-  - Archived all legacy and duplicate test files
-  - Enhanced documentation with detailed directory structure
-  - Standardized directory structure following best practices
-  
-- v0.5.1 (2024-03-23): **The Documentation Update**
-  - Added comprehensive Interface Design History documentation
-  - Created research on Early Apple UI Design Language (1970s-1980s)
-  - Added case study on EPA's 1977 Unified Visual Design System
-  - Documented Cultural and Societal Design Trends in early computing
-  - Created a Design Language index document for all design resources
-  - Updated README with links to new research documentation
-  - Expanded the project's design language foundations
+A summary of version changes is provided below. For more detailed information, see:
+- [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
+- [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
 
-- v0.5.0 (2024-03-23): **The GUI Update**
-  - Enhanced GUI with black-background theme for better visibility and authentic punch card aesthetic
-  - Implemented OpenAI integration with model selection and prompt customization
-  - Added real-time service status monitoring for both OpenAI and fly.io connectivity
-  - Created API console with detailed connection information (toggle with 'C' key)
-  - Implemented classic Mac-style menu bar with enhanced button toolbar fallback
-  - Standardized on Space Mono font throughout the interface for consistent terminal-like appearance
-  - Added keyboard shortcuts for common functions including console visibility
-  - Fixed button layout issues to prevent UI elements from being cut off
-  - Significantly improved error handling for service connectivity issues
-  - Enhanced API key security with dedicated secrets directory and secure lookup hierarchy
-  - Updated .gitignore to prevent sensitive information from being committed
-  - *Secret feature: Service status indicators color coding*
+### v0.6.0 (March 24, 2024) - Major Project Reorganization
+- **Complete Directory Structure Reorganization**: Implemented a modern, well-organized directory structure
+- **Module-Based Architecture**: Separated code into logical modules (display, api, core, animation, console)
+- **Enhanced Maintainability**: Improved code organization for better maintainability and collaboration
+- **Dedicated Module Directories**: Created specialized directories for each component
+- **API Key Protection**: Implemented secure API key storage in the git-ignored `secrets/` directory
+- **Backup File Management**: Added explicit patterns in `.gitignore` to prevent committing backup files
+- **Documentation**: Added comprehensive security documentation in `SECURITY.md`
+- **Clean Repository History**: Removed sensitive information from repository history
+- **Centralized Configuration**: Moved all configuration files to the `config/` directory
+- **Organized Documentation**: Consolidated documentation in the `docs/` directory
+- **Legacy Code Management**: Preserved legacy code in a dedicated `src/legacy/` directory
+- **Resource Organization**: Centralized resources in the `resources/` directory
+- **Simplified Entry Point**: Created a clean main entry point at the project root (`punch_card.py`)
+- **Organized Backups**: Moved all backup files to the `backups/` directory
+- **Clean Project Root**: Significantly reduced clutter in the project root directory
+- **Preserved Development History**: Maintained development history in an organized structure
 
-- v0.1.1 (2024-08-12): **The Visualization Update**
-  - Enhanced terminal display with multiple character sets
-  - Improved fallback console mode with row/column indicators
-  - Added verbose mode for detailed LED state tracking
-  - Resolved synchronization issues between LED state manager and hardware controller
-  - Improved error handling and terminal size detection
-  - Added command-line arguments for customization
+### v0.5.9-security (March 24, 2024) - Security Enhancement
+- **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
+- **Enhanced API Key Handling**: Improved documentation and practices for API key management
 
-- v0.1.0 (2024-06-15): **The Renaissance Update**
-  - Improved project structure and documentation
-  - Added comprehensive research documentation
-  - Enhanced hardware implementation guides
-  - Consolidated technical specifications
-  - *Secret feature: Message animation patterns*
+### v0.5.9 (March 24, 2024) - Security & Bug Fixes
+- **Enhanced Git Security**: Updated `.gitignore` to exclude backup files that might contain API keys
+- **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
+- **Visual Bug Fix**: Fixed issue with punch card holes not properly clearing
 
-- v0.0.1 (2024-03-17): **The Primordial Release**
-  - Basic punch card display
-  - Test message support
-  - Statistics tracking
-  - Random sentence generation
-  - OpenAI integration
-  - Diagnostic logging
-  - *Secret feature: DOS mode easter egg*
+### v0.5.8 (March 24, 2024) - Enhanced Message Display
+- **Message Display Enhancement**: Improved message display timing functionality
+- **Visual Bug Fix**: Fixed issue with punch card holes display - holes now properly clear after display
+- **Code Structure Improvements**: Enhanced code organization and readability
+- **Switched to `repaint()`**: Changed from `update()` to `repaint()` for complete widget refresh
 
-## 📚 References
-
+### v0.5.7 (March 23, 2024) - Non-Functional Save Point
+- **Replaced Complex Implementation**: Simplified the main display module with a functional standalone version
+- **Working Punch Card Visualization**: Successfully displays IBM 026 punch card patterns 
+- **Command-Line Interface**: Preserved all command-line options from the original implementation
+- **Preserved Original Functionality**: Maintains the core functionality of displaying text on punch cards
+- **Fixed IBM 026 Encoding**: Properly encodes text into IBM 026 punch card format
+- **Fixed LED Grid**: Proper visualization of the punch card's LED matrix
+- **Streamlined Implementation**: Removed problematic code sections that caused syntax errors
+- **Minimized Dependencies**: Reduced to essential PyQt6 components
+- **Command Line Options**: Support for various display modes and test functions
+- **Testing Functions**: Built-in tests for validating encoding accuracy
+- **Character Encoding Display**: Visual representation of character-to-punch mapping 
 - [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
 - [Columbia University Computing History Archive](https://www.columbia.edu/cu/computinghistory/)
 - [Two-Bit History: The Punched Card Tabulator](https://twobithistory.org)
