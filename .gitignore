@@ -124,4 +124,10 @@ api_keys.json
 .env
 config/secrets.json
 config/sensitive.json
-openai_api_key.txt 
+openai_api_key.txt
+
+# Backup files that might contain sensitive information
+*.bak
+punch_card_settings.json.bak
+*.backup
+*~ 
