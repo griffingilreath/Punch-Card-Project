@@ -48,7 +48,17 @@
 
 ### What's New in v0.5.3 (Released March 24, 2024):
 
-This version implements a comprehensive Git branching strategy based on GitFlow while preserving the project's existing version archiving system.
+This version implements a comprehensive Git branching strategy based on GitFlow while preserving the project's existing version archiving system. It also includes a critical fix for the IBM 026 punch card encoding display.
+
+#### Punch Card Display Fix
+- **Corrected IBM 026 Encoding**: Fixed the mapping between characters and punch patterns to accurately reflect the IBM 026 keypunch standard
+- **New Display Script**: Added `ibm_026_punch_card.py` script for reliable visualization of punch card patterns 
+- **Command Line Options**:
+  - `--test-encoding`: Displays all characters and their corresponding punch patterns
+  - `--show-alphabet`: Shows just the alphabet (A-Z) on the punch card display
+  - `--show-alphanumeric`: Shows both the alphabet and numbers on the punch card
+  - Direct text input: Pass any text as an argument to display it on the punch card
+- **Improved Documentation**: Added clear comments about the IBM 026 row mapping (rows 12, 11, 0-9) and character patterns
 
 #### Git Versioning Improvements
 - **Modified GitFlow Implementation**: A structured approach to version control
@@ -543,15 +553,6 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
 ## 🗓️ Version History
 
 - v0.5.3 (2024-03-24): **The Branching Update**
-  - Implemented comprehensive Git branching strategy based on GitFlow
-  - Created git_version_manager.py for branch and version management
-  - Added detailed branching documentation in VERSION_CONTROL.md
-  - Enhanced GitHub Wiki with improved organization
-  - Added Project Structure documentation to the Wiki
-  - Integrated Git workflow with existing version archiving system
-  - Streamlined documentation for personal project
-  
-- v0.5.2 (2024-03-24): **The Reorganization Update**
   - Complete restructuring of the project for optimal organization
   - Properly separated core, display, and utility modules
   - Enhanced test organization with specialized test directories
@@ -562,7 +563,7 @@ See the `RPiHardwareController` class in `hardware_controller.py` for details on
   - Archived all legacy and duplicate test files
   - Enhanced documentation with detailed directory structure
   - Standardized directory structure following best practices
-
+  
 - v0.5.1 (2024-03-23): **The Documentation Update**
   - Added comprehensive Interface Design History documentation
   - Created research on Early Apple UI Design Language (1970s-1980s)
