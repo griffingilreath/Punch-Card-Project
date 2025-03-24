@@ -1,4 +1,4 @@
-# Punch Card Project v0.5.3 - The Branching Update
+# Punch Card Project v0.6.0 - Major Project Reorganization
 
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
