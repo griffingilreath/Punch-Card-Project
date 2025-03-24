@@ -16,6 +16,7 @@ import threading
 from functools import partial
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime
+import json
 
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QLabel, QPushButton, QStackedLayout,
@@ -427,6 +428,12 @@ class SettingsDialog(QDialog):
         self.message_delay.setSuffix(" ms")
         display_layout.addRow("Message Delay:", self.message_delay)
         
+        self.message_display_time = QSpinBox()
+        self.message_display_time.setRange(1, 60)
+        self.message_display_time.setValue(5)
+        self.message_display_time.setSuffix(" seconds")
+        display_layout.addRow("Message Display Time:", self.message_display_time)
+        
         self.random_delay = QCheckBox()
         self.random_delay.setChecked(True)
         display_layout.addRow("Random Delay:", self.random_delay)
@@ -520,6 +527,7 @@ class SettingsDialog(QDialog):
         return {
             'led_delay': self.led_delay.value(),
             'message_delay': self.message_delay.value(),
+            'message_display_time': self.message_display_time.value(),
             'random_delay': self.random_delay.isChecked(),
             'show_splash': self.show_splash.isChecked(),
             'auto_console': self.auto_console.isChecked(),
@@ -1024,13 +1032,27 @@ class PunchCardDisplay(QMainWindow):
         # Add the bottom section to the main layout
         self.main_layout.addWidget(bottom_section)
         
-        # Initialize display variables
+        # Initialize variables
+        self.showing_splash = True  # Start with splash screen
+        self.led_delay = 100
+        self.message_delay = 3000
+        self.message_display_time = 5  # Default 5 seconds for message display
         self.current_message = ""
         self.current_char_index = 0
+        self.running = False
+        self.card_errors = {}
+        self.hardware_detected = False
+        self.splash_step = 0
+        self.splash_delay = 50
+        
+        # Setup timers
         self.timer = QTimer()
         self.timer.timeout.connect(self.display_next_char)
-        self.led_delay = 100  # milliseconds
-        self.running = False
+        
+        # Add a timer for message display time
+        self.message_display_timer = QTimer()
+        self.message_display_timer.setSingleShot(True)
+        self.message_display_timer.timeout.connect(self.clear_message)
         
         # Create console and settings dialogs
         self.console = ConsoleWindow(self)
@@ -1077,6 +1099,9 @@ class PunchCardDisplay(QMainWindow):
         # Always start with splash screen
         self.start_splash_screen()
         
+        # Load settings from file
+        self.load_settings()
+    
     def validate_led_state(self, row: int, col: int, expected_state: bool, phase: str):
         """Validate that an LED is in the expected state and fix if necessary."""
         actual_state = self.punch_card.grid[row][col]
@@ -1108,8 +1133,10 @@ class PunchCardDisplay(QMainWindow):
             if self.settings.exec() == QDialog.DialogCode.Accepted:
                 settings = self.settings.get_settings()
                 self.led_delay = settings['led_delay']
+                self.message_display_time = settings['message_display_time']
                 self.timer.setInterval(self.led_delay)
                 self.console.log(f"Settings updated: {settings}")
+                self.console.log(f"Message display time set to {self.message_display_time} seconds", "INFO")
         elif event.key() == Qt.Key.Key_Space and self.showing_splash and not self.hardware_check_complete:
             # Skip hardware detection and use virtual mode
             self.auto_skip_hardware_detection()
@@ -1185,13 +1212,19 @@ class PunchCardDisplay(QMainWindow):
             self.update_status(f"DISPLAYING: {self.current_message[:self.current_char_index+1]}")
             self.current_char_index += 1
         else:
-            # Clear the entire grid when done
-            self.punch_card.clear_grid()
+            # Display complete - Keep the message displayed for the configured time
             self.timer.stop()
             self.running = False
-            self.start_button.setEnabled(True)
-            self.clear_button.setEnabled(True)
             self.update_status("DISPLAY COMPLETE")
+            
+            # Start the message display timer
+            display_time_ms = self.message_display_time * 1000  # Convert seconds to milliseconds
+            self.console.log(f"Message will be displayed for {self.message_display_time} seconds", "INFO")
+            self.message_display_timer.start(display_time_ms)
+            
+            # Keep buttons disabled until the message display time is complete
+            self.start_button.setEnabled(False)
+            self.clear_button.setEnabled(False)
     
     def _display_character(self, char: str, col: int):
         """Display a character on the punch card grid."""
@@ -1730,6 +1763,66 @@ class PunchCardDisplay(QMainWindow):
         self.api_console.show()
         self.api_console.raise_()
         self.api_console.activateWindow()
+
+    def clear_message(self):
+        """Clear the message after the display time has elapsed."""
+        # Clear the entire grid
+        self.punch_card.clear_grid()
+        
+        # Enable buttons
+        self.start_button.setEnabled(True)
+        self.clear_button.setEnabled(True)
+        
+        self.console.log("Message display time elapsed, cleared display", "INFO")
+        self.update_status("READY")
+
+    def load_settings(self):
+        """Load settings from the settings file."""
+        try:
+            # Try different possible locations for the settings file
+            settings_file_paths = [
+                "punch_card_settings.json",
+                "../punch_card_settings.json",
+                "../../punch_card_settings.json",
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../punch_card_settings.json")
+            ]
+            
+            settings_data = None
+            settings_path = None
+            
+            for path in settings_file_paths:
+                try:
+                    if os.path.exists(path):
+                        with open(path, 'r') as f:
+                            settings_data = json.load(f)
+                            settings_path = path
+                            break
+                except Exception as e:
+                    self.console.log(f"Error loading settings from {path}: {str(e)}", "ERROR")
+            
+            if settings_data:
+                self.console.log(f"Loaded settings from {settings_path}", "INFO")
+                
+                # Load message display time
+                if 'message_display_time' in settings_data:
+                    self.message_display_time = settings_data['message_display_time']
+                    self.console.log(f"Message display time loaded: {self.message_display_time} seconds", "INFO")
+                
+                # Load other settings
+                if 'display_delay' in settings_data:
+                    self.led_delay = settings_data['display_delay']
+                    self.timer.setInterval(self.led_delay)
+                    self.console.log(f"LED delay loaded: {self.led_delay} ms", "INFO")
+                
+                # Update settings dialog values
+                if hasattr(self, 'settings'):
+                    self.settings.led_delay.setValue(self.led_delay)
+                    self.settings.message_display_time.setValue(self.message_display_time)
+            else:
+                self.console.log("No settings file found, using defaults", "WARNING")
+        
+        except Exception as e:
+            self.console.log(f"Error loading settings: {str(e)}", "ERROR")
 
 
 def main():
