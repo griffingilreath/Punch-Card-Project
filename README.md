@@ -52,6 +52,40 @@ A modernized implementation of the IBM 80-column punch card system for historica
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
+## Version History
+
+### v0.6.2 (Current)
+- Added support for multiple character encodings
+- Improved LED matrix visualization
+- Enhanced error handling for hardware integration
+- Updated documentation with detailed examples
+- Fixed GPIO pin mapping issues
+- Resolved character encoding edge cases
+- Improved error messages for invalid punch patterns
+- Added comprehensive hardware setup guide
+- Updated installation instructions
+- Expanded troubleshooting section
+
+### v0.6.1
+- Implemented secure API key handling
+- Added automated testing framework
+- Enhanced error reporting
+- Improved documentation clarity
+- Fixed minor UI bugs
+
+### v0.6.0
+- Major UI overhaul with modern design
+- Added support for custom encoding schemes
+- Integrated OpenAI API for pattern recognition
+- Enhanced hardware simulation mode
+- Improved performance and stability
+
+### v0.5.3
+- Added ASCII art banner
+- Implemented basic punch card visualization
+- Created initial hardware integration
+- Set up project structure and documentation
+
 ## Project Overview
 
 This project provides a full GUI implementation of an IBM 80-column punch card system, allowing users to experiment with this historical computing technology in a modern environment. It's designed for educational purposes to help understand the foundations of computer programming and data processing.
