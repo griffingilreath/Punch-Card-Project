@@ -64,43 +64,9 @@ A implementation of the IBM 80-column punch card system for a fine art object.
 - Streamlined technical sections
 - Better organized project structure
 
-### Bug Fixes
-- Fixed GPIO pin mapping issues
-- Resolved character encoding edge cases
-- Improved error messages for invalid punch patterns
-
-### Documentation
-- Added comprehensive hardware setup guide
-- Updated installation instructions
-- Expanded troubleshooting section
-
 ## Project Overview
 
 This project provides a full GUI implementation of an IBM 80-column punch card system, allowing users to experiment with this historical computing technology in a modern environment. It's designed for educational purposes to help understand the foundations of computer programming and data processing.
-
-┌─────────────────────────────── PUNCH CARD GUI UPDATE ────────────────────────────────┐
-│ ┌──────────┐ ┌───────────────────────────────────────────────────────────────┐ ┌───┐ │
-│ │   Menu   │ │                                                               │ │ × │ │
-│ └──────────┘ └───────────────────────────────────────────────────────────────┘ └───┘ │
-│ ┌──────────────────────────────────────────────────────────────────────────────────┐ │
-│ │                                                                                  │ │
-│ │  ████████  ███████  ████████ ██    ██    ███    ██    ██  ███████   █████  ████  │ │
-│ │     ██     ██    ██    ██    ██    ██   ██ ██   ██    ██  ██       ██   ██ ██ █  │ │
-│ │     ██     ██    ██    ██    ██    ██  ██   ██  ██    ██  █████    ███████ ██ █  │ │
-│ │     ██     ██    ██    ██    ██    ██ █████████ ██    ██  ██       ██   ██ ██ █  │ │
-│ │     ██      ██████     ██     ██████  ██     ██  ██████   ███████  ██   ██ ████  │ │
-│ └──────────────────────────────────────────────────────────────────────────────────┘ │
-│ ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌────────────────┐   ┌────────────────┐ │
-│ │ Settings │   │  OpenAI  │   │ Database │   │ Toggle Console │   │Black Background│ │
-│ └──────────┘   └──────────┘   └──────────┘   └────────────────┘   └────────────────┘ │
-│                                                                                      │
-│ ┌──────────────────────────────────── CONSOLE ─────────────────────────────────────┐ │
-│ │ [21:45:32] API initialized                                                       │ │
-│ │ [21:45:33] OpenAI connection: ONLINE                                             │ │
-│ │ [21:45:34] Service status: All systems operational                               │ │
-│ │ [21:45:35] Press 'C' to toggle console visibility                                │ │
-│ └──────────────────────────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────────────────┘
 
 ## Features
 
@@ -109,6 +75,9 @@ This project provides a full GUI implementation of an IBM 80-column punch card s
 - Support for multiple character encodings
 - Import/export functionality
 - Historical reference materials
+- Hardware integration with LED matrix
+- Secure API key handling
+- Comprehensive testing framework
 
 ## Installation
 
@@ -179,7 +148,39 @@ Control individual LEDs:
 python led_control.py --row 12 --col 1 --state on
 ```
 
-## 🔌 Hardware Integration
+## Development
+
+### Testing
+
+The project uses pytest for the test framework and includes both unit tests and integration tests organized by functionality. You can run tests in two ways:
+
+1. Using pytest (recommended):
+```bash
+# Run all tests
+python -m pytest
+
+# Run specific test file
+python -m pytest test_encoding.py
+```
+
+2. Using individual test scripts:
+```bash
+# Test LED hardware functionality
+python test_leds.py --test hardware
+
+# Validate punch card encoding
+python test_encoding.py --validate
+
+# Test GUI components
+python test_gui.py --check-display
+```
+
+Each test module focuses on a specific component:
+- `test_leds.py`: Hardware integration tests for LED matrix
+- `test_encoding.py`: Character encoding and punch card format validation
+- `test_gui.py`: GUI component functionality and display updates
+
+## Hardware Integration
 
 ### Simulated Hardware
 
@@ -243,128 +244,6 @@ Required components for physical implementation:
 - 5V power supply
 
 See the `hardware_controller.py` class for detailed implementation.
-
-## Punch Card Encoding
-
-The punch card system uses a specific encoding scheme for characters based on the IBM 80-column punch card format. Here's a detailed breakdown of the punch patterns:
-
-### Standard IBM Encoding
-
-```
-Row 12 (Zone)  Row 11 (Zone)  Row 0 (Zone)  Rows 1-9 (Numeric)
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-     ○              ○              ○              ○
-```
-
-### Character Mapping
-
-```
-Character  Row 12  Row 11  Row 0  Rows 1-9
-A          ○       ○       ○       ○
-B          ○       ○       ○       ○
-C          ○       ○       ○       ○
-...
-Z          ○       ○       ○       ○
-0          ○       ○       ○       ○
-1          ○       ○       ○       ○
-...
-9          ○       ○       ○       ○
-```
-
-### Special Characters
-
-```
-Special    Row 12  Row 11  Row 0  Rows 1-9
-Space      ○       ○       ○       ○
-Period     ○       ○       ○       ○
-Comma      ○       ○       ○       ○
-...
-```
-
-## Historical Context
-
-IBM's 80-column punch cards were a revolutionary data storage medium that dominated computing from the 1920s through the 1970s. Each card measured precisely 7⅜ × 3¼ inches (187mm × 82.5mm) and featured:
-
-- 80 columns for character storage (numbered 1-80 from left to right)
-- 12 punch positions per column (rows 12, 11, 0-9 from top to bottom)
-- A clipped corner for orientation (typically upper-left on IBM cards)
-- Rectangular holes (~1mm × 3mm) introduced in 1928 for tighter spacing
-
-> 💭 **Fun Fact**: The phrase "Do not fold, spindle, or mutilate" became a cultural touchstone of the punch card era. The term "spindle" referred to a spike often found at retail counters where receipts and papers were impaled for storage. Punch cards were processed by machines that required intact, undamaged cards - hence the warning!
-
-## References and Resources
-
-### Historical Documentation
-- [IBM Punch Card Systems Manual](https://archive.org/details/ibm-manuals)
-- [Early Computing Archive](https://www.computerhistory.org/collections/punch-cards/)
-- [Hollerith Machine Documentation](https://www.census.gov/history/hollerith.html)
-
-### Technical Resources
-- [IBM 80-Column Card Codes](https://www.ibm.com/support/pages/punched-card-codes)
-- [EBCDIC Reference](https://www.ibm.com/docs/en/zos-basic-skills?topic=ebcdic-ascii-character-sets)
-- [Punch Card Design Specifications](https://www.computerhistory.org/collections/catalog/102646121)
-
-### Academic Papers
-- "The Evolution of Punch Card Programming" (Computer History Review, 2019)
-- "Impact of Early Data Processing Methods" (IEEE Annals, 2020)
-- "Hollerith's Electric Tabulating System" (Technology Review, 2018)
-
-### Related Projects
-- [Virtual Punch Card Reader](https://github.com/virtual-punch-reader)
-- [Punch Card Emulator](https://github.com/punch-emulator)
-- [Historical Computing Tools](https://github.com/historical-computing)
-
-### Design Guidelines
-- [IBM Hardware Interface Standards](https://www.ibm.com/design/standards)
-- [Punch Card Manufacturing Specs](https://www.nist.gov/standards/punch-cards)
-- [LED Matrix Design Patterns](https://www.led-guidelines.org)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Project Status
-
-Active development - see [CHANGELOG.md](CHANGELOG.md) for updates.
-
-## Development
-
-### Testing
-
-The project uses pytest for the test framework and includes both unit tests and integration tests organized by functionality. You can run tests in two ways:
-
-1. Using pytest (recommended):
-```bash
-# Run all tests
-python -m pytest
-
-# Run specific test file
-python -m pytest test_encoding.py
-```
-
-2. Using individual test scripts:
-```bash
-# Test LED hardware functionality
-python test_leds.py --test hardware
-
-# Validate punch card encoding
-python test_encoding.py --validate
-
-# Test GUI components
-python test_gui.py --check-display
-```
-
-Each test module focuses on a specific component:
-- `test_leds.py`: Hardware integration tests for LED matrix
-- `test_encoding.py`: Character encoding and punch card format validation
-- `test_gui.py`: GUI component functionality and display updates
 
 ## Troubleshooting
 
@@ -500,6 +379,14 @@ Each test module focuses on a specific component:
 - OpenAI integration
 - Diagnostic logging
 - *Secret feature: DOS mode easter egg*
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Project Status
+
+Active development - see [CHANGELOG.md](CHANGELOG.md) for updates.
 
 ---
 
