@@ -64,38 +64,6 @@ A implementation of the IBM 80-column punch card system for a fine art object.
 - Streamlined technical sections
 - Better organized project structure
 
-## What's New in v0.6.3
-
-### Documentation & Organization
-- Restored and reorganized testing documentation
-- Added comprehensive test suite with pytest integration
-- Updated command-line interface documentation
-- Improved test script organization and clarity
-- Removed outdated debug mode references
-- Added detailed test module descriptions
-
-### Testing Framework
-- Added pytest and pytest-cov dependencies
-- Created dedicated test files for each component:
-  - LED hardware integration tests
-  - Punch card encoding validation
-  - GUI component testing
-- Implemented both pytest and standalone test runners
-
-### Code Quality
-- Fixed inconsistencies in command-line arguments
-- Standardized test command formats
-- Enhanced test coverage reporting
-- Improved code organization
-
-## What's New in v0.6.2
-
-### Features
-- Added support for multiple character encodings
-- Improved LED matrix visualization
-- Enhanced error handling for hardware integration
-- Updated documentation with detailed examples
-
 ### Bug Fixes
 - Fixed GPIO pin mapping issues
 - Resolved character encoding edge cases
@@ -110,7 +78,6 @@ A implementation of the IBM 80-column punch card system for a fine art object.
 
 This project provides a full GUI implementation of an IBM 80-column punch card system, allowing users to experiment with this historical computing technology in a modern environment. It's designed for educational purposes to help understand the foundations of computer programming and data processing.
 
-```
 ┌─────────────────────────────── PUNCH CARD GUI UPDATE ────────────────────────────────┐
 │ ┌──────────┐ ┌───────────────────────────────────────────────────────────────┐ ┌───┐ │
 │ │   Menu   │ │                                                               │ │ × │ │
@@ -122,10 +89,18 @@ This project provides a full GUI implementation of an IBM 80-column punch card s
 │ │     ██     ██    ██    ██    ██    ██  ██   ██  ██    ██  █████    ███████ ██ █  │ │
 │ │     ██     ██    ██    ██    ██    ██ █████████ ██    ██  ██       ██   ██ ██ █  │ │
 │ │     ██      ██████     ██     ██████  ██     ██  ██████   ███████  ██   ██ ████  │ │
-│ │                                                                                  │ │
+│ └──────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌────────────────┐   ┌────────────────┐ │
+│ │ Settings │   │  OpenAI  │   │ Database │   │ Toggle Console │   │Black Background│ │
+│ └──────────┘   └──────────┘   └──────────┘   └────────────────┘   └────────────────┘ │
+│                                                                                      │
+│ ┌──────────────────────────────────── CONSOLE ─────────────────────────────────────┐ │
+│ │ [21:45:32] API initialized                                                       │ │
+│ │ [21:45:33] OpenAI connection: ONLINE                                             │ │
+│ │ [21:45:34] Service status: All systems operational                               │ │
+│ │ [21:45:35] Press 'C' to toggle console visibility                                │ │
 │ └──────────────────────────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────────────────────────┘
-```
 
 ## Features
 
@@ -269,17 +244,6 @@ Required components for physical implementation:
 
 See the `hardware_controller.py` class for detailed implementation.
 
-## Historical Context
-
-IBM's 80-column punch cards were a revolutionary data storage medium that dominated computing from the 1920s through the 1970s. Each card measured precisely 7⅜ × 3¼ inches (187mm × 82.5mm) and featured:
-
-- 80 columns for character storage (numbered 1-80 from left to right)
-- 12 punch positions per column (rows 12, 11, 0-9 from top to bottom)
-- A clipped corner for orientation (typically upper-left on IBM cards)
-- Rectangular holes (~1mm × 3mm) introduced in 1928 for tighter spacing
-
-> 💭 **Fun Fact**: The phrase "Do not fold, spindle, or mutilate" became a cultural touchstone of the punch card era. The term "spindle" referred to a spike often found at retail counters where receipts and papers were impaled for storage. Punch cards were processed by machines that required intact, undamaged cards - hence the warning!
-
 ## Punch Card Encoding
 
 The punch card system uses a specific encoding scheme for characters based on the IBM 80-column punch card format. Here's a detailed breakdown of the punch patterns:
@@ -324,160 +288,16 @@ Comma      ○       ○       ○       ○
 ...
 ```
 
-## Development
+## Historical Context
 
-### Testing
+IBM's 80-column punch cards were a revolutionary data storage medium that dominated computing from the 1920s through the 1970s. Each card measured precisely 7⅜ × 3¼ inches (187mm × 82.5mm) and featured:
 
-The project uses pytest for the test framework and includes both unit tests and integration tests organized by functionality. You can run tests in two ways:
+- 80 columns for character storage (numbered 1-80 from left to right)
+- 12 punch positions per column (rows 12, 11, 0-9 from top to bottom)
+- A clipped corner for orientation (typically upper-left on IBM cards)
+- Rectangular holes (~1mm × 3mm) introduced in 1928 for tighter spacing
 
-1. Using pytest (recommended):
-```bash
-# Run all tests
-python -m pytest
-
-# Run specific test file
-python -m pytest test_encoding.py
-```
-
-2. Using individual test scripts:
-```bash
-# Test LED hardware functionality
-python test_leds.py --test hardware
-
-# Validate punch card encoding
-python test_encoding.py --validate
-
-# Test GUI components
-python test_gui.py --check-display
-```
-
-Each test module focuses on a specific component:
-- `test_leds.py`: Hardware integration tests for LED matrix
-- `test_encoding.py`: Character encoding and punch card format validation
-- `test_gui.py`: GUI component functionality and display updates
-
-## Troubleshooting
-
-### Common Issues
-
-1. LED Matrix Not Responding
-   - Check GPIO connections
-   - Verify power supply
-   - Test with `test_leds.py --test hardware`
-
-2. Encoding Errors
-   - Verify character support
-   - Check encoding configuration
-   - Run validation tests
-
-3. GUI Issues
-   - Update dependencies
-   - Check system requirements
-   - Clear cache files
-
-## Version History
-
-### v0.6.3 (Current)
-- Restored and reorganized testing documentation
-- Added comprehensive test suite with pytest integration
-- Updated command-line interface documentation
-- Improved test script organization and clarity
-- Removed outdated debug mode references
-- Added detailed test module descriptions
-- Added pytest and pytest-cov dependencies
-- Created dedicated test files for each component
-- Implemented both pytest and standalone test runners
-- Fixed inconsistencies in command-line arguments
-- Standardized test command formats
-- Enhanced test coverage reporting
-- Improved code organization
-
-### v0.6.2
-- Added support for multiple character encodings
-- Improved LED matrix visualization
-- Enhanced error handling for hardware integration
-- Updated documentation with detailed examples
-- Fixed GPIO pin mapping issues
-- Resolved character encoding edge cases
-- Improved error messages for invalid punch patterns
-- Added comprehensive hardware setup guide
-- Updated installation instructions
-- Expanded troubleshooting section
-
-### v0.6.1
-- Implemented secure API key handling
-- Added automated testing framework
-- Enhanced error reporting
-- Improved documentation clarity
-- Fixed minor UI bugs
-
-### v0.6.0
-- Major UI overhaul with modern design
-- Added support for custom encoding schemes
-- Integrated OpenAI API for pattern recognition
-- Enhanced hardware simulation mode
-- Improved performance and stability
-
-### v0.5.3
-- Added ASCII art banner
-- Implemented basic punch card visualization
-- Created initial hardware integration
-- Set up project structure and documentation
-
-### v0.5.2 (March 24, 2024) - The Reorganization Update
-- Reorganized code architecture with proper module separation
-- Improved testing organization with dedicated directories
-- Enhanced configuration management
-- Streamlined data handling
-- Standardized logging system
-- Cleaner version archiving
-- Fixed duplicate files and improved organization
-
-### v0.5.1 (March 23, 2024) - The Documentation Update
-- Added comprehensive Interface Design History documentation
-- Created research on Early Apple UI Design Language (1970s-1980s)
-- Added case study on EPA's 1977 Unified Visual Design System
-- Documented Cultural and Societal Design Trends in early computing
-- Created a Design Language index document
-- Updated references with links to research documentation
-- Expanded the project's design language foundations
-
-### v0.5.0 (March 23, 2024) - The GUI Update
-- Enhanced GUI with black-background theme for better visibility
-- Implemented OpenAI integration with model selection
-- Added real-time service status monitoring
-- Created API console with detailed connection information
-- Implemented classic Mac-style menu bar
-- Standardized on Space Mono font throughout
-- Added keyboard shortcuts for common functions
-- Fixed button layout issues
-- Improved error handling for service connectivity
-- Enhanced API key security with dedicated secrets directory
-- *Secret feature: Service status indicators color coding*
-
-### v0.1.1 (2024-08-12) - The Visualization Update
-- Enhanced terminal display with multiple character sets
-- Improved fallback console mode with row/column indicators
-- Added verbose mode for detailed LED state tracking
-- Resolved synchronization issues between LED state manager and hardware controller
-- Improved error handling and terminal size detection
-- Added command-line arguments for customization
-
-### v0.1.0 (2024-06-15) - The Renaissance Update
-- Improved project structure and documentation
-- Added comprehensive research documentation
-- Enhanced hardware implementation guides
-- Consolidated technical specifications
-- *Secret feature: Message animation patterns*
-
-### v0.0.1 (2024-03-17) - The Primordial Release
-- Basic punch card display
-- Test message support
-- Statistics tracking
-- Random sentence generation
-- OpenAI integration
-- Diagnostic logging
-- *Secret feature: DOS mode easter egg*
+> 💭 **Fun Fact**: The phrase "Do not fold, spindle, or mutilate" became a cultural touchstone of the punch card era. The term "spindle" referred to a spike often found at retail counters where receipts and papers were impaled for storage. Punch cards were processed by machines that required intact, undamaged cards - hence the warning!
 
 ## References and Resources
 
