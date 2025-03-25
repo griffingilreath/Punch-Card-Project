@@ -334,6 +334,173 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Active development - see [CHANGELOG.md](CHANGELOG.md) for updates.
 
+## Development
+
+### Testing
+
+The project uses pytest for the test framework and includes both unit tests and integration tests organized by functionality. You can run tests in two ways:
+
+1. Using pytest (recommended):
+```bash
+# Run all tests
+python -m pytest
+
+# Run specific test file
+python -m pytest test_encoding.py
+```
+
+2. Using individual test scripts:
+```bash
+# Test LED hardware functionality
+python test_leds.py --test hardware
+
+# Validate punch card encoding
+python test_encoding.py --validate
+
+# Test GUI components
+python test_gui.py --check-display
+```
+
+Each test module focuses on a specific component:
+- `test_leds.py`: Hardware integration tests for LED matrix
+- `test_encoding.py`: Character encoding and punch card format validation
+- `test_gui.py`: GUI component functionality and display updates
+
+## Troubleshooting
+
+### Common Issues
+
+1. LED Matrix Not Responding
+   - Check GPIO connections
+   - Verify power supply
+   - Test with `test_leds.py --test hardware`
+
+2. Encoding Errors
+   - Verify character support
+   - Check encoding configuration
+   - Run validation tests
+
+3. GUI Issues
+   - Update dependencies
+   - Check system requirements
+   - Clear cache files
+
+## Version History
+
+### v0.6.4 (Current)
+- Fixed README formatting and structure
+- Updated hardware integration documentation
+- Corrected file path references
+- Improved documentation clarity
+- Enhanced version history organization
+- Standardized section headers
+- Fixed duplicate sections
+- Updated component references
+- Improved code block formatting
+- Enhanced readability of technical sections
+
+### v0.6.3
+- Restored and reorganized testing documentation
+- Added comprehensive test suite with pytest integration
+- Updated command-line interface documentation
+- Improved test script organization and clarity
+- Removed outdated debug mode references
+- Added detailed test module descriptions
+- Added pytest and pytest-cov dependencies
+- Created dedicated test files for each component
+- Implemented both pytest and standalone test runners
+- Fixed inconsistencies in command-line arguments
+- Standardized test command formats
+- Enhanced test coverage reporting
+- Improved code organization
+
+### v0.6.2
+- Added support for multiple character encodings
+- Improved LED matrix visualization
+- Enhanced error handling for hardware integration
+- Updated documentation with detailed examples
+- Fixed GPIO pin mapping issues
+- Resolved character encoding edge cases
+- Improved error messages for invalid punch patterns
+- Added comprehensive hardware setup guide
+- Updated installation instructions
+- Expanded troubleshooting section
+
+### v0.6.1
+- Implemented secure API key handling
+- Added automated testing framework
+- Enhanced error reporting
+- Improved documentation clarity
+- Fixed minor UI bugs
+
+### v0.6.0
+- Major UI overhaul with modern design
+- Added support for custom encoding schemes
+- Integrated OpenAI API for pattern recognition
+- Enhanced hardware simulation mode
+- Improved performance and stability
+
+### v0.5.3
+- Added ASCII art banner
+- Implemented basic punch card visualization
+- Created initial hardware integration
+- Set up project structure and documentation
+
+### v0.5.2 (March 24, 2024) - The Reorganization Update
+- Reorganized code architecture with proper module separation
+- Improved testing organization with dedicated directories
+- Enhanced configuration management
+- Streamlined data handling
+- Standardized logging system
+- Cleaner version archiving
+- Fixed duplicate files and improved organization
+
+### v0.5.1 (March 23, 2024) - The Documentation Update
+- Added comprehensive Interface Design History documentation
+- Created research on Early Apple UI Design Language (1970s-1980s)
+- Added case study on EPA's 1977 Unified Visual Design System
+- Documented Cultural and Societal Design Trends in early computing
+- Created a Design Language index document
+- Updated references with links to research documentation
+- Expanded the project's design language foundations
+
+### v0.5.0 (March 23, 2024) - The GUI Update
+- Enhanced GUI with black-background theme for better visibility
+- Implemented OpenAI integration with model selection
+- Added real-time service status monitoring
+- Created API console with detailed connection information
+- Implemented classic Mac-style menu bar
+- Standardized on Space Mono font throughout
+- Added keyboard shortcuts for common functions
+- Fixed button layout issues
+- Improved error handling for service connectivity
+- Enhanced API key security with dedicated secrets directory
+- *Secret feature: Service status indicators color coding*
+
+### v0.1.1 (2024-08-12) - The Visualization Update
+- Enhanced terminal display with multiple character sets
+- Improved fallback console mode with row/column indicators
+- Added verbose mode for detailed LED state tracking
+- Resolved synchronization issues between LED state manager and hardware controller
+- Improved error handling and terminal size detection
+- Added command-line arguments for customization
+
+### v0.1.0 (2024-06-15) - The Renaissance Update
+- Improved project structure and documentation
+- Added comprehensive research documentation
+- Enhanced hardware implementation guides
+- Consolidated technical specifications
+- *Secret feature: Message animation patterns*
+
+### v0.0.1 (2024-03-17) - The Primordial Release
+- Basic punch card display
+- Test message support
+- Statistics tracking
+- Random sentence generation
+- OpenAI integration
+- Diagnostic logging
+- *Secret feature: DOS mode easter egg*
+
 ---
 
 <div align="center">
