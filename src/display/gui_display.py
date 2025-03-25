@@ -877,10 +877,23 @@ class APIConsoleWindow(QDialog):
             self.update_status("Unavailable")
 
 class PunchCardDisplay(QMainWindow):
-    """Main window for the minimalist punch card display application."""
+    """
+    Main window for the Punch Card Display application.
+    This provides a GUI interface for the punch card system.
+    """
     
-    def __init__(self):
+    def __init__(self, punch_card=None):
+        """
+        Initialize the punch card display.
+        
+        Args:
+            punch_card: PunchCard instance to connect to this display
+        """
         super().__init__()
+        
+        # Store the punch card instance
+        self.punch_card = punch_card
+        
         self.setWindowTitle("Punch Card Display")
         self.setMinimumSize(900, 600)
         
@@ -1830,20 +1843,30 @@ class PunchCardDisplay(QMainWindow):
             self.console.log(f"Error loading settings: {str(e)}", "ERROR")
 
 
-def main():
-    """Run the application."""
-    app = QApplication.instance() if QApplication.instance() else QApplication([])
+def run_gui_app():
+    """
+    Main entry point for the GUI application.
+    """
+    import sys
+    from PyQt6.QtWidgets import QApplication
+    from src.core.punch_card import PunchCard
     
-    # Create and show the display
-    display = PunchCardDisplay()
-    display.show()
-    
-    # If this is run as a script, start the event loop
-    if __name__ == "__main__":
+    try:
+        # Initialize application
+        app = QApplication.instance() if QApplication.instance() else QApplication(sys.argv)
+        punch_card = PunchCard()
+        gui = PunchCardDisplay(punch_card)
+        gui.show()
+        
+        # Run application
         sys.exit(app.exec())
-    
-    return display, app
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.exception(f"Error in GUI application: {e}")
+        print(f"\nAn error occurred: {e}")
 
-
+# If run directly, start the GUI application
 if __name__ == "__main__":
-    main() 
+    run_gui_app() 

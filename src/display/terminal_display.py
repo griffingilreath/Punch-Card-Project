@@ -311,4 +311,32 @@ class TerminalDisplay:
                 pass
             
             # Sleep to avoid high CPU usage
-            time.sleep(0.1) 
+            time.sleep(0.1)
+
+def run_terminal_app():
+    """
+    Main entry point for the terminal application.
+    """
+    from src.core.punch_card import PunchCard
+    from src.display.display_adapter import DisplayAdapter
+    
+    try:
+        # Initialize the application
+        punch_card = PunchCard()
+        display = TerminalDisplay()
+        adapter = DisplayAdapter(punch_card, display)
+        
+        # Run the terminal application
+        adapter.start()
+        
+    except KeyboardInterrupt:
+        print("\nApplication terminated by user.")
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.exception(f"Error in terminal application: {e}")
+        print(f"\nAn error occurred: {e}")
+
+# If run directly, start the terminal application
+if __name__ == "__main__":
+    run_terminal_app() 

@@ -9,7 +9,80 @@ import threading
 from typing import List, Tuple, Dict, Any, Optional
 
 # Import the terminal display module
-from terminal_display import TerminalDisplay, CharacterSet
+from src.display.terminal_display import TerminalDisplay, CharacterSet
+
+class DisplayAdapter:
+    """Adapter to connect a display interface with the punch card system."""
+    
+    def __init__(self, punch_card, display):
+        """
+        Initialize the display adapter.
+        
+        Args:
+            punch_card: The punch card instance
+            display: The display instance (terminal or GUI)
+        """
+        self.punch_card = punch_card
+        self.display = display
+        self.running = False
+        self.update_thread = None
+    
+    def start(self):
+        """Start the display adapter."""
+        self.running = True
+        
+        # Start the punch card system if needed
+        if hasattr(self.punch_card, 'start') and callable(self.punch_card.start):
+            self.punch_card.start()
+            
+        # Start the display if needed
+        if hasattr(self.display, 'start') and callable(self.display.start):
+            self.display.start()
+        
+        # Start update thread
+        self.update_thread = threading.Thread(target=self._update_loop)
+        self.update_thread.daemon = True
+        self.update_thread.start()
+    
+    def stop(self):
+        """Stop the display adapter."""
+        self.running = False
+        
+        # Stop the punch card system if needed
+        if hasattr(self.punch_card, 'stop') and callable(self.punch_card.stop):
+            self.punch_card.stop()
+            
+        # Stop the display if needed
+        if hasattr(self.display, 'stop') and callable(self.display.stop):
+            self.display.stop()
+        
+        # Wait for update thread to finish
+        if self.update_thread and self.update_thread.is_alive():
+            self.update_thread.join(timeout=1.0)
+    
+    def _update_loop(self):
+        """Update loop to keep the display in sync with the punch card state."""
+        try:
+            while self.running:
+                # Get data from punch card
+                if hasattr(self.punch_card, 'get_display_data'):
+                    data = self.punch_card.get_display_data()
+                    
+                    # Update display with data
+                    if hasattr(self.display, 'update'):
+                        self.display.update(data)
+                
+                # Sleep to avoid high CPU usage
+                time.sleep(0.1)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Error in display adapter update loop: {e}")
+            # Exit the loop but don't crash the application
+            self.running = False
+
+# For backwards compatibility
+PunchCardDisplayAdapter = DisplayAdapter
 
 class PunchCardDisplayAdapter:
     """Adapter to integrate terminal display with punch card system."""
