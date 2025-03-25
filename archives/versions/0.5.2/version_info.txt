@@ -1,0 +1,5 @@
+Version: 0.5.2
+Name: The Reorganization Update
+Date: March 24, 2024
+Release Type: Minor
+Description: This version reorganizes the project structure for better maintainability and follows up on the comprehensive design documentation added in v0.5.1. 
