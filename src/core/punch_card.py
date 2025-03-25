@@ -47,7 +47,7 @@ import os
 import time
 import random
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
 import shutil
@@ -422,7 +422,15 @@ class PunchCardStats:
             
         return self.stats
 
-class PunchCardDisplay:
+class PunchCard:
+    """
+    Main class for the Punch Card Display application.
+    This provides a GUI interface for the punch card system.
+    
+    Note: This was previously named PunchCardDisplay but has been renamed to PunchCard
+    for better integration with the display modules.
+    """
+    
     def __init__(self, led_delay: float = DEFAULT_LED_DELAY,
                  message_delay: float = DEFAULT_MESSAGE_DELAY,
                  random_delay: bool = True,
@@ -1788,3 +1796,21 @@ class PunchCardDisplay:
             y_offset += 4  # Changed back from 3 to 4 to restore previous positioning
 
         return x_offset, y_offset
+
+    def get_display_data(self) -> Dict[str, Any]:
+        """
+        Get data for display adapters.
+        This method provides data that can be used by display adapters to render the punch card.
+        
+        Returns:
+            Dict with display data including grid state, message, etc.
+        """
+        # Prepare data for display adapters
+        data = {
+            'grid': self.grid_state if hasattr(self, 'grid_state') else [[False for _ in range(COLUMNS)] for _ in range(ROWS)],
+            'message': self.current_message if hasattr(self, 'current_message') else DEFAULT_MESSAGE,
+            'status': self.status if hasattr(self, 'status') else "Ready",
+            'version': VERSION,
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        return data

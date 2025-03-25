@@ -313,6 +313,28 @@ class TerminalDisplay:
             # Sleep to avoid high CPU usage
             time.sleep(0.1)
 
+    def update(self, data):
+        """
+        Update the display with data from the punch card.
+        
+        Args:
+            data: Dictionary containing display data from the punch card
+        """
+        if not data:
+            return
+            
+        # Update the LED grid if provided
+        if 'grid' in data:
+            self.update_led_grid(data['grid'])
+            
+        # Update status message if provided
+        if 'status' in data:
+            self.set_status(f"{data['status']}")
+            
+        # Log message if provided
+        if 'message' in data and hasattr(data, 'timestamp'):
+            self.add_debug_message(f"Message: {data['message']} [{data['timestamp']}]")
+
 def run_terminal_app():
     """
     Main entry point for the terminal application.
