@@ -1,6 +1,6 @@
 # Punch Card Project
 
-[![Current Version](https://img.shields.io/badge/version-0.6.2-blue.svg)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.2)
+[![Current Version](https://img.shields.io/badge/version-0.6.4-blue.svg)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.4)
 
     ┌──────────────────────────────────────────────────────────────────────────────────┐
     │ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗██╗  ██╗     ██████╗ █████╗ ██████╗ ██████╗   │
@@ -33,6 +33,36 @@ A implementation of the IBM 80-column punch card system for a fine art object.
 > 1. Consider that key compromised and regenerate a new one
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
+
+## What's New in v0.6.4
+
+### Features
+- Fixed README formatting and structure
+- Updated hardware integration documentation
+- Corrected file path references
+- Improved documentation clarity
+- Enhanced version history organization
+- Standardized section headers
+- Fixed duplicate sections
+- Updated component references
+- Improved code block formatting
+- Enhanced readability of technical sections
+
+### Documentation
+- Streamlined project structure documentation
+- Enhanced hardware integration guides
+- Improved code block formatting
+- Fixed duplicate sections
+- Standardized section headers
+- Updated file path references
+- Enhanced technical documentation clarity
+
+### Organization
+- Consolidated duplicate sections
+- Improved version history structure
+- Enhanced component documentation
+- Streamlined technical sections
+- Better organized project structure
 
 ## What's New in v0.6.3
 
