@@ -1,6 +1,6 @@
 # Punch Card Project
 
-[![Current Version](https://img.shields.io/badge/version-0.6.2-blue.svg)](https://github.com/griffingilreath/PunchCardProject/releases/tag/v0.6.2)
+[![Current Version](https://img.shields.io/badge/version-0.6.2-blue.svg)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.2)
 
 A modernized implementation of the IBM 026 punch card system for historical and educational purposes.
 
@@ -27,8 +27,8 @@ This project provides a full GUI implementation of an IBM 026 punch card system,
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/griffingilreath/PunchCardProject.git
-   cd PunchCardProject
+   git clone https://github.com/griffingilreath/Punch-Card-Project.git
+   cd Punch-Card-Project
    ```
 
 2. Install dependencies:
@@ -74,7 +74,7 @@ Please ensure your code follows our coding standards and includes appropriate te
 
 **Current Version: 0.6.2** - Restored OpenAI settings and Statistics tabs
 
-See [Releases](https://github.com/griffingilreath/PunchCardProject/releases) for all released versions and [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+See [Releases](https://github.com/griffingilreath/Punch-Card-Project/releases) for all released versions and [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
 
 ## License
 
