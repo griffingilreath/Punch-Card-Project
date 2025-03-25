@@ -19,10 +19,12 @@ from datetime import datetime
 import json
 
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                            QHBoxLayout, QLabel, QPushButton, QStackedLayout,
+                            QHBoxLayout, QLabel, QPushButton, QStackedLayout, QRadioButton,
                             QSizePolicy, QFrame, QDialog, QTextEdit, QSpinBox,
-                            QCheckBox, QFormLayout, QGroupBox)
-from PyQt6.QtCore import Qt, QTimer, QSize, QRect, QRectF, pyqtSignal, QDir
+                            QCheckBox, QFormLayout, QGroupBox, QTabWidget, 
+                            QLineEdit, QComboBox, QSlider, QDoubleSpinBox,
+                            QDialogButtonBox, QMessageBox)
+from PyQt6.QtCore import Qt, QTimer, QSize, QRect, QRectF, pyqtSignal, QDir, QObject, QEvent
 from PyQt6.QtGui import QPainter, QColor, QPen, QFont, QPalette, QBrush, QPainterPath, QKeyEvent
 
 # Color scheme
@@ -398,11 +400,13 @@ class ConsoleWindow(QDialog):
         self.log("Console cleared", "INFO")
 
 class SettingsDialog(QDialog):
-    """Settings dialog for configuring the punch card display."""
+    """Dialog for configuring punch card settings."""
+
     def __init__(self, parent=None):
+        """Initialize the settings dialog."""
         super().__init__(parent)
-        self.setWindowTitle("Settings")
-        self.setMinimumWidth(400)
+        self.setWindowTitle("Punch Card Settings")
+        self.resize(550, 650)  # Make dialog larger to accommodate tabs
         
         # Set dark theme
         self.setStyleSheet(f"""
@@ -410,54 +414,146 @@ class SettingsDialog(QDialog):
                 background-color: {COLORS['background'].name()};
                 color: {COLORS['text'].name()};
             }}
-            QLabel, QSpinBox, QCheckBox {{
+            QLabel, QSpinBox, QCheckBox, QLineEdit, QComboBox, QTextEdit, QSlider {{
                 color: {COLORS['text'].name()};
+            }}
+            QTabWidget::pane {{
+                border: 1px solid {COLORS['hole_outline'].name()};
+                background-color: {COLORS['background'].name()};
+            }}
+            QTabBar::tab {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                padding: 6px 12px;
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-bottom: none;
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {COLORS['button_hover'].name()};
             }}
         """)
         
-        layout = QFormLayout(self)
+        # Create the main layout
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
         
-        # Display settings
-        display_group = QGroupBox("Display Settings")
-        display_layout = QFormLayout()
+        # Create tab widget
+        self.tab_widget = QTabWidget()
+        self.layout.addWidget(self.tab_widget)
         
+        # Create tabs
+        self.display_tab = QWidget()
+        self.card_tab = QWidget()
+        self.openai_tab = QWidget()
+        self.stats_tab = QWidget()  # New stats tab
+        
+        # Set up tabs
+        self._setup_display_tab()
+        self._setup_card_tab()
+        self._setup_openai_tab()
+        self._setup_stats_tab()  # Set up stats tab
+        
+        # Add tabs to widget
+        self.tab_widget.addTab(self.display_tab, "Display")
+        self.tab_widget.addTab(self.card_tab, "Card Dimensions")
+        self.tab_widget.addTab(self.openai_tab, "🤖 OpenAI API")
+        self.tab_widget.addTab(self.stats_tab, "📊 Statistics")
+        
+        # Add buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        self.layout.addWidget(button_box)
+        
+        # Load existing settings
+        self._load_settings()
+        
+        # Initialize message stats if not exists
+        global message_stats
+        if 'message_stats' not in globals():
+            self._initialize_message_stats()
+
+    def _initialize_message_stats(self):
+        """Initialize global message stats variable if it doesn't exist."""
+        global message_stats
+        message_stats = {
+            "total": 0,
+            "local": 0,
+            "openai": 0,
+            "database": 0,
+            "system": 0,
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_message": "",
+            "last_source": ""
+        }
+        
+        # Initialize service status tracking
+        global service_status
+        service_status = {
+            "openai": {
+                "status": "unknown",
+                "message": "Not checked yet",
+                "last_checked": "Never"
+            },
+            "flyio": {
+                "status": "unknown",
+                "message": "Not checked yet",
+                "last_checked": "Never"
+            }
+        }
+
+    def _setup_display_tab(self):
+        """Set up the display settings tab."""
+        layout = QFormLayout()
+        self.display_tab.setLayout(layout)
+        
+        # LED Update Delay
         self.led_delay = QSpinBox()
         self.led_delay.setRange(50, 500)
         self.led_delay.setValue(100)
         self.led_delay.setSuffix(" ms")
-        display_layout.addRow("LED Update Delay:", self.led_delay)
+        layout.addRow("LED Update Delay:", self.led_delay)
         
-        self.message_delay = QSpinBox()
-        self.message_delay.setRange(1000, 10000)
-        self.message_delay.setValue(3000)
-        self.message_delay.setSuffix(" ms")
-        display_layout.addRow("Message Delay:", self.message_delay)
+        # Message interval
+        self.interval_spin = QSpinBox()
+        self.interval_spin.setRange(1, 3600)
+        self.interval_spin.setSuffix(" seconds")
+        layout.addRow("Message interval:", self.interval_spin)
         
-        self.message_display_time = QSpinBox()
-        self.message_display_time.setRange(1, 60)
-        self.message_display_time.setValue(5)
-        self.message_display_time.setSuffix(" seconds")
-        display_layout.addRow("Message Display Time:", self.message_display_time)
+        # Message display time
+        self.display_time_spin = QSpinBox()
+        self.display_time_spin.setRange(1, 3600)
+        self.display_time_spin.setSuffix(" seconds")
+        layout.addRow("Message display time:", self.display_time_spin)
         
+        # Delay factor
+        self.delay_factor_spin = QDoubleSpinBox()
+        self.delay_factor_spin.setRange(0.1, 10.0)
+        self.delay_factor_spin.setSingleStep(0.1)
+        layout.addRow("Typing delay factor:", self.delay_factor_spin)
+        
+        # Random Delay
         self.random_delay = QCheckBox()
         self.random_delay.setChecked(True)
-        display_layout.addRow("Random Delay:", self.random_delay)
+        layout.addRow("Random Delay:", self.random_delay)
         
+        # Show Splash Screen
         self.show_splash = QCheckBox()
         self.show_splash.setChecked(True)
-        display_layout.addRow("Show Splash Screen:", self.show_splash)
+        layout.addRow("Show Splash Screen:", self.show_splash)
         
+        # Auto-Open Console
         self.auto_console = QCheckBox()
         self.auto_console.setChecked(True)
-        display_layout.addRow("Auto-Open Console:", self.auto_console)
-        
-        display_group.setLayout(display_layout)
-        layout.addRow(display_group)
+        layout.addRow("Auto-Open Console:", self.auto_console)
         
         # Card dimensions settings
         card_group = QGroupBox("Card Dimensions")
         card_layout = QFormLayout()
         
+        # Scale Factor
         self.scale_factor = QSpinBox()
         self.scale_factor.setRange(1, 10)
         self.scale_factor.setValue(3)
@@ -465,6 +561,18 @@ class SettingsDialog(QDialog):
         self.scale_factor.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Scale Factor:", self.scale_factor)
         
+        # Width and Height
+        self.width_spin = QSpinBox()
+        self.width_spin.setRange(10, 1000)
+        self.width_spin.setSuffix(" pixels")
+        card_layout.addRow("Card width:", self.width_spin)
+        
+        self.height_spin = QSpinBox()
+        self.height_spin.setRange(10, 1000)
+        self.height_spin.setSuffix(" pixels")
+        card_layout.addRow("Card height:", self.height_spin)
+        
+        # Top/Bottom Margin
         self.top_margin = QSpinBox()
         self.top_margin.setRange(1, 20)
         self.top_margin.setValue(4)
@@ -472,6 +580,7 @@ class SettingsDialog(QDialog):
         self.top_margin.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Top/Bottom Margin:", self.top_margin)
         
+        # Side Margin
         self.side_margin = QSpinBox()
         self.side_margin.setRange(1, 20)
         self.side_margin.setValue(5)
@@ -479,6 +588,7 @@ class SettingsDialog(QDialog):
         self.side_margin.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Side Margin:", self.side_margin)
         
+        # Row Spacing
         self.row_spacing = QSpinBox()
         self.row_spacing.setRange(1, 10)
         self.row_spacing.setValue(2)
@@ -486,6 +596,7 @@ class SettingsDialog(QDialog):
         self.row_spacing.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Row Spacing:", self.row_spacing)
         
+        # Column Spacing
         self.column_spacing = QSpinBox()
         self.column_spacing.setRange(1, 10)
         self.column_spacing.setValue(1)
@@ -493,6 +604,7 @@ class SettingsDialog(QDialog):
         self.column_spacing.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Column Spacing:", self.column_spacing)
         
+        # Hole Width
         self.hole_width = QSpinBox()
         self.hole_width.setRange(1, 5)
         self.hole_width.setValue(1)
@@ -500,6 +612,7 @@ class SettingsDialog(QDialog):
         self.hole_width.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Hole Width:", self.hole_width)
         
+        # Hole Height
         self.hole_height = QSpinBox()
         self.hole_height.setRange(1, 10)
         self.hole_height.setValue(3)
@@ -550,6 +663,885 @@ class SettingsDialog(QDialog):
             'hole_width': self.hole_width.value(),
             'hole_height': self.hole_height.value()
         }
+
+    def _setup_openai_tab(self):
+        """Set up the OpenAI API tab."""
+        layout = QVBoxLayout()
+        self.openai_tab.setLayout(layout)
+        
+        # API Key Section
+        api_key_group = QGroupBox("API Key")
+        api_key_layout = QVBoxLayout()
+        api_key_group.setLayout(api_key_layout)
+        
+        # API Key input with layout
+        key_input_layout = QHBoxLayout()
+        
+        self.api_key_edit = QLineEdit()
+        self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.api_key_edit.setPlaceholderText("Enter your OpenAI API key")
+        key_input_layout.addWidget(self.api_key_edit)
+        
+        # Toggle visibility button
+        toggle_btn = RetroButton("👁")
+        toggle_btn.setMaximumWidth(30)
+        toggle_btn.clicked.connect(self.toggle_key_visibility)
+        key_input_layout.addWidget(toggle_btn)
+        
+        api_key_layout.addLayout(key_input_layout)
+        
+        # API key status label
+        self.api_key_status = QLabel("Status: Not verified")
+        api_key_layout.addWidget(self.api_key_status)
+        
+        # API Key action buttons
+        key_buttons_layout = QHBoxLayout()
+        
+        verify_btn = RetroButton("Verify Key")
+        verify_btn.clicked.connect(self.verify_api_key)
+        key_buttons_layout.addWidget(verify_btn)
+        
+        save_btn = RetroButton("Save Key")
+        save_btn.clicked.connect(self.save_api_key)
+        key_buttons_layout.addWidget(save_btn)
+        
+        api_key_layout.addLayout(key_buttons_layout)
+        
+        # Add the API key group to the main layout
+        layout.addWidget(api_key_group)
+        
+        # Add separator
+        separator1 = QFrame()
+        separator1.setFrameShape(QFrame.Shape.HLine)
+        separator1.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator1)
+        
+        # Model Selection Section
+        model_group = QGroupBox("Model Selection")
+        model_layout = QVBoxLayout()
+        model_group.setLayout(model_layout)
+        
+        # Model dropdown with refresh button
+        model_select_layout = QHBoxLayout()
+        
+        model_layout.addWidget(QLabel("Select OpenAI Model:"))
+        self.model_combo = QComboBox()
+        
+        # Add models
+        self.model_combo.addItems([
+            "gpt-4o",
+            "gpt-4-turbo",
+            "gpt-4",
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-16k"
+        ])
+        self.model_combo.currentIndexChanged.connect(self.update_model_description)
+        model_select_layout.addWidget(self.model_combo)
+        
+        # Refresh models button
+        refresh_button = RetroButton("Refresh")
+        refresh_button.setFixedWidth(80)
+        refresh_button.clicked.connect(self.refresh_models)
+        model_select_layout.addWidget(refresh_button)
+        
+        model_layout.addLayout(model_select_layout)
+        
+        # Model description
+        self.model_description = QLabel("GPT 4o: OpenAI's most capable multimodal model")
+        self.model_description.setWordWrap(True)
+        model_layout.addWidget(self.model_description)
+        
+        # Temperature setting
+        model_layout.addWidget(QLabel("Temperature (randomness):"))
+        
+        temp_layout = QHBoxLayout()
+        self.temperature_slider = QSlider(Qt.Orientation.Horizontal)
+        self.temperature_slider.setRange(0, 100)
+        self.temperature_slider.setValue(70)
+        self.temperature_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.temperature_slider.setTickInterval(10)
+        temp_layout.addWidget(self.temperature_slider)
+        
+        self.temperature_label = QLabel("0.7")
+        self.temperature_slider.valueChanged.connect(lambda v: self.temperature_label.setText(f"{v/100:.1f}"))
+        temp_layout.addWidget(self.temperature_label)
+        
+        model_layout.addLayout(temp_layout)
+        
+        model_layout.addWidget(QLabel("Higher values = more random outputs"))
+        
+        # Add model group to main layout
+        layout.addWidget(model_group)
+        
+        # Add separator
+        separator2 = QFrame()
+        separator2.setFrameShape(QFrame.Shape.HLine)
+        separator2.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator2)
+        
+        # Usage and Cost Tracking Section
+        usage_group = QGroupBox("Usage and Cost Tracking")
+        usage_layout = QVBoxLayout()
+        usage_group.setLayout(usage_layout)
+        
+        # Add usage display
+        self.usage_text = QTextEdit()
+        self.usage_text.setReadOnly(True)
+        self.usage_text.setMaximumHeight(150)
+        self.usage_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        usage_layout.addWidget(self.usage_text)
+        
+        # Buttons for usage stats
+        usage_buttons = QHBoxLayout()
+        
+        update_usage_btn = RetroButton("Update Stats")
+        update_usage_btn.clicked.connect(self.update_usage_stats)
+        usage_buttons.addWidget(update_usage_btn)
+        
+        reset_usage_btn = RetroButton("Reset Stats")
+        reset_usage_btn.clicked.connect(self.reset_usage_stats)
+        usage_buttons.addWidget(reset_usage_btn)
+        
+        usage_layout.addLayout(usage_buttons)
+        
+        # Add usage group to main layout
+        layout.addWidget(usage_group)
+        
+        # Add separator
+        separator3 = QFrame()
+        separator3.setFrameShape(QFrame.Shape.HLine)
+        separator3.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator3)
+        
+        # Service status section
+        service_group = QGroupBox("OpenAI Service Status")
+        service_layout = QHBoxLayout()
+        service_group.setLayout(service_layout)
+        
+        self.service_status_label = QLabel("Status: Not checked")
+        service_layout.addWidget(self.service_status_label)
+        
+        check_status_btn = RetroButton("Check Status")
+        check_status_btn.clicked.connect(self.check_openai_service)
+        service_layout.addWidget(check_status_btn)
+        
+        layout.addWidget(service_group)
+
+    def toggle_key_visibility(self):
+        """Toggle visibility of the API key."""
+        if self.api_key_edit.echoMode() == QLineEdit.EchoMode.Password:
+            self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Normal)
+        else:
+            self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+
+    def update_model_description(self, index):
+        """Update the model description when selection changes."""
+        model = self.model_combo.currentText()
+        
+        descriptions = {
+            "gpt-3.5-turbo": "Fast and cost-effective for most tasks",
+            "gpt-4": "More capable than GPT-3.5 but slower and more expensive",
+            "gpt-4-turbo": "Improved version of GPT-4 with better performance",
+            "gpt-4o": "Most advanced model with visual capabilities",
+            "gpt-3.5-turbo-16k": "GPT-3.5 Turbo with extended context window"
+        }
+        
+        description = descriptions.get(model, "No description available")
+        self.model_description.setText(f"{model}: {description}")
+    
+    def refresh_models(self):
+        """Refresh the available models list."""
+        try:
+            # Try to get the models from the API if we have a key
+            api_key = self.api_key_edit.text().strip()
+            if api_key and len(api_key) > 20 and api_key != "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+                # Import OpenAI
+                try:
+                    from openai import OpenAI
+                    
+                    # Create a temporary client
+                    temp_client = OpenAI(api_key=api_key)
+                    
+                    # Try to get models
+                    models = temp_client.models.list()
+                    
+                    # Extract model names that are appropriate for chat
+                    model_names = [
+                        model.id for model in models.data
+                        if model.id.startswith(("gpt-3", "gpt-4")) and not model.id.endswith("-vision")
+                    ]
+                    
+                    if model_names:
+                        # Remember the current selection
+                        current_model = self.model_combo.currentText()
+                        
+                        # Update the combo box
+                        self.model_combo.clear()
+                        self.model_combo.addItems(model_names)
+                        
+                        # Try to restore previous selection
+                        index = self.model_combo.findText(current_model)
+                        if index >= 0:
+                            self.model_combo.setCurrentIndex(index)
+                        
+                        self.model_description.setText("Models refreshed from API")
+                        return
+                    
+                except ImportError:
+                    self.model_description.setText("Error: OpenAI module not installed")
+                except Exception as e:
+                    self.model_description.setText(f"Error refreshing models: {str(e)[:60]}")
+            
+            # Fallback to default models if we can't get them from the API
+            self.model_combo.clear()
+            self.model_combo.addItems([
+                "gpt-4o",
+                "gpt-4-turbo",
+                "gpt-4",
+                "gpt-3.5-turbo",
+                "gpt-3.5-turbo-16k"
+            ])
+            self.model_description.setText("Using default model list (API key not set or error)")
+            
+        except Exception as e:
+            self.model_description.setText(f"Error: {str(e)[:60]}")
+
+    def verify_api_key(self):
+        """Check if the API key is valid."""
+        # Get API key from input
+        api_key = self.api_key_edit.text()
+        
+        # Check if we have text entered
+        if not api_key or len(api_key.strip()) < 10:
+            self.api_key_status.setText("Status: Invalid key (too short)")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+            return
+        
+        # Update UI
+        self.api_key_status.setText("Status: Verifying...")
+        self.api_key_status.setStyleSheet("color: #AAAAAA;")
+        
+        # Try to initialize a client to test the key
+        try:
+            # Import OpenAI
+            from openai import OpenAI, APIError
+            
+            # Create a temporary client
+            temp_client = OpenAI(api_key=api_key)
+            
+            # Try a lightweight API call to verify the key
+            try:
+                models = temp_client.models.list(limit=1)
+                
+                # Key is valid
+                self.api_key_status.setText(f"Status: Valid ✅")
+                self.api_key_status.setStyleSheet("color: #55AA55;")
+                
+            except APIError as e:
+                # API-specific errors (usually authentication or permissions)
+                self.api_key_status.setText(f"Status: Invalid key - {str(e)[:60]}")
+                self.api_key_status.setStyleSheet("color: #FF5555;")
+                
+        except ImportError:
+            self.api_key_status.setText("Status: OpenAI module not installed")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+        except Exception as e:
+            self.api_key_status.setText(f"Status: Error - {str(e)[:60]}")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+
+    def save_api_key(self):
+        """Update the API key in the configuration."""
+        api_key = self.api_key_edit.text()
+        
+        # Skip if key is just placeholder asterisks
+        if api_key == "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            QMessageBox.warning(
+                self, 
+                "API Key Update", 
+                "Please enter your actual API key, not the placeholder."
+            )
+            return
+        
+        if not api_key:
+            QMessageBox.warning(
+                self, 
+                "API Key Update", 
+                "API key cannot be empty."
+            )
+            return
+        
+        # Save the API key to settings
+        try:
+            import json
+            import os
+            
+            # Load existing settings
+            settings_path = "punch_card_settings.json"
+            settings = {}
+            
+            if os.path.exists(settings_path):
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+            
+            # Update with new API key
+            settings["openai_api_key"] = api_key
+            
+            # Add model and temperature if they don't exist
+            settings["openai_model"] = self.model_combo.currentText()
+            settings["temperature"] = float(self.temperature_slider.value()) / 100.0
+            
+            # Save updated settings
+            with open(settings_path, "w") as f:
+                json.dump(settings, f, indent=4)
+            
+            QMessageBox.information(
+                self, 
+                "API Key Update", 
+                "✅ API key successfully saved to settings file."
+            )
+            
+            # Update API key status
+            self.verify_api_key()
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "API Key Update Error",
+                f"An error occurred while updating your API key: {str(e)}"
+            )
+
+    def check_openai_service(self):
+        """Check the OpenAI service status."""
+        self.service_status_label.setText("Status: Checking...")
+        
+        try:
+            import requests
+            
+            url = "https://status.openai.com/api/v2/status.json"
+            response = requests.get(url, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                status_indicator = data.get("status", {}).get("indicator", "unknown")
+                status_description = data.get("status", {}).get("description", "Unknown status")
+                
+                if status_indicator == "none":
+                    self.service_status_label.setText("Status: All systems operational")
+                    self.service_status_label.setStyleSheet("color: #55AA55;")
+                else:
+                    self.service_status_label.setText(f"Status: {status_description}")
+                    
+                    # Set color based on status
+                    if status_indicator == "minor":
+                        self.service_status_label.setStyleSheet("color: #FFAA55;")
+                    elif status_indicator == "major" or status_indicator == "critical":
+                        self.service_status_label.setStyleSheet("color: #FF5555;")
+                    else:
+                        self.service_status_label.setStyleSheet("color: #AAAAAA;")
+            else:
+                self.service_status_label.setText(f"Status: Error (HTTP {response.status_code})")
+                self.service_status_label.setStyleSheet("color: #FF5555;")
+                
+        except Exception as e:
+            self.service_status_label.setText(f"Status: Error - {str(e)[:60]}")
+            self.service_status_label.setStyleSheet("color: #FF5555;")
+
+    def update_usage_stats(self):
+        """Update the OpenAI usage statistics display."""
+        import json
+        import os
+        
+        # Default display if no stats available
+        usage_text = "No OpenAI usage data available."
+        
+        try:
+            # Load settings file to get usage data
+            settings_path = "punch_card_settings.json"
+            
+            if os.path.exists(settings_path):
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+                
+                # Check if we have OpenAI usage data
+                if "openai_usage" in settings:
+                    usage = settings["openai_usage"]
+                    
+                    # Format the usage statistics
+                    usage_text = "=== OpenAI API Usage ===\n"
+                    usage_text += f"Total API calls: {usage.get('total_calls', 0)}\n"
+                    usage_text += f"Total tokens: {usage.get('total_tokens', 0)}\n"
+                    usage_text += f"Prompt tokens: {usage.get('prompt_tokens', 0)}\n"
+                    usage_text += f"Completion tokens: {usage.get('completion_tokens', 0)}\n"
+                    usage_text += f"Estimated cost: ${usage.get('estimated_cost', 0):.4f}\n"
+                    
+                    # Add last updated timestamp if available
+                    if "last_updated" in usage:
+                        usage_text += f"\nLast updated: {usage.get('last_updated', 'Never')}"
+            
+            # Update the usage text display
+            self.usage_text.setText(usage_text)
+            
+        except Exception as e:
+            self.usage_text.setText(f"Error loading usage stats: {str(e)}")
+
+    def reset_usage_stats(self):
+        """Reset the OpenAI usage statistics."""
+        import json
+        import os
+        from datetime import datetime
+        
+        # Confirm with user
+        confirm = QMessageBox.question(
+            self,
+            "Reset Usage Statistics",
+            "Are you sure you want to reset all OpenAI usage statistics?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            try:
+                # Load settings file
+                settings_path = "punch_card_settings.json"
+                settings = {}
+                
+                if os.path.exists(settings_path):
+                    with open(settings_path, "r") as f:
+                        settings = json.load(f)
+                
+                # Reset OpenAI usage stats
+                settings["openai_usage"] = {
+                    "total_calls": 0,
+                    "total_tokens": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "estimated_cost": 0.0,
+                    "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "history": []
+                }
+                
+                # Save updated settings
+                with open(settings_path, "w") as f:
+                    json.dump(settings, f, indent=4)
+                
+                # Update the display
+                self.update_usage_stats()
+                
+                QMessageBox.information(
+                    self,
+                    "Usage Statistics Reset",
+                    "OpenAI usage statistics have been reset."
+                )
+                
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Reset Error",
+                    f"An error occurred while resetting usage statistics: {str(e)}"
+                )
+
+    def _setup_stats_tab(self):
+        """Set up the statistics tab."""
+        layout = QVBoxLayout()
+        self.stats_tab.setLayout(layout)
+        
+        # Message Statistics Section
+        stats_group = QGroupBox("Message Statistics")
+        stats_layout = QVBoxLayout()
+        stats_group.setLayout(stats_layout)
+        
+        # Add stats display
+        self.stats_text = QTextEdit()
+        self.stats_text.setReadOnly(True)
+        self.stats_text.setMinimumHeight(150)
+        self.stats_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        stats_layout.addWidget(self.stats_text)
+        
+        # Reset stats button
+        reset_stats_btn = RetroButton("Reset Statistics")
+        reset_stats_btn.clicked.connect(self.reset_message_stats)
+        stats_layout.addWidget(reset_stats_btn)
+        
+        # Add stats group to main layout
+        layout.addWidget(stats_group)
+        
+        # Add separator
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator)
+        
+        # Service Status Section
+        service_group = QGroupBox("Service Status")
+        service_layout = QVBoxLayout()
+        service_group.setLayout(service_layout)
+        
+        # Add service status display
+        self.service_status_text = QTextEdit()
+        self.service_status_text.setReadOnly(True)
+        self.service_status_text.setMinimumHeight(150)
+        self.service_status_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        service_layout.addWidget(self.service_status_text)
+        
+        # Refresh status button
+        refresh_status_btn = RetroButton("Refresh Service Status")
+        refresh_status_btn.clicked.connect(self.refresh_service_status)
+        service_layout.addWidget(refresh_status_btn)
+        
+        # Add service group to main layout
+        layout.addWidget(service_group)
+        
+        # Update the statistics display
+        self.update_stats_display()
+
+    def update_stats_display(self):
+        """Update the statistics display with current stats."""
+        # Update message statistics
+        self.stats_text.setText(self.get_stats_text())
+        
+        # Update service status
+        self.service_status_text.setText(self.get_service_status_text())
+        
+        # Update OpenAI usage stats
+        self.update_usage_stats()
+
+    def get_stats_text(self):
+        """Format and return statistics as text."""
+        global message_stats
+        if 'message_stats' not in globals():
+            self._initialize_message_stats()
+            
+        ms = message_stats
+        text = "=== Message Counts ===\n"
+        text += f"Total messages: {ms.get('total', 0)}\n"
+        text += f"Local messages: {ms.get('local', 0)}\n"
+        text += f"OpenAI messages: {ms.get('openai', 0)}\n"
+        text += f"Database messages: {ms.get('database', 0)}\n"
+        text += f"System messages: {ms.get('system', 0)}\n\n"
+        
+        text += f"Last updated: {ms.get('last_updated', 'Never')}\n"
+        
+        if ms.get('last_message') and ms.get('last_source'):
+            text += f"Last message: '{ms.get('last_message', '')}'\n"
+            text += f"Source: {ms.get('last_source', '')}\n"
+        
+        return text
+
+    def get_service_status_text(self):
+        """Get formatted text of service statuses."""
+        global service_status
+        if 'service_status' not in globals():
+            self._initialize_message_stats()
+            
+        openai_status = service_status.get("openai", {})
+        flyio_status = service_status.get("flyio", {})
+        
+        text = "=== Service Status ===\n"
+        text += f"OpenAI: {openai_status.get('status', 'Unknown')} - {openai_status.get('message', 'No message')}\n"
+        text += f"Last checked: {openai_status.get('last_checked', 'Never')}\n\n"
+        
+        text += f"Fly.io: {flyio_status.get('status', 'Unknown')} - {flyio_status.get('message', 'No message')}\n"
+        text += f"Last checked: {flyio_status.get('last_checked', 'Never')}\n"
+        
+        return text
+
+    def reset_message_stats(self):
+        """Reset the message statistics."""
+        global message_stats
+        
+        # Confirm with user
+        confirm = QMessageBox.question(
+            self,
+            "Reset Statistics",
+            "Are you sure you want to reset all message statistics?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            # Reset stats
+            message_stats = {
+                "total": 0,
+                "local": 0,
+                "openai": 0,
+                "database": 0,
+                "system": 0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "last_message": "",
+                "last_source": ""
+            }
+            
+            # Update display
+            self.update_stats_display()
+            
+            QMessageBox.information(
+                self,
+                "Statistics Reset",
+                "Message statistics have been reset."
+            )
+
+    def refresh_service_status(self):
+        """Refresh the service status display."""
+        global service_status
+        
+        # Update the status
+        self.check_openai_status()
+        self.check_flyio_status()
+        
+        # Update the display
+        self.service_status_text.setText(self.get_service_status_text())
+        
+        QMessageBox.information(
+            self,
+            "Service Status",
+            "Service status has been refreshed."
+        )
+
+    def check_openai_status(self):
+        """Check OpenAI API status and update global status tracking."""
+        global service_status
+        
+        import requests
+        from datetime import datetime
+        
+        url = "https://status.openai.com/api/v2/status.json"
+        service_status["openai"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        try:
+            # Try to make a simple API request
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            
+            data = response.json()
+            status_indicator = data.get("status", {}).get("indicator", "unknown")
+            status_description = data.get("status", {}).get("description", "Unknown status")
+            
+            if status_indicator == "none":
+                service_status["openai"]["status"] = "operational"
+                service_status["openai"]["message"] = "All systems operational"
+            else:
+                service_status["openai"]["status"] = status_indicator
+                service_status["openai"]["message"] = status_description
+                
+            return True
+        except Exception as e:
+            service_status["openai"]["status"] = "error"
+            service_status["openai"]["message"] = f"Error checking status: {str(e)[:50]}"
+            return False
+
+    def check_flyio_status(self):
+        """Check fly.io status and update global status tracking."""
+        global service_status
+        
+        import requests
+        from datetime import datetime
+        
+        url = "https://status.fly.io/api/v2/status.json"
+        service_status["flyio"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        try:
+            # Try to make a simple API request
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            
+            data = response.json()
+            status_indicator = data.get("status", {}).get("indicator", "unknown")
+            status_description = data.get("status", {}).get("description", "Unknown status")
+            
+            service_status["flyio"]["status"] = status_indicator
+            service_status["flyio"]["message"] = status_description
+                
+            return True
+        except Exception as e:
+            service_status["flyio"]["status"] = "error"
+            service_status["flyio"]["message"] = f"Error checking status: {str(e)[:50]}"
+            return False
+
+    def _load_settings(self):
+        """Load existing settings into the dialog."""
+        import json
+        import os
+        
+        settings_path = "punch_card_settings.json"
+        
+        if os.path.exists(settings_path):
+            try:
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+                
+                # Load display settings
+                self.led_delay.setValue(settings.get("led_delay", 100))
+                self.interval_spin.setValue(settings.get("interval", 5))
+                self.display_time_spin.setValue(settings.get("message_display_time", 3))
+                self.delay_factor_spin.setValue(settings.get("delay_factor", 1.0))
+                self.random_delay.setChecked(settings.get("random_delay", True))
+                self.show_splash.setChecked(settings.get("show_splash", True))
+                self.auto_console.setChecked(settings.get("auto_console", True))
+                
+                # Load dimension settings
+                self.width_spin.setValue(settings.get("card_width", 300))
+                self.height_spin.setValue(settings.get("card_height", 200))
+                
+                # Load card settings if available
+                if "scale_factor" in settings:
+                    self.scale_factor.setValue(settings.get("scale_factor", 3))
+                if "top_margin" in settings:
+                    self.top_margin.setValue(settings.get("top_margin", 4))
+                if "side_margin" in settings:
+                    self.side_margin.setValue(settings.get("side_margin", 5))
+                if "row_spacing" in settings:
+                    self.row_spacing.setValue(settings.get("row_spacing", 2))
+                if "column_spacing" in settings:
+                    self.column_spacing.setValue(settings.get("column_spacing", 1))
+                if "hole_width" in settings:
+                    self.hole_width.setValue(settings.get("hole_width", 1))
+                if "hole_height" in settings:
+                    self.hole_height.setValue(settings.get("hole_height", 3))
+                
+                # Load OpenAI settings
+                if "openai_api_key" in settings:
+                    self.api_key_edit.setText("●●●●●●●●●●●●●●●●●●●●●●●●●●●●")
+                
+                # Set model if it exists
+                if "openai_model" in settings:
+                    index = self.model_combo.findText(settings["openai_model"])
+                    if index >= 0:
+                        self.model_combo.setCurrentIndex(index)
+                
+                # Set temperature if it exists
+                if "temperature" in settings:
+                    temp_value = int(settings["temperature"] * 100)
+                    self.temperature_slider.setValue(temp_value)
+                
+            except Exception as e:
+                print(f"Error loading settings: {e}")
+
+    def accept(self):
+        """Save settings and close the dialog."""
+        self.save_settings()
+        super().accept()
+
+    def save_settings(self):
+        """Save settings to a file."""
+        import json
+        import os
+        from datetime import datetime
+        
+        # Get settings from form
+        settings = {
+            # Display settings
+            "led_delay": self.led_delay.value(),
+            "interval": self.interval_spin.value(),
+            "message_display_time": self.display_time_spin.value(),
+            "delay_factor": self.delay_factor_spin.value(),
+            "random_delay": self.random_delay.isChecked(),
+            "show_splash": self.show_splash.isChecked(),
+            "auto_console": self.auto_console.isChecked(),
+            
+            # Card dimensions
+            "card_width": self.width_spin.value(),
+            "card_height": self.height_spin.value(),
+            
+            # Card detailed settings
+            "scale_factor": self.scale_factor.value(),
+            "top_margin": self.top_margin.value(),
+            "side_margin": self.side_margin.value(),
+            "row_spacing": self.row_spacing.value(),
+            "column_spacing": self.column_spacing.value(),
+            "hole_width": self.hole_width.value(),
+            "hole_height": self.hole_height.value(),
+            
+            # OpenAI settings (don't overwrite API key if placeholder)
+            "openai_model": self.model_combo.currentText(),
+            "temperature": float(self.temperature_slider.value()) / 100.0
+        }
+        
+        # API key - only save if it's not the placeholder
+        api_key = self.api_key_edit.text()
+        if api_key and api_key != "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            settings["openai_api_key"] = api_key
+        
+        # Load existing settings to preserve other values
+        settings_path = "punch_card_settings.json"
+        existing_settings = {}
+        
+        if os.path.exists(settings_path):
+            try:
+                with open(settings_path, "r") as f:
+                    existing_settings = json.load(f)
+            except json.JSONDecodeError:
+                print("Warning: Could not parse settings file. Creating new file.")
+        
+        # Merge with existing settings
+        existing_settings.update(settings)
+        
+        # Initialize OpenAI usage section if it doesn't exist
+        if "openai_usage" not in existing_settings:
+            existing_settings["openai_usage"] = {
+                "total_calls": 0,
+                "total_tokens": 0,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "estimated_cost": 0.0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "history": []
+            }
+        
+        # Save settings
+        with open(settings_path, "w") as f:
+            json.dump(existing_settings, f, indent=4)
+
+    def _setup_card_tab(self):
+        """Set up the card dimensions tab."""
+        self.card_tab = QWidget()
+        card_layout = QVBoxLayout(self.card_tab)
+        
+        # Create form for card dimensions
+        card_form = QFormLayout()
+        card_form.setSpacing(10)
+        
+        # Card width input
+        self.card_width_input = QSpinBox()
+        self.card_width_input.setRange(10, 200)
+        self.card_width_input.setValue(80)
+        self.card_width_input.setFixedWidth(100)
+        card_form.addRow("Card Width:", self.card_width_input)
+        
+        # Card height input
+        self.card_height_input = QSpinBox()
+        self.card_height_input.setRange(5, 50)
+        self.card_height_input.setValue(12)
+        self.card_height_input.setFixedWidth(100)
+        card_form.addRow("Card Height:", self.card_height_input)
+        
+        # Add explanation
+        card_explanation = QLabel(
+            "Card dimensions determine how many columns and rows are displayed in the punch card."
+            "\nChanges will take effect after restarting the application."
+        )
+        card_explanation.setStyleSheet("color: gray; font-style: italic;")
+        card_explanation.setWordWrap(True)
+        
+        # Add form and explanation to layout
+        card_layout.addLayout(card_form)
+        card_layout.addWidget(card_explanation)
+        card_layout.addStretch(1)
+        
+        # Update values from settings
+        self.update_card_dimensions()
 
 class MessageGenerator:
     """Generates random messages for display."""
@@ -877,25 +1869,15 @@ class APIConsoleWindow(QDialog):
             self.update_status("Unavailable")
 
 class PunchCardDisplay(QMainWindow):
-    """
-    Main window for the Punch Card Display application.
-    This provides a GUI interface for the punch card system.
-    """
+    """Main window for the minimalist punch card display application."""
     
     def __init__(self, punch_card=None):
-        """
-        Initialize the punch card display.
-        
-        Args:
-            punch_card: PunchCard instance to connect to this display
-        """
         super().__init__()
-        
-        # Store the punch card instance
-        self.punch_card = punch_card
-        
         self.setWindowTitle("Punch Card Display")
         self.setMinimumSize(900, 600)
+        
+        # Store the punch card instance
+        self.punch_card_instance = punch_card
         
         # Set window style and background color
         self.setStyleSheet(f"""
