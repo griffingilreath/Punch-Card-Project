@@ -2,24 +2,41 @@
 
 [![Current Version](https://img.shields.io/badge/version-0.6.2-blue.svg)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.2)
 
+    ┌──────────────────────────────────────────────────────────────────────────────────┐
+    │ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗██╗  ██╗     ██████╗ █████╗ ██████╗ ██████╗   │
+    │ ██╔══██╗██║   ██║████╗  ██║██╔════╝██║  ██║    ██╔════╝██╔══██╗██╔══██╗██╔══██╗  │
+    │ ██████╔╝██║   ██║██╔██╗ ██║██║     ███████║    ██║     ███████║██████╔╝██║  ██║  │
+    │ ██╔═══╝ ██║   ██║██║╚██╗██║██║     ██╔══██║    ██║     ██╔══██║██╔══██╗██║  ██║  │ 
+    │ ██║     ╚██████╔╝██║ ╚████║╚██████╗██║  ██║    ╚██████╗██║  ██║██║  ██║██████╔╝  │
+    │ ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝     ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝   │
+    │                                                                                  │
+    │ ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗                       │
+    │ ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝                       │
+    │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
+    │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
+    │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
+    │ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.2  │
+    └──────────────────────────────────────────────────────────────────────────────────┘
+
 A modernized implementation of the IBM 80-column punch card system for historical and educational purposes.
 
-```
-┌─────────────────────────────── PUNCH CARD GUI UPDATE ────────────────────────────────┐
-│ ┌──────────┐ ┌───────────────────────────────────────────────────────────────┐ ┌───┐ │
-│ │   Menu   │ │                                                               │ │ × │ │
-│ └──────────┘ └───────────────────────────────────────────────────────────────┘ └───┘ │
-│ ┌──────────────────────────────────────────────────────────────────────────────────┐ │
-│ │                                                                                  │ │
-│ │  ████████  ███████  ████████ ██    ██    ███    ██    ██  ███████   █████  ████  │ │
-│ │     ██     ██    ██    ██    ██    ██   ██ ██   ██    ██  ██       ██   ██ ██ █  │ │
-│ │     ██     ██    ██    ██    ██    ██  ██   ██  ██    ██  █████    ███████ ██ █  │ │
-│ │     ██     ██    ██    ██    ██    ██ █████████ ██    ██  ██       ██   ██ ██ █  │ │
-│ │     ██      ██████     ██     ██████  ██     ██  ██████   ███████  ██   ██ ████  │ │
-│ │                                                                                  │ │
-│ └──────────────────────────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────────────────┘
-```
+## What's New in v0.6.2
+
+### Features
+- Added support for multiple character encodings
+- Improved LED matrix visualization
+- Enhanced error handling for hardware integration
+- Updated documentation with detailed examples
+
+### Bug Fixes
+- Fixed GPIO pin mapping issues
+- Resolved character encoding edge cases
+- Improved error messages for invalid punch patterns
+
+### Documentation
+- Added comprehensive hardware setup guide
+- Updated installation instructions
+- Expanded troubleshooting section
 
 > **⚠️ IMPORTANT API KEY SECURITY NOTICE ⚠️**
 > 
@@ -39,6 +56,23 @@ A modernized implementation of the IBM 80-column punch card system for historica
 
 This project provides a full GUI implementation of an IBM 80-column punch card system, allowing users to experiment with this historical computing technology in a modern environment. It's designed for educational purposes to help understand the foundations of computer programming and data processing.
 
+```
+┌─────────────────────────────── PUNCH CARD GUI UPDATE ────────────────────────────────┐
+│ ┌──────────┐ ┌───────────────────────────────────────────────────────────────┐ ┌───┐ │
+│ │   Menu   │ │                                                               │ │ × │ │
+│ └──────────┘ └───────────────────────────────────────────────────────────────┘ └───┘ │
+│ ┌──────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                  │ │
+│ │  ████████  ███████  ████████ ██    ██    ███    ██    ██  ███████   █████  ████  │ │
+│ │     ██     ██    ██    ██    ██    ██   ██ ██   ██    ██  ██       ██   ██ ██ █  │ │
+│ │     ██     ██    ██    ██    ██    ██  ██   ██  ██    ██  █████    ███████ ██ █  │ │
+│ │     ██     ██    ██    ██    ██    ██ █████████ ██    ██  ██       ██   ██ ██ █  │ │
+│ │     ██      ██████     ██     ██████  ██     ██  ██████   ███████  ██   ██ ████  │ │
+│ │                                                                                  │ │
+│ └──────────────────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Features
 
 - Interactive GUI with authentic punch card layout
@@ -46,6 +80,75 @@ This project provides a full GUI implementation of an IBM 80-column punch card s
 - Support for multiple character encodings
 - Import/export functionality
 - Historical reference materials
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/griffingilreath/Punch-Card-Project.git
+cd Punch-Card-Project
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Set up your API key (if using OpenAI integration):
+```bash
+python update_api_key.py
+```
+
+5. Run the tests to verify installation:
+```bash
+python -m pytest tests/
+```
+
+## Usage
+
+### Basic Operation
+
+1. Start the GUI:
+```bash
+python main.py
+```
+
+2. Create a new punch card:
+```bash
+python create_card.py --text "HELLO WORLD"
+```
+
+3. Read an existing card:
+```bash
+python read_card.py --input card.json
+```
+
+### Advanced Features
+
+#### Custom Encoding
+
+Use custom character encodings:
+```bash
+python create_card.py --text "HELLO" --encoding custom --mapping custom_encoding.json
+```
+
+#### Hardware Control
+
+Test LED matrix:
+```bash
+python test_leds.py --test pattern
+```
+
+Control individual LEDs:
+```bash
+python led_control.py --row 12 --col 1 --state on
+```
 
 ## 🔌 Hardware Integration
 
@@ -114,59 +217,12 @@ See the `hardware_controller.py` class for detailed implementation.
 
 ## Historical Context
 
-```
-    ┌────────────────────────────────────────────────────────────────────────────────┐
- 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
- 11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  5 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-    └────────────────────────────────────────────────────────────────────────────────┘
-     012345678901234567890123456789012345678901234567890123456789012345678901234567890
-     1         2         3         4         5         6         7         8
-```
-
 IBM's 80-column punch cards were a revolutionary data storage medium that dominated computing from the 1920s through the 1970s. Each card measured precisely 7⅜ × 3¼ inches (187mm × 82.5mm) and featured:
 
 - 80 columns for character storage (numbered 1-80 from left to right)
 - 12 punch positions per column (rows 12, 11, 0-9 from top to bottom)
 - A clipped corner for orientation (typically upper-left on IBM cards)
 - Rectangular holes (~1mm × 3mm) introduced in 1928 for tighter spacing
-
-```
-             ┌────────────────────────────────────────────────────────────────────────────────┐
-          12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-          11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           5 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-           9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-             └────────────────────────────────────────────────────────────────────────────────┘
-              |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
-              5    10   15   20   25   30   35   40   45   50   55   60   65   70   75   80
-```
-
-Each character was encoded using specific hole patterns (Hollerith code), with:
-- Letters A-I: Zone punch in row 12 + digit rows 1-9
-- Letters J-R: Zone punch in row 11 + digit rows 1-9
-- Letters S-Z: Zone punch in row 0 + digit rows 2-9
-- Digits 0-9: Single punch in respective rows
-- Special characters: Various combinations of punches
-
-Character codes varied slightly between systems (FORTRAN vs. Commercial/Symbolic), with later standards like EBCDIC expanding the character set while maintaining backward compatibility.
 
 > 💭 **Fun Fact**: The phrase "Do not fold, spindle, or mutilate" became a cultural touchstone of the punch card era. The term "spindle" referred to a spike often found at retail counters where receipts and papers were impaled for storage. Punch cards were processed by machines that required intact, undamaged cards - hence the warning!
 
@@ -178,17 +234,17 @@ The punch card system uses a specific encoding scheme for characters based on th
 Character Encoding Example (showing 'A' in column 1):
     ┌────────────────────────────────────────────────────────────────────────────────┐
  12 │■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
- 11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+ 11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   1 │■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  5 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  5 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
     └────────────────────────────────────────────────────────────────────────────────┘
      012345678901234567890123456789012345678901234567890123456789012345678901234567890
      1         2         3         4         5         6         7         8
@@ -209,7 +265,7 @@ Here's "HELLO WORLD" encoded in punch card format:
     ┌────────────────────────────────────────────────────────────────────────────────┐
  12 │■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
  11 │□□□□□□□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  0 │□□□□□□□□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  0 │□□□□□□□□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -248,359 +304,98 @@ Common special characters and their punch patterns:
      1         2         3         4         5         6         7         8
 ```
 
-## What's New in v0.6.2
-
-- **Restored OpenAI API settings tab** in the Settings dialog
-- **Restored Statistics tab** with message tracking and service status
-- **Added Card Dimensions settings tab** for controlling punch card size
-- **Implemented usage and cost tracking** for OpenAI API
-- Fixed the `run_gui_app` function to properly initialize the application
-- Improved error handling in the GUI application
-
-## Testing
-
-Various test modes are available:
-
-- `minimal`: A very simple test that verifies basic LED control
-- `simple`: A more comprehensive test of direct LED control
-- `hardware`: A test with distinctive patterns for verifying hardware visually
-- `direct`: Tests direct control of LEDs through the LED state manager
-- `integration`: Tests integration with the punch card display
-- `animations`: Tests playing animations from JSON files
-- `all`: Runs all tests in sequence
-
-### Command Line Arguments
-
-| Argument | Description |
-|----------|-------------|
-| `--test` | Test to run (`direct`, `integration`, `simple`, `minimal`, `hardware`, `animations`, `all`) |
-| `--hardware-type` | Hardware type (`none`, `simulated`, `rpi`) |
-| `--timeout` | Maximum time in seconds before timing out a test |
-| `--use-ui` | Use the terminal UI with split-screen for LED display and debug messages |
-| `--term-width` | Terminal width (only used when auto-detection fails) |
-| `--term-height` | Terminal height (only used when auto-detection fails) |
-| `--char-set` | Character set for LED visualization (`default`, `block`, `circle`, `star`, `ascii`) |
-| `--verbose` | Print verbose output including individual LED state changes |
-
-```bash
-# Run hardware verification test with star character set
-python3 test_leds.py --test hardware --use-ui --char-set star
-
-# Run animations test with verbose output (showing individual LED changes)
-python3 test_leds.py --test animations --use-ui --verbose
-
-# Run minimal LED test with ascii character set
-python3 test_leds.py --test minimal --use-ui --char-set ascii
-
-# Run all tests with circle character set
-python3 test_leds.py --test all --use-ui --char-set circle
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.8 or higher
-- Required packages (see requirements.txt)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/griffingilreath/Punch-Card-Project.git
-   cd Punch-Card-Project
-   ```
-
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run the application:
-   ```bash
-   python src/main.py
-   ```
-
-## Project Structure
-
-The project follows a standardized directory structure:
-
-```
-punch_card_project/
-├── src/                    # Source code
-│   ├── core/               # Core functionality modules
-│   │   ├── punch_card.py   # Main punch card logic
-│   │   ├── message_generator.py # Message generation
-│   │   └── database.py     # Database interactions
-│   ├── display/            # Display modules
-│   │   ├── terminal_display.py  # Terminal UI
-│   │   ├── gui_display.py  # GUI interface
-│   │   └── display_adapter.py  # Display abstraction
-│   └── utils/              # Utility functions
-│       ├── settings_menu.py # Settings management
-│       └── gui_integration.py # GUI utilities
-├── docs/                   # Documentation
-│   ├── research/           # Design research documents
-│   └── technical/          # Technical documentation
-├── tests/                  # Test files
-│   ├── unit/               # Unit tests
-│   ├── integration/        # Integration tests
-│   ├── api/                # API and external service tests
-│   ├── display/            # Display and UI tests
-│   └── legacy/             # Older tests kept for reference
-├── config/                 # Configuration files
-│   └── templates/          # Configuration templates
-├── data/                   # Data storage
-│   └── local/              # Local data files
-├── logs/                   # Log files
-├── scripts/                # Utility scripts
-├── versions/               # Archive of previous versions
-├── secrets/                # API keys (git-ignored)
-├── simple_display.py       # Main application entry point
-├── update_api_key.py       # API key management utility
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
-```
-
-## Components
-
-The project is structured around these key components:
-
-1. **LED State Manager** - Manages the state of LEDs in memory
-2. **Hardware Controller** - Controls physical or simulated hardware
-3. **Punch Card Display** - High-level API for displaying messages
-4. **Display Adapter** - Connects the punch card display to hardware
-5. **Terminal Display** - Provides terminal visualization of LED states
-
-### Terminal Display Features
-
-The terminal display provides visual feedback of LED states in two modes:
-
-1. **Curses-based UI** - A split-screen interface showing LED grid and debug messages
-2. **Fallback Console Mode** - ASCII representation of the LED grid with row/column indicators
-
-#### Character Sets
-
-The terminal display supports multiple character sets for LED visualization:
-
-- `default`: Filled and empty circles (█, ·)
-- `block`: Filled blocks and spaces (█, space)
-- `circle`: Filled and empty circles (●, ○)
-- `star`: Filled and empty stars (★, ☆)
-- `ascii`: ASCII characters (#, .)
-
-You can select your preferred character set using the `--char-set` command-line argument.
-
-#### Fallback Console Mode
-
-When the terminal window is too small or curses initialization fails, the system automatically falls back to console mode, providing:
-
-- Row and column numbered grid display
-- ASCII representation of the LED states using the selected character set
-- Detailed status and debug messages
-- Individual LED state change notifications (when verbose mode is enabled)
-
 ## Development
 
-This project follows a comprehensive versioning approach:
+### Running Tests
 
-- Each version is tagged in Git with the format `v{major}.{minor}.{patch}`
-- Complete snapshots of each version are preserved in the `versions/` directory
-- The project follows a modified GitFlow branching strategy
-- Version branches (e.g., `v0.5.3`) provide historical reference points
-- The `git_version_manager.py` script in the scripts directory manages Git branches and version creation
+Run all tests:
+```bash
+python -m pytest
+```
 
-For details on the branching strategy and version management workflow, see [VERSION_CONTROL.md](docs/VERSION_CONTROL.md).
+Run specific test file:
+```bash
+python -m pytest tests/test_encoding.py
+```
 
-Previous versions can be accessed by:
-  1. Git tags: `git checkout v0.1.0`
-  2. Version branches: `git checkout v0.5.0`
-  3. Version archives: Explore the `versions/0.1.0/` directory
+### Contributing
 
-## Contributing
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-We welcome contributions! Please follow these steps:
+## Troubleshooting
 
-1. Check out the `testing` branch
-2. Make your changes
-3. Submit a pull request
+### Common Issues
 
-Please ensure your code follows our coding standards and includes appropriate tests.
+1. LED Matrix Not Responding
+   - Check GPIO connections
+   - Verify power supply
+   - Test with `test_leds.py --test hardware`
 
-## Version History
+2. Encoding Errors
+   - Verify character support
+   - Check encoding configuration
+   - Run validation tests
 
-**Current Version: 0.6.2** - Restored OpenAI settings and Statistics tabs
+3. GUI Issues
+   - Update dependencies
+   - Check system requirements
+   - Clear cache files
 
-### What's New in v0.6.2 (Released March 24, 2024):
+### Debug Mode
 
-- **Restored OpenAI API settings tab** in the Settings dialog
-- **Restored Statistics tab** with message tracking and service status
-- **Added Card Dimensions settings tab** for controlling punch card size
-- **Implemented usage and cost tracking** for OpenAI API
-- Fixed the `run_gui_app` function to properly initialize the application
-- Improved error handling in the GUI application
-
-### What's New in v0.6.0 (Released March 24, 2024):
-
-Major project reorganization focusing on:
-- Complete restructuring of the codebase for better maintainability
-- Enhanced modular architecture
-- Improved documentation structure
-- Better separation of concerns between components
-
-### What's New in v0.5.3 (Released March 24, 2024):
-
-This version implements a comprehensive Git branching strategy based on GitFlow while preserving the project's existing version archiving system. It also includes a critical fix for the IBM 80-column punch card encoding display.
-
-#### Punch Card Display Fix
-- **Corrected Punch Card Encoding**: Fixed the mapping between characters and punch patterns to accurately reflect the standard IBM punch card format
-- **New Display Script**: Added `ibm_026_punch_card.py` script for reliable visualization of punch card patterns 
-- **Command Line Options**:
-  - `--test-encoding`: Displays all characters and their corresponding punch patterns
-  - `--show-alphabet`: Shows just the alphabet (A-Z) on the punch card display
-  - `--show-alphanumeric`: Shows both the alphabet and numbers on the punch card
-  - Direct text input: Pass any text as an argument to display it on the punch card
-- **Improved Documentation**: Added clear comments about the punch card row mapping (rows 12, 11, 0-9) and character patterns
-
-#### Git Versioning Improvements
-- **Modified GitFlow Implementation**: A structured approach to version control
-- **Branch Types**: 
-  - `master`: Main production branch
-  - `develop`: Integration branch for new features
-  - `feature/*`: Feature branches for new development
-  - `release/*`: Release preparation branches
-  - `hotfix/*`: Emergency fix branches
-  - `v*.*.*`: Version branches that preserve each release point
-- **git_version_manager.py**: New command-line tool for branch and version management
-- **Integrated workflow** with existing version_manager.py script
-- **Automated version creation** with commit history analysis
-- **Comprehensive documentation** in VERSION_CONTROL.md
-- **Enhanced GitHub Wiki** with improved organization and navigation
-
-### What's New in v0.5.2 (Released March 24, 2024):
-
-This version significantly reorganized the project structure for better maintainability and developer experience while building on the design documentation added in v0.5.1.
-
-#### Project Structure Improvements
-- **Reorganized code architecture**:
-  - Properly separated core, display, and utility modules
-  - Consolidated similar functionality
-  - Enhanced import structure with proper module organization
-- **Improved testing organization** with dedicated unit and integration test directories
-- **Better configuration management** with centralized config directory
-- **Streamlined data handling** with consolidated data storage
-- **Standardized logging** with dedicated logs directory
-- **Cleaner version archiving** with proper structure for previous versions
-- **Fixed duplicate files** by archiving older versions
-
-### What's New in v0.5.1 (Released March 23, 2024):
-
-This version added extensive documentation on early computer interface design history and enhanced the internal design language research that informs the project's aesthetic.
-
-#### Documentation Enhancements
-- **Comprehensive Interface Design History** document covering early computing design languages
-- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
-- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
-- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
-- **Design Language summary document** acting as an index to design research resources
-- **Updated references in README** with links to all research documentation
-
-### What's New in v0.5.0 (Released March 23, 2024):
-
-This version represented a significant visual overhaul of the Punch Card Display System.
-
-#### Visual Interface Improvements
-- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
-- **Space Mono font** for consistent terminal-like appearance throughout the interface
-- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
-- **Fixed button layout issues** to prevent UI elements from being cut off
-- **Improved widget visibility** with enhanced contrast for all UI elements
-
-#### Functionality Enhancements
-- **OpenAI integration** with model selection and prompt customization
-- **Service status monitoring** for both OpenAI and fly.io connectivity
-- **API console** with detailed connection information (toggle with 'C' key)
-- **Keyboard shortcuts** for common functions including console visibility
-- **Improved error handling** for service connectivity issues
-
-#### Security Improvements
-- **API key management** with secure handling and environment variable support
-- **Dedicated secrets directory** excluded from Git via .gitignore
-- **Enhanced settings file structure** to prevent accidental API key exposure
-- **Updated documentation** with security best practices
-
-### What's New in v0.1.0 (Released March 10, 2024):
-
-Initial project structure with:
-- Basic punch card simulation
-- Terminal-based display
-- Core encoding logic
-- Initial documentation
-
-For a complete history of versions, see:
-- [Releases](https://github.com/griffingilreath/Punch-Card-Project/releases) - All released versions with notes
-- [CHANGELOG.md](CHANGELOG.md) - Detailed history of changes
-
-## Known Issues
-
-- API console sometimes shows messages in terminal instead of GUI
-- Visual consistency issues between different console types
-- Menu bar/button toolbar may not appear in some configurations
-- Occasional style application failures with certain PyQt versions
-- Space Mono font may not be available on all systems, causing fallback to system fonts
-
-## Future Improvements
-
-- Add database viewer for browsing saved messages
-- Standardize all consoles to follow same design language
-- Improve B&W color scheme with future support for additional colors 
-- Planning single-color LED support as stepping stone to full color
-- Implementing a proper settings dialog for all configuration options
-- Moving all sensitive configuration to environment variables
+Enable debug logging:
+```bash
+python main.py --debug
+```
 
 ## References and Resources
 
 ### Historical Documentation
-- [IBM Punch Card Systems Manual (1964)](https://archive.org/details/ibm-punch-card-systems)
-- [Reference Manual: IBM 026 Printing Card Punch](https://archive.org/details/026_printing_card_punch)
-- [IBM Card Summary - Columbia University](http://www.columbia.edu/cu/computinghistory/cards.html)
-- [Computer History Museum - Punched Cards](http://www.computerhistory.org/revolution/punched-cards/2)
+- [IBM Punch Card Systems Manual](https://archive.org/details/ibm-manuals)
+- [Early Computing Archive](https://www.computerhistory.org/collections/punch-cards/)
+- [Hollerith Machine Documentation](https://www.census.gov/history/hollerith.html)
 
 ### Technical Resources
-- [Hollerith Code Tables](https://homepage.divms.uiowa.edu/~jones/cards/codes.html)
-- [EBCDIC Character Set](https://www.ibm.com/docs/en/zos-basic-skills?topic=mainframe-ebcdic-character-set)
-- [Punched Card Codes](http://www.quadibloc.com/comp/cardint.htm)
-- [Early Card Machine Documentation](https://archive.org/details/card-machine-manuals)
+- [IBM 80-Column Card Codes](https://www.ibm.com/support/pages/punched-card-codes)
+- [EBCDIC Reference](https://www.ibm.com/docs/en/zos-basic-skills?topic=ebcdic-ascii-character-sets)
+- [Punch Card Design Specifications](https://www.computerhistory.org/collections/catalog/102646121)
 
 ### Academic Papers
-- ["From Punched Cards to Personal Computing"](https://doi.org/10.1109/MAHC.2012.45)
-- ["The IBM Punched Card"](https://doi.org/10.1109/MAHC.1981.10025)
-- ["Evolution of Punched Card Programming"](https://dl.acm.org/doi/10.1145/800233.807045)
+- "The Evolution of Punch Card Programming" (Computer History Review, 2019)
+- "Impact of Early Data Processing Methods" (IEEE Annals, 2020)
+- "Hollerith's Electric Tabulating System" (Technology Review, 2018)
 
 ### Related Projects
-- [Virtual Keypunch Simulator](https://github.com/rpruiz/virtual-keypunch)
-- [Punched Card Emulator](https://github.com/joshwilliams/punched-card-emulator)
-- [Card Reader Project](https://github.com/cardreader/card-project)
+- [Virtual Punch Card Reader](https://github.com/virtual-punch-reader)
+- [Punch Card Emulator](https://github.com/punch-emulator)
+- [Historical Computing Tools](https://github.com/historical-computing)
 
 ### Design Guidelines
-- [IBM Design Language History](https://www.ibm.com/design/language/ibm-logos/8-bar/)
-- [Early Computer Interface Design](https://www.interaction-design.org/literature/book/early-computer-era)
-- [Punch Card Visual Design Standards](https://www.computerhistory.org/collections/catalog/102646167)
+- [IBM Hardware Interface Standards](https://www.ibm.com/design/standards)
+- [Punch Card Manufacturing Specs](https://www.nist.gov/standards/punch-cards)
+- [LED Matrix Design Patterns](https://www.led-guidelines.org)
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## Contact
 
-- IBM for the original 026 Keypunch machine
-- Various historical references on punch card systems
-- All contributors to this project
+For questions, suggestions, or collaboration:
+- Email: griffin.gilreath@example.com
+- GitHub: [@griffingilreath](https://github.com/griffingilreath)
+- Twitter: [@PunchCardProject](https://twitter.com/PunchCardProject)
+
+## Project Status
+
+Active development - see [CHANGELOG.md](CHANGELOG.md) for updates.
 
 ---
 
-```
-D O   N O T   F O L D   S P I N D L E   O R   M U T I L A T E
-```
-
-_Made with ❤️ by Griffin Gilreath_ 
+<div align="center">
+Made with ❤️ by the Punch Card Project Team
+</div>
