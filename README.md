@@ -15,7 +15,7 @@
     │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
     │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
     │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-    │ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.3  │
+    │ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.4  │
     └──────────────────────────────────────────────────────────────────────────────────┘
 
 A implementation of the IBM 80-column punch card system for a fine art object.
@@ -34,33 +34,35 @@ A implementation of the IBM 80-column punch card system for a fine art object.
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
-## What's New in v0.6.3
+## What's New in v0.6.4
 
 ### Features
-- Restored comprehensive testing documentation
-- Added pytest integration for automated testing
-- Enhanced code organization and structure
-- Improved documentation clarity and completeness
-- Fixed version tracking and release management
-- Added automated version update system
-- Restored historical context and usage examples
-- Enhanced hardware integration documentation
-- Improved project structure documentation
-- Added comprehensive reference materials
-
-### Bug Fixes
-- Fixed GPIO pin mapping issues
-- Resolved character encoding edge cases
-- Improved error messages for invalid punch patterns
+- Fixed README formatting and structure
+- Updated hardware integration documentation
+- Corrected file path references
+- Improved documentation clarity
+- Enhanced version history organization
+- Standardized section headers
+- Fixed duplicate sections
+- Updated component references
+- Improved code block formatting
+- Enhanced readability of technical sections
 
 ### Documentation
-- Added comprehensive hardware setup guide
-- Updated installation instructions
-- Expanded troubleshooting section
+- Streamlined project structure documentation
+- Enhanced hardware integration guides
+- Improved code block formatting
+- Fixed duplicate sections
+- Standardized section headers
+- Updated file path references
+- Enhanced technical documentation clarity
 
-
-
-
+### Organization
+- Consolidated duplicate sections
+- Improved version history structure
+- Enhanced component documentation
+- Streamlined technical sections
+- Better organized project structure
 
 ## Project Overview
 
