@@ -15,7 +15,7 @@
     │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
     │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
     │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-    │ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.3  │
+    │ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.4  │
     └──────────────────────────────────────────────────────────────────────────────────┘
 
 A implementation of the IBM 80-column punch card system for a fine art object.
@@ -105,9 +105,6 @@ A implementation of the IBM 80-column punch card system for a fine art object.
 - Added comprehensive hardware setup guide
 - Updated installation instructions
 - Expanded troubleshooting section
-
-
-
 
 ## Project Overview
 
@@ -287,7 +284,45 @@ IBM's 80-column punch cards were a revolutionary data storage medium that domina
 
 The punch card system uses a specific encoding scheme for characters based on the IBM 80-column punch card format. Here's a detailed breakdown of the punch patterns:
 
+### Standard IBM Encoding
 
+```
+Row 12 (Zone)  Row 11 (Zone)  Row 0 (Zone)  Rows 1-9 (Numeric)
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+     ○              ○              ○              ○
+```
+
+### Character Mapping
+
+```
+Character  Row 12  Row 11  Row 0  Rows 1-9
+A          ○       ○       ○       ○
+B          ○       ○       ○       ○
+C          ○       ○       ○       ○
+...
+Z          ○       ○       ○       ○
+0          ○       ○       ○       ○
+1          ○       ○       ○       ○
+...
+9          ○       ○       ○       ○
+```
+
+### Special Characters
+
+```
+Special    Row 12  Row 11  Row 0  Rows 1-9
+Space      ○       ○       ○       ○
+Period     ○       ○       ○       ○
+Comma      ○       ○       ○       ○
+...
+```
 
 ## Development
 
@@ -339,8 +374,6 @@ Each test module focuses on a specific component:
    - Update dependencies
    - Check system requirements
    - Clear cache files
-
-
 
 ## Version History
 
@@ -446,7 +479,6 @@ Each test module focuses on a specific component:
 - Diagnostic logging
 - *Secret feature: DOS mode easter egg*
 
-
 ## References and Resources
 
 ### Historical Documentation
@@ -477,7 +509,6 @@ Each test module focuses on a specific component:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 
 ## Project Status
 
