@@ -6,6 +6,10 @@
 WIKI_DIR="$HOME/punch_card_wiki"
 mkdir -p "$WIKI_DIR"
 
+# Get the current version
+CURRENT_VERSION=$(python3 punch_card.py --version | head -n 1 | cut -d ' ' -f 4)
+echo "Detected current version: $CURRENT_VERSION"
+
 # Create the Version-History.md file
 echo "Creating Version-History.md..."
 cat > "$WIKI_DIR/Version-History.md" << 'EOT'
@@ -167,44 +171,260 @@ For earlier versions and more detailed technical changes, please see:
 - [Release Notes](https://github.com/griffingilreath/Punch-Card-Project/blob/main/docs/versions/release_notes.md) - User-focused update notes
 EOT
 
-# Update the sidebar to include the Version History link
-if [ -f "$WIKI_DIR/_Sidebar.md" ]; then
-    echo "Updating _Sidebar.md to include Version History..."
-    # Check if Version History is already in the sidebar
-    if ! grep -q "Version-History" "$WIKI_DIR/_Sidebar.md"; then
-        # Add Version History link in the Documentation section
-        sed -i '' '/## Documentation/a\
-- [Version History](Version-History)
-' "$WIKI_DIR/_Sidebar.md"
-    fi
-else
-    echo "Creating _Sidebar.md..."
-    cat > "$WIKI_DIR/_Sidebar.md" << 'EOT'
-# Wiki Navigation
+# Create the _Sidebar.md file with automatic version detection
+echo "Creating _Sidebar.md..."
+cat > "$WIKI_DIR/_Sidebar.md" << EOT
+# Navigation
 
-## Getting Started
-- [Home](Home)
-- [Installation](Installation)
-- [Quick Start Guide](Quick-Start-Guide)
+* [Home](Home)
 
-## Documentation
-- [Version History](Version-History)
-- [User Guide](User-Guide)
-- [API Reference](API-Reference)
-- [Configuration](Configuration)
+## User Guides
+* [Installation Guide](Installation-Guide)
+* [Usage Guide](Usage-Guide)
+* [Configuration](Configuration)
+* [Command Line Arguments](Command-Line-Arguments)
+* [API Key Security](API-Key-Security)
 
-## Development
-- [Contributing](Contributing)
-- [Architecture](Architecture)
-- [Testing](Testing)
+## Design Research
+* [Design Language Overview](Design-Language)
+* [Interface Design History](Interface-Design-History)
+* [Early Apple UI Design](Early-Apple-UI-Design)
+* [EPA's 1977 Design System](EPA-Design-System)
+* [Cultural Design Trends](Cultural-Design-Trends)
+* [Punch Card Encoding](Punch-Card-Encoding)
+* [Sociological Aspects](Sociological-Aspects)
 
-## Research
-- [Interface Design History](Interface-Design-History)
-- [Punch Card Encoding](Punch-Card-Encoding)
-- [LED Implementation](LED-Implementation)
-- [Sociological Aspects](Sociological-Aspects)
+## Developer Documentation
+* [Project Structure](Project-Structure)
+* [Git Version Control](Git-Version-Control)
+* [Testing](Testing)
+* [Version History](Version-History)
+* [System Architecture](System-Architecture)
+
+## Version Releases
 EOT
-fi
+
+# Add version entries to the sidebar dynamically
+# This extracts version information from Version-History.md and formats it properly
+grep -E "^### v[0-9]+\.[0-9]+\.[0-9]+" "$WIKI_DIR/Version-History.md" | while read -r line; do
+  # Extract version number (e.g., v0.6.5)
+  version=$(echo "$line" | cut -d ' ' -f 2)
+  
+  # Extract title (e.g., GUI Default Interface)
+  title=$(echo "$line" | sed -E 's/^### v[0-9]+\.[0-9]+\.[0-9]+ \([^)]+\) - (.*)$/\1/')
+  
+  # Create slug for the link (e.g., v0.6.5-gui-default)
+  # Remove the v from version and replace spaces with dashes in title
+  version_num=$(echo "$version" | sed 's/v//')
+  slug=$(echo "$title" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  page_name="v${version_num}-${slug}"
+  
+  # Add to the sidebar
+  echo "* [$version: $title]($page_name)" >> "$WIKI_DIR/_Sidebar.md"
+done
+
+# Finish the sidebar
+cat >> "$WIKI_DIR/_Sidebar.md" << 'EOT'
+
+## Hardware
+* [LED Implementation](LED-Implementation)
+* [Hardware Integration](Hardware-Integration)
+* [Raspberry Pi Setup](Raspberry-Pi-Setup)
+
+## Resources
+* [Version Archives](Version-Archives)
+* [References](References)
+* [FAQ](FAQ)
+EOT
+
+# Create System Architecture diagram page
+echo "Creating System Architecture page..."
+cat > "$WIKI_DIR/System-Architecture.md" << 'EOT'
+# Punch Card Project: System Architecture
+
+This page provides comprehensive diagrams and explanations of the Punch Card Project's architecture.
+
+## Overall System Architecture
+
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                            Punch Card Project                              │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                 ┌─────────────────┬┴┬─────────────────┐
+                 │                 │  │                 │
+       ┌─────────▼─────────┐      │  │      ┌──────────▼───────────┐
+       │       GUI         │      │  │      │    Terminal Mode     │
+       │   Interface       │      │  │      │    Interface         │
+       └─────────┬─────────┘      │  │      └──────────┬───────────┘
+                 │                │  │                 │
+                 │         ┌──────▼──▼───────┐         │
+                 │         │                 │         │
+                 └────────►│   Core Engine   │◄────────┘
+                           │                 │
+                           └────────┬────────┘
+                                    │
+            ┌────────────┬──────────┼──────────┬────────────┐
+            │            │          │          │            │
+   ┌────────▼─────┐     ┌▼────────────┐     ┌──▼────┐     ┌─▼──────────┐
+   │  LED State   │     │ Punch Card  │     │ API   │     │ Hardware   │
+   │  Manager     │     │ Encoder     │     │ Client│     │ Controller │
+   └──────────────┘     └─────────────┘     └───────┘     └────────────┘
+                                                                │
+                                                         ┌──────┴───────┐
+                                                         │ Physical or  │
+                                                         │ Simulated    │
+                                                         │ Hardware     │
+                                                         └──────────────┘
+```
+
+## Component Interactions
+
+### UI Components
+The Punch Card Project offers two primary user interfaces:
+
+1. **GUI Interface** - Interactive graphical interface with:
+   - Punch card visualization
+   - Input options and controls
+   - Status display and feedback
+   - Interactive card editing
+
+2. **Terminal Interface** - Text-based interface with:
+   - ASCII representation of punch cards
+   - Command-line options
+   - Test modes and diagnostics
+   - Hardware integration tools
+
+Both interfaces communicate with the Core Engine, which manages all project functionality.
+
+### Core Components
+
+1. **Core Engine**
+   - Central coordinator of the system
+   - Manages application state
+   - Routes commands between components
+   - Handles configuration settings
+   - Manages error handling and logging
+
+2. **LED State Manager**
+   - Maintains the state of all LEDs in memory
+   - Provides APIs for manipulating LED states
+   - Handles transitions and animations
+   - Ensures consistent state representation
+
+3. **Punch Card Encoder**
+   - Converts text to punch card patterns
+   - Implements IBM 026, IBM 029, and UNIVAC encoding standards
+   - Handles character validation
+   - Manages encoding/decoding operations
+
+4. **API Client**
+   - Communicates with external APIs (OpenAI)
+   - Handles authentication and key management
+   - Manages rate limiting and error recovery
+   - Processes API responses
+
+5. **Hardware Controller**
+   - Abstracts physical hardware details
+   - Supports Raspberry Pi GPIO for physical LEDs
+   - Provides simulation mode for testing
+   - Handles hardware initialization and shutdown
+
+## Data Flow
+
+```
+┌─────────────┐    ┌───────────┐    ┌──────────────┐    ┌─────────────┐
+│  User Input  │───►│ Interface │───►│ Core Engine  │───►│  Encoder    │
+└─────────────┘    └───────────┘    └──────────────┘    └──────┬──────┘
+                                                               │
+                                                               ▼
+┌─────────────┐    ┌───────────┐    ┌──────────────┐    ┌─────────────┐
+│  Output     │◄───│ Hardware  │◄───│ LED Manager  │◄───│  Card Data  │
+└─────────────┘    └───────────┘    └──────────────┘    └─────────────┘
+```
+
+1. **Input Processing Flow**:
+   - User provides input via GUI or Terminal
+   - Interface passes commands to Core Engine
+   - Core Engine validates and processes input
+   - Input is encoded into punch card patterns
+   - LED states are updated based on patterns
+   - Hardware controller updates physical or simulated hardware
+
+2. **External API Flow**:
+   - Core Engine requests external data (if needed)
+   - API Client handles authentication and requests
+   - Response is processed by Core Engine
+   - Results are encoded and displayed
+
+## Module Structure
+
+The codebase is organized into logical modules:
+
+```
+src/
+├── core/               # Core functionality
+│   ├── engine.py       # Central coordination
+│   ├── config.py       # Configuration management
+│   └── utils.py        # Core utilities
+├── display/            # Display components
+│   ├── gui/            # GUI interface
+│   │   ├── main_window.py
+│   │   ├── widgets.py
+│   │   └── controllers.py
+│   └── terminal/       # Terminal interface
+│       ├── ui.py
+│       ├── console.py
+│       └── formatters.py
+├── hardware/           # Hardware abstraction
+│   ├── controller.py   # Hardware controller base
+│   ├── led_manager.py  # LED state management
+│   ├── simulator.py    # Hardware simulation
+│   └── rpi.py          # Raspberry Pi implementation
+├── encoding/           # Card encoding
+│   ├── ibm026.py       # IBM 026 encoding
+│   ├── ibm029.py       # IBM 029 encoding
+│   ├── univac.py       # UNIVAC encoding
+│   └── custom.py       # Custom encoding support
+└── api/                # External API integration
+    ├── client.py       # API client base
+    ├── openai.py       # OpenAI integration
+    └── key_manager.py  # API key management
+```
+
+## Testing Architecture
+
+The project includes a comprehensive testing infrastructure:
+
+```
+tests/
+├── unit/              # Unit tests
+│   ├── core/          # Core component tests
+│   ├── display/       # Display component tests
+│   ├── hardware/      # Hardware component tests
+│   └── encoding/      # Encoding component tests
+├── integration/       # Integration tests
+│   ├── gui_tests.py   # GUI integration
+│   ├── terminal_tests.py # Terminal integration
+│   └── api_tests.py   # API integration
+└── e2e/               # End-to-end tests
+    ├── scenarios/     # Test scenarios
+    └── fixtures/      # Test data
+```
+
+## Configuration Management
+
+Configuration is managed through a hierarchical system:
+
+1. **Command Line Arguments** - Highest priority
+2. **Environment Variables** - Second priority
+3. **Configuration Files** - Third priority
+4. **Default Settings** - Lowest priority
+
+---
+
+This architecture document will be updated as the system evolves.
+EOT
 
 echo "Wiki content has been updated in $WIKI_DIR"
 echo "To publish these changes to the GitHub wiki:"
@@ -215,5 +435,5 @@ echo "   cp -r $WIKI_DIR/* /path/to/Punch-Card-Project.wiki/"
 echo "3. Commit and push the changes"
 echo "   cd /path/to/Punch-Card-Project.wiki/"
 echo "   git add ."
-echo "   git commit -m \"Update wiki content with Version History\""
+echo "   git commit -m \"Update wiki content with Version History and System Architecture\""
 echo "   git push origin master" 
