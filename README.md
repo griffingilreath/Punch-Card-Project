@@ -599,7 +599,7 @@ A summary of version changes is provided below. For more detailed information, s
 - [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
 - [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
 
-### v0.6.5 (March 27, 2024) - GUI Default Interface
+### v0.6.5 (March 25, 2024) - GUI Default Interface
 - Made the GUI the default interface when no arguments are provided
 - Added clearer command-line options and documentation
 - Updated usage examples to reflect new default behavior
