@@ -1,0 +1,10 @@
+{
+  "openai": {
+    "api_key": "YOUR_OPENAI_API_KEY_HERE",
+    "organization_id": "YOUR_ORG_ID_IF_APPLICABLE"
+  },
+  "other_services": {
+    "service1_key": "SERVICE1_KEY_HERE",
+    "service2_key": "SERVICE2_KEY_HERE"
+  }
+} 

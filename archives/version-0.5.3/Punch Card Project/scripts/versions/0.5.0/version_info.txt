@@ -1,0 +1,33 @@
+Version: 0.5.0
+Date: 2025-03-23
+Description: The GUI Update with enhanced black theme and service status monitoring
+
+Key Features:
+- Black-background theme
+- OpenAI integration
+- Service status monitoring
+- Key press toggles for console
+- Button style improvements
+
+Files Included:
+
+Directory Structure:
+/versions/0.5.0/
+├── src/           # Source code files
+├── data/          # Data files and databases
+├── config/        # Configuration files
+├── tests/         # Test files
+├── requirements.txt
+├── README.md
+└── version_info.txt
+
+Dependencies:
+- PyQt6
+- OpenAI
+- requests
+
+To Run:
+Run with: python3 simple_display.py --openai --debug --black-bg
+Press 'C' to toggle console visibility
+
+Note: Beta version with known issues: API console outputs to terminal, visual inconsistencies between consoles, occasional styling failures.

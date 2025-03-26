@@ -1,23 +1,31 @@
-# Punch Card Project v0.6.4 - Major Project Reorganization
-
-[![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
+# Punch Card Project v0.5.2 - The Reorganization Update
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗██╗  ██╗     ██████╗ █████╗ ██████╗ ██████╗   │
-│ ██╔══██╗██║   ██║████╗  ██║██╔════╝██║  ██║    ██╔════╝██╔══██╗██╔══██╗██╔══██╗  │
-│ ██████╔╝██║   ██║██╔██╗ ██║██║     ███████║    ██║     ███████║██████╔╝██║  ██║  │
-│ ██╔═══╝ ██║   ██║██║╚██╗██║██║     ██╔══██║    ██║     ██╔══██║██╔══██╗██║  ██║  │ 
-│ ██║     ╚██████╔╝██║ ╚████║╚██████╗██║  ██║    ╚██████╗██║  ██║██║  ██║██████╔╝  │
-│ ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝     ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝   │
-│                                                                                  │
-│ ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗                       │
-│ ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝                       │
-│ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
-│ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
-│ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.4  │
-└──────────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────── PUNCH CARD GUI UPDATE ───────────────────────────────┐
+│ ┌──────────┐ ┌─────────────────────────────────────────────────────────────┐ ┌───┐ │
+│ │   Menu   │ │                                                             │ │ × │ │
+│ └──────────┘ └─────────────────────────────────────────────────────────────┘ └───┘ │
+│ ┌──────────────────────────────────────────────────────────────────────────────────┐│
+│ │                                                                                  ││
+│ │  ████████  ███████  ████████ ██    ██    ███    ██    ██  ███████   █████  ████ ││
+│ │     ██     ██    ██    ██    ██    ██   ██ ██   ██    ██  ██       ██   ██ ██ █ ││
+│ │     ██     ██    ██    ██    ██    ██  ██   ██  ██    ██  █████    ███████ ██ █ ││
+│ │     ██     ██    ██    ██    ██    ██ █████████ ██    ██  ██       ██   ██ ██ █ ││
+│ │     ██      ██████     ██     ██████  ██     ██  ██████   ███████  ██   ██ ████ ││
+│ │                                                                                  ││
+│ └──────────────────────────────────────────────────────────────────────────────────┘│
+│                                                                                      │
+│ ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌───────────────┐   ┌────────────────┐ │
+│ │ Settings │   │  OpenAI  │   │ Database │   │ Toggle Console│   │ Black Background│ │
+│ └──────────┘   └──────────┘   └──────────┘   └───────────────┘   └────────────────┘ │
+│                                                                                      │
+│ ┌──────────────────────────────────── CONSOLE ─────────────────────────────────────┐│
+│ │ [21:45:32] API initialized                                                       ││
+│ │ [21:45:33] OpenAI connection: ONLINE                                             ││
+│ │ [21:45:34] Service status: All systems operational                               ││
+│ │ [21:45:35] Press 'C' to toggle console visibility                                ││
+│ └──────────────────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 > **⚠️ IMPORTANT API KEY SECURITY NOTICE ⚠️**
@@ -34,57 +42,76 @@
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
-**Status**: Beta - The Branching Update implements a comprehensive Git versioning strategy while building on v0.5.2's project organization.
+**Status**: Beta - The Reorganization Update improves project structure while building on v0.5.1's design documentation.
 
-**What's New in v0.6.4**
+### What's New in v0.5.2 (Released March 24, 2024):
 
-**Features**
+This version significantly reorganizes the project structure for better maintainability and developer experience while building on the design documentation added in v0.5.1.
 
-- Fixed README formatting and structure
-- Updated hardware integration documentation
-- Corrected file path references
-- Improved documentation clarity
-- Enhanced version history organization
-- Standardized section headers
-- Fixed duplicate sections
-- Updated component references
-- Improved code block formatting
-- Enhanced readability of technical sections
+#### Project Structure Improvements
+- **Reorganized code architecture**:
+  - Properly separated core, display, and utility modules
+  - Consolidated similar functionality
+  - Enhanced import structure with proper module organization
+- **Improved testing organization** with dedicated unit and integration test directories
+- **Better configuration management** with centralized config directory
+- **Streamlined data handling** with consolidated data storage
+- **Standardized logging** with dedicated logs directory
+- **Cleaner version archiving** with proper structure for previous versions
+- **Fixed duplicate files** by archiving older versions
 
-**Documentation**
+### What's New in v0.5.1 (Released March 23, 2024):
 
-- Streamlined project structure documentation
-- Enhanced hardware integration guides
-- Improved code block formatting
-- Fixed duplicate sections
-- Standardized section headers
-- Updated file path references
-- Enhanced technical documentation clarity
+This version adds extensive documentation on early computer interface design history and enhances the internal design language research that informs the project's aesthetic.
 
-**Organization**
+#### Documentation Enhancements
+- **Comprehensive Interface Design History** document covering early computing design languages
+- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
+- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
+- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
+- **Design Language summary document** acting as an index to design research resources
+- **Updated references in README** with links to all research documentation
 
-- Consolidated duplicate sections
-- Improved version history structure
-- Enhanced component documentation
-- Streamlined technical sections
-- Better organized project structure
+### What's New in v0.5.0 (Released March 23, 2024):
 
-**Project Overview**
+This version represents a significant visual overhaul of the Punch Card Display System, focusing on improved GUI elements, better visibility with a black background theme, and enhanced service monitoring for OpenAI and fly.io connections.
 
-This project provides a full GUI implementation of an IBM 80-column punch card system, allowing users to experiment with this historical computing technology in a modern environment. It's designed for educational purposes to help understand the foundations of computer programming and data processing.
+#### Visual Interface Improvements
+- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
+- **Space Mono font** for consistent terminal-like appearance throughout the interface
+- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
+- **Fixed button layout issues** to prevent UI elements from being cut off
+- **Improved widget visibility** with enhanced contrast for all UI elements
 
-**Features**
+#### Functionality Enhancements
+- **OpenAI integration** with model selection and prompt customization
+- **Service status monitoring** for both OpenAI and fly.io connectivity
+- **API console** with detailed connection information (toggle with 'C' key)
+- **Keyboard shortcuts** for common functions including console visibility
+- **Improved error handling** for service connectivity issues
 
-- Interactive GUI with authentic punch card layout
-- Card visualization and encoding
-- Support for multiple character encodings
-- Import/export functionality
-- Historical reference materials
-- Hardware integration with LED matrix
-- Secure API key handling
-- Comprehensive testing framework
+#### Security Improvements
+- **API key management** with secure handling and environment variable support
+- **Dedicated secrets directory** excluded from Git via .gitignore
+- **Enhanced settings file structure** to prevent accidental API key exposure
+- **Updated documentation** with security best practices
 
-**Repository Organization**
+### Known Issues:
+- API console sometimes shows messages in terminal instead of GUI
+- Visual consistency issues between different console types
+- Menu bar/button toolbar may not appear in some configurations
+- Occasional style application failures with certain PyQt versions
+- Space Mono font may not be available on all systems, causing fallback to system fonts
+
+### Future Improvements:
+- Add database viewer for browsing saved messages
+- Standardize all consoles to follow same design language
+- Improve B&W color scheme with future support for additional colors 
+- Planning single-color LED support as stepping stone to full color
+- Implementing a proper settings dialog for all configuration options
+- Moving all sensitive configuration to environment variables
+
+## Repository Organization
 
 The project now uses a standardized directory structure that follows best practices for Python projects:
 
@@ -131,26 +158,22 @@ punch_card_project/
 
 ### Versioning Strategy
 
-The project follows a comprehensive versioning approach:
-
 - Each version is tagged in Git with the format `v{major}.{minor}.{patch}`
 - Complete snapshots of each version are preserved in the `versions/` directory
-- The project follows a modified GitFlow branching strategy
-- Version branches (e.g., `v0.5.3`) provide historical reference points
-- The `git_version_manager.py` script in the scripts directory manages Git branches and version creation
-
-For details on the branching strategy and version management workflow, see [VERSION_CONTROL.md](docs/VERSION_CONTROL.md).
-
-Previous versions can be accessed by:
+- The version_manager.py script in the scripts directory handles creating new version snapshots
+- Previous versions can be accessed by:
   1. Git tags: `git checkout v0.1.0`
-  2. Version branches: `git checkout v0.5.0`
-  3. Version archives: Explore the `versions/0.1.0/` directory
+  2. Version archives: Explore the `versions/0.1.0/` directory
 
-**What is the Punch Card Project?**
+## What is the Punch Card Display System?
 
-This project implements a punch card system with LED integration for both simulated and physical hardware.
+A modern project that pays homage to the punch card era of computing through a simulated display system. It combines vintage computing aesthetics with modern technologies like AI-generated content.
 
-**Components**
+# 💾 Punch Card Project 💾
+
+This project implements a punch card display system with LED integration for both simulated and physical hardware.
+
+## Components
 
 The project is structured around the following key components:
 
@@ -160,21 +183,14 @@ The project is structured around the following key components:
 4. **Display Adapter** - Connects the punch card display to hardware
 5. **Terminal Display** - Provides terminal visualization of LED states
 
-**Future Features & Planning**
-
-Explore our detailed planning for upcoming features:
-
-- [External Terminal Feature](docs/features/External_Terminal.md) - Documentation for the interactive terminal with receipt printer for gallery installations
-- Additional features coming soon...
-
-**Terminal Display Features**
+## Terminal Display Features
 
 The terminal display provides visual feedback of LED states in two modes:
 
 1. **Curses-based UI** - A split-screen interface showing LED grid and debug messages
 2. **Fallback Console Mode** - ASCII representation of the LED grid with row/column indicators
 
-**Character Sets**
+### Character Sets
 
 The terminal display supports multiple character sets for LED visualization:
 
@@ -186,7 +202,7 @@ The terminal display supports multiple character sets for LED visualization:
 
 You can select your preferred character set using the `--char-set` command-line argument.
 
-**Fallback Console Mode**
+### Fallback Console Mode
 
 When the terminal window is too small or curses initialization fails, the system automatically falls back to console mode, providing:
 
@@ -195,7 +211,7 @@ When the terminal window is too small or curses initialization fails, the system
 - Detailed status and debug messages
 - Individual LED state change notifications (when verbose mode is enabled)
 
-**Usage**
+### Usage
 
 ```bash
 # Run hardware verification test with star character set
@@ -211,7 +227,7 @@ python3 test_leds.py --test minimal --use-ui --char-set ascii
 python3 test_leds.py --test all --use-ui --char-set circle
 ```
 
-**Testing**
+## Testing
 
 Various test modes are available:
 
@@ -223,7 +239,7 @@ Various test modes are available:
 - `animations`: Tests playing animations from JSON files
 - `all`: Runs all tests in sequence
 
-**Command Line Arguments**
+### Command Line Arguments
 
 | Argument | Description |
 |----------|-------------|
@@ -236,80 +252,13 @@ Various test modes are available:
 | `--char-set` | Character set for LED visualization (`default`, `block`, `circle`, `star`, `ascii`) |
 | `--verbose` | Print verbose output including individual LED state changes |
 
-**Contributing**
+## Contributing
 
 To contribute to this project:
 
 1. Ensure all tests pass with `python3 test_leds.py --test all`
 2. Add appropriate documentation for new features
 3. Follow the existing code style
-
-**Character Encoding**
-
-The IBM 026 punch card system uses a sophisticated encoding scheme that combines zone punches (rows 12, 11, 0) with digit punches (rows 1-9) to represent characters:
-
-**Letters**
-- **A-I**: Zone punch in row 12 + digit punches 1-9
-  - A = 12,1
-  - B = 12,2
-  - C = 12,3
-  - D = 12,4
-  - E = 12,5
-  - F = 12,6
-  - G = 12,7
-  - H = 12,8
-  - I = 12,9
-
-- **J-R**: Zone punch in row 11 + digit punches 1-9
-  - J = 11,1
-  - K = 11,2
-  - L = 11,3
-  - M = 11,4
-  - N = 11,5
-  - O = 11,6
-  - P = 11,7
-  - Q = 11,8
-  - R = 11,9
-
-- **S-Z**: Zone punch in row 0 + digit punches 2-9
-  - S = 0,2
-  - T = 0,3
-  - U = 0,4
-  - V = 0,5
-  - W = 0,6
-  - X = 0,7
-  - Y = 0,8
-  - Z = 0,9
-
-**Numbers**
-- Single punch in respective rows 0-9
-  - 0 = row 0
-  - 1 = row 1
-  - 2 = row 2
-  - 3 = row 3
-  - 4 = row 4
-  - 5 = row 5
-  - 6 = row 6
-  - 7 = row 7
-  - 8 = row 8
-  - 9 = row 9
-
-**Special Characters**
-- Space: No punches
-- Period (.): 12,3,8
-- Comma (,): 0,3,8
-- Hyphen (-): 11
-- Slash (/): 0,1
-- Ampersand (&): 12
-- At (@): 12,11
-- Hash (#): 12,0
-- Percent (%): 11,0
-- Plus (+): 3
-- Asterisk (*): 4
-- Equals (=): 6
-- Parentheses (): 7,8
-- Dollar ($): 9
-- Other special characters use various combinations of zone and digit punches
 
 ```
  ___________________________________________________________________________________
@@ -333,9 +282,9 @@ The IBM 026 punch card system uses a sophisticated encoding scheme that combines
   |__________________________________________________________________________________|
 ```
 
-*A sophisticated terminal-based simulator of an 80-column punch card system, featuring LED grid visualization and message processing capabilities with historical accuracy and modern integrations.*
+*A sophisticated terminal-based simulator of an 80-column punch card display system, featuring LED grid visualization and message processing capabilities with historical accuracy and modern integrations.*
 
-**🔍 Overview**
+## 🔍 Overview
 
 This project recreates the iconic IBM 80-column punch card system in a digital format, combining historical computing preservation with modern LED display technology. It simulates the character-by-character display process of punch cards while providing an interface for message generation, processing, and visualization.
 
@@ -345,11 +294,11 @@ This project recreates the iconic IBM 80-column punch card system in a digital f
 Running the program with <code>--vintage-mode</code> activates a special display simulating a worn-out punch card reader with occasional misreads and mechanical sounds. There's also a 1 in 100 chance you'll trigger the "card jam" animation!
 </details>
 
-**📚 Historical Context**
+## 📚 Historical Context
 
 ```
     ┌────────────────────────────────────────────────────────────────────────────────┐
- 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+ 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
  11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -366,22 +315,6 @@ Running the program with <code>--vintage-mode</code> activates a special display
      1         2         3         4         5         6         7         8
 ```
 
-```
-┌────────────────────────────────────────────────────────────────────────────────┐
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-└────────────────────────────────────────────────────────────────────────────────┘
-```
-
 IBM's 80-column punch cards were a revolutionary data storage medium that dominated computing from the 1920s through the 1970s. Each card measured precisely 7⅜ × 3¼ inches (187mm × 82.5mm) and featured:
 
 - 80 columns for character storage (numbered 1-80 from left to right)
@@ -389,8 +322,9 @@ IBM's 80-column punch cards were a revolutionary data storage medium that domina
 - A clipped corner for orientation (typically upper-left on IBM cards)
 - Rectangular holes (~1mm × 3mm) introduced in 1928 for tighter spacing
 
+```
              ┌────────────────────────────────────────────────────────────────────────────────┐
-          12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+          12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
           11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
            0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
            1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -401,9 +335,11 @@ IBM's 80-column punch cards were a revolutionary data storage medium that domina
            6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
            7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
            8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+           9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
              └────────────────────────────────────────────────────────────────────────────────┘
               |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
               5    10   15   20   25   30   35   40   45   50   55   60   65   70   75   80
+```
 
 Each character was encoded using specific hole patterns (Hollerith code), with:
 - Letters A-I: Zone punch in row 12 + digit rows 1-9
@@ -435,7 +371,7 @@ punch_card_system/
 └── README.md              # This file
 ```
 
-**✨ Features**
+## ✨ Features
 
 - Terminal-based IBM 80-column punch card simulation with historical accuracy
 - LED grid visualization in various display modes:
@@ -496,7 +432,7 @@ pip install -r requirements.txt
 python simple_display.py --black-bg --openai --debug
 ```
 
-**🔐 API Key Security**
+### 🔐 API Key Security
 
 The project now includes enhanced security for API keys with v0.5.0:
 
@@ -577,153 +513,72 @@ For physical LED matrix integration, the system includes a Raspberry Pi GPIO con
 python test_leds.py --test hardware --hardware-type rpi
 ```
 
-See the `RPiHardwareController` class in `src/hardware_controller.py` for details on pin mapping and configuration.
+See the `RPiHardwareController` class in `hardware_controller.py` for details on pin mapping and configuration.
 
 ## 🗓️ Version History
 
-A summary of version changes is provided below. For more detailed information, see:
-- [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
-- [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
-
-### v0.6.4 (March 26, 2024) - Documentation Refinement
-- **Fixed README formatting** and structure
-- **Updated hardware integration documentation** with improved clarity
-- **Corrected file path references** throughout documentation
-- **Improved documentation clarity** with better examples
-- **Enhanced version history organization**
-- **Standardized section headers** for consistency
-- **Fixed duplicate sections** 
-- **Updated component references**
-- **Improved code block formatting**
-- **Enhanced readability** of technical sections
-
-### v0.6.3 (March 25, 2024) - Testing Infrastructure
-- **Restored and reorganized testing documentation**
-- **Added comprehensive test suite** with pytest integration
-- **Updated command-line interface documentation**
-- **Improved test script organization** and clarity
-- **Removed outdated debug mode references**
-- **Added detailed test module descriptions**
-- **Added pytest and pytest-cov dependencies**
-- **Created dedicated test files** for each component
-- **Implemented both pytest and standalone test runners**
-- **Fixed inconsistencies** in command-line arguments
-- **Standardized test command formats**
-- **Enhanced test coverage reporting**
-- **Improved code organization**
-
-### v0.6.2 (March 25, 2024) - Enhanced Character Support
-- **Added support for multiple character encodings**
-- **Improved LED matrix visualization**
-- **Enhanced error handling** for hardware integration
-- **Updated documentation** with detailed examples
-- **Fixed GPIO pin mapping issues**
-- **Resolved character encoding edge cases**
-- **Improved error messages** for invalid punch patterns
-- **Added comprehensive hardware setup guide**
-- **Updated installation instructions**
-- **Expanded troubleshooting section**
-
-### v0.6.1 (March 24, 2024) - Security & Testing
-- **Implemented secure API key handling**
-- **Added automated testing framework**
-- **Enhanced error reporting**
-- **Improved documentation clarity**
-- **Fixed minor UI bugs**
-
-### v0.6.0 (March 24, 2024) - Major Project Reorganization
-- **Complete Directory Structure Reorganization**: Implemented a modern, well-organized directory structure
-- **Module-Based Architecture**: Separated code into logical modules (display, api, core, animation, console)
-- **Enhanced Maintainability**: Improved code organization for better maintainability and collaboration
-- **Dedicated Module Directories**: Created specialized directories for each component
-- **API Key Protection**: Implemented secure API key storage in the git-ignored `secrets/` directory
-- **Backup File Management**: Added explicit patterns in `.gitignore` to prevent committing backup files
-- **Documentation**: Added comprehensive security documentation in `SECURITY.md`
-- **Clean Repository History**: Removed sensitive information from repository history
-- **Centralized Configuration**: Moved all configuration files to the `config/` directory
-- **Organized Documentation**: Consolidated documentation in the `docs/` directory
-- **Legacy Code Management**: Preserved legacy code in a dedicated `src/legacy/` directory
-- **Resource Organization**: Centralized resources in the `resources/` directory
-- **Simplified Entry Point**: Created a clean main entry point at the project root (`punch_card.py`)
-- **Organized Backups**: Moved all backup files to the `backups/` directory
-- **Clean Project Root**: Significantly reduced clutter in the project root directory
-- **Preserved Development History**: Maintained development history in an organized structure
-
-### v0.5.9-security (March 24, 2024) - Security Enhancement
-- **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
-- **Enhanced API Key Handling**: Improved documentation and practices for API key management
-
-### v0.5.9 (March 24, 2024) - Security & Bug Fixes
-- **Enhanced Git Security**: Updated `.gitignore` to exclude backup files that might contain API keys
-- **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
-- **Visual Bug Fix**: Fixed issue with punch card holes not properly clearing
-
-### v0.5.8 (March 24, 2024) - Enhanced Message Display
-- **Message Display Enhancement**: Improved message display timing functionality
-- **Visual Bug Fix**: Fixed issue with punch card holes display - holes now properly clear after display
-- **Code Structure Improvements**: Enhanced code organization and readability
-- **Switched to `repaint()`**: Changed from `update()` to `repaint()` for complete widget refresh
-
-### v0.5.7 (March 23, 2024) - Non-Functional Save Point
-- **Replaced Complex Implementation**: Simplified the main display module with a functional standalone version
-- **Working Punch Card Visualization**: Successfully displays IBM 026 punch card patterns 
-- **Command-Line Interface**: Preserved all command-line options from the original implementation
-- **Preserved Original Functionality**: Maintains the core functionality of displaying text on punch cards
-- **Fixed IBM 026 Encoding**: Properly encodes text into IBM 026 punch card format
-- **Fixed LED Grid**: Proper visualization of the punch card's LED matrix
-- **Streamlined Implementation**: Removed problematic code sections that caused syntax errors
-- **Minimized Dependencies**: Reduced to essential PyQt6 components
-- **Command Line Options**: Support for various display modes and test functions
-- **Testing Functions**: Built-in tests for validating encoding accuracy
-- **Character Encoding Display**: Visual representation of character-to-punch mapping 
-- [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
-### v0.5.3 (March 24, 2024) - The Branching Update
-- **Complete restructuring** of the project for optimal organization
-- **Properly separated** core, display, and utility modules
-- **Enhanced test organization** with specialized test directories
-- **Consolidated and archived** all display-related modules
-- **Created proper configuration and data directories** 
-- **Reduced root directory** to only essential files
-- **Moved database and JSON files** to dedicated data directory
-- **Archived all legacy and duplicate test files** 
-- **Comprehensive documentation** in VERSION_CONTROL.md
-- **Enhanced GitHub Wiki** with improved organization and navigation
-
-### v0.5.2 (March 24, 2024) - Project Structure Improvements
-- **Reorganized code architecture**:
+- v0.5.2 (2024-03-24): **The Reorganization Update**
+  - Complete restructuring of the project for optimal organization
   - Properly separated core, display, and utility modules
-  - Consolidated similar functionality
-  - Enhanced import structure with proper module organization
-- **Improved testing organization** with dedicated unit and integration test directories
-- **Better configuration management** with centralized config directory
-- **Streamlined data handling** with consolidated data storage
-- **Standardized logging** with dedicated logs directory
-- **Cleaner version archiving** with proper structure for previous versions
-- **Fixed duplicate files** by archiving older versions
+  - Enhanced test organization with specialized test directories
+  - Consolidated and archived all display-related modules
+  - Created proper configuration and data directories
+  - Reduced root directory to only essential files
+  - Moved database and JSON files to dedicated data directory
+  - Archived all legacy and duplicate test files
+  - Enhanced documentation with detailed directory structure
+  - Standardized directory structure following best practices
+  
+- v0.5.1 (2024-03-23): **The Documentation Update**
+  - Added comprehensive Interface Design History documentation
+  - Created research on Early Apple UI Design Language (1970s-1980s)
+  - Added case study on EPA's 1977 Unified Visual Design System
+  - Documented Cultural and Societal Design Trends in early computing
+  - Created a Design Language index document for all design resources
+  - Updated README with links to new research documentation
+  - Expanded the project's design language foundations
 
-### v0.5.1 (March 23, 2024) - Documentation Enhancements
-- **Comprehensive Interface Design History** document covering early computing design languages
-- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
-- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
-- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
-- **Design Language summary document** acting as an index to design research resources
-- **Updated references in README** with links to all research documentation
+- v0.5.0 (2024-03-23): **The GUI Update**
+  - Enhanced GUI with black-background theme for better visibility and authentic punch card aesthetic
+  - Implemented OpenAI integration with model selection and prompt customization
+  - Added real-time service status monitoring for both OpenAI and fly.io connectivity
+  - Created API console with detailed connection information (toggle with 'C' key)
+  - Implemented classic Mac-style menu bar with enhanced button toolbar fallback
+  - Standardized on Space Mono font throughout the interface for consistent terminal-like appearance
+  - Added keyboard shortcuts for common functions including console visibility
+  - Fixed button layout issues to prevent UI elements from being cut off
+  - Significantly improved error handling for service connectivity issues
+  - Enhanced API key security with dedicated secrets directory and secure lookup hierarchy
+  - Updated .gitignore to prevent sensitive information from being committed
+  - *Secret feature: Service status indicators color coding*
 
-### v0.5.0 (March 23, 2024) - Visual Interface Overhaul
-- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
-- **Space Mono font** for consistent terminal-like appearance throughout the interface
-- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
-- **Fixed button layout issues** to prevent UI elements from being cut off
-- **Improved widget visibility** with enhanced contrast for all UI elements
-- **OpenAI integration** with model selection and prompt customization
-- **Service status monitoring** for both OpenAI and fly.io connectivity
-- **API console** with detailed connection information (toggle with 'C' key)
-- **Keyboard shortcuts** for common functions including console visibility
-- **Improved error handling** for service connectivity issues
-- **API key management** with secure handling and environment variable support
-- **Dedicated secrets directory** excluded from Git via .gitignore
-- **Enhanced settings file structure** to prevent accidental API key exposure
-- **Updated documentation** with security best practices
+- v0.1.1 (2024-08-12): **The Visualization Update**
+  - Enhanced terminal display with multiple character sets
+  - Improved fallback console mode with row/column indicators
+  - Added verbose mode for detailed LED state tracking
+  - Resolved synchronization issues between LED state manager and hardware controller
+  - Improved error handling and terminal size detection
+  - Added command-line arguments for customization
+
+- v0.1.0 (2024-06-15): **The Renaissance Update**
+  - Improved project structure and documentation
+  - Added comprehensive research documentation
+  - Enhanced hardware implementation guides
+  - Consolidated technical specifications
+  - *Secret feature: Message animation patterns*
+
+- v0.0.1 (2024-03-17): **The Primordial Release**
+  - Basic punch card display
+  - Test message support
+  - Statistics tracking
+  - Random sentence generation
+  - OpenAI integration
+  - Diagnostic logging
+  - *Secret feature: DOS mode easter egg*
+
+## 📚 References
+
+- [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
 - [Columbia University Computing History Archive](https://www.columbia.edu/cu/computinghistory/)
 - [Two-Bit History: The Punched Card Tabulator](https://twobithistory.org)
 - [The Craft of Coding: Understanding Historical Computing](https://craftofcoding.wordpress.com/)

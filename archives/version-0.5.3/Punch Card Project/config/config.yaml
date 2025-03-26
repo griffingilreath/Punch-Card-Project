@@ -1,0 +1,50 @@
+# Display Configuration
+display:
+  rows: 12
+  columns: 80
+  led_delay: 0.05
+  message_delay: 3
+  random_delay: true
+  random_delay_min: 5
+  random_delay_max: 15
+  min_random_delay: 30
+  max_random_delay: 60
+  brightness: 0.5
+
+# Database Configuration
+database:
+  path: "data/messages.db"
+  backup_interval: 3600  # 1 hour in seconds
+
+# Message Generation
+message_generation:
+  use_openai: true
+  max_tokens: 100
+  temperature: 0.7
+  model: "gpt-3.5-turbo"
+
+# Diagnostic Information
+diagnostics:
+  enabled: true
+  log_level: "INFO"
+  include_ip: true
+  include_system_info: true
+  include_memory_usage: true
+  include_cpu_usage: true
+
+# Test Messages
+test_messages:
+  enabled: true
+  file: "data/test_messages.txt"
+  default_messages:
+    - "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    - "HELLO WORLD THIS IS A TEST MESSAGE"
+    - "IBM PUNCH CARD SYSTEM READY"
+    - "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG"
+
+# API Integration Settings
+api:
+  enabled: true
+  endpoint: "https://punch-card-api-v3.fly.dev"
+  timeout: 10  # seconds
+  max_retries: 3 
