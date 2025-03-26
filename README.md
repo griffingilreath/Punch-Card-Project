@@ -349,7 +349,7 @@ Running the program with <code>--vintage-mode</code> activates a special display
 
 ```
     ┌────────────────────────────────────────────────────────────────────────────────┐
- 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+ 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
  11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -368,7 +368,6 @@ Running the program with <code>--vintage-mode</code> activates a special display
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────┐
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -586,53 +585,51 @@ A summary of version changes is provided below. For more detailed information, s
 - [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
 - [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
 
+### v0.6.4 (March 26, 2024) - Documentation Refinement
+- **Fixed README formatting** and structure
+- **Updated hardware integration documentation** with improved clarity
+- **Corrected file path references** throughout documentation
+- **Improved documentation clarity** with better examples
+- **Enhanced version history organization**
+- **Standardized section headers** for consistency
+- **Fixed duplicate sections** 
+- **Updated component references**
+- **Improved code block formatting**
+- **Enhanced readability** of technical sections
 
-v0.6.4 (Current)
+### v0.6.3 (March 25, 2024) - Testing Infrastructure
+- **Restored and reorganized testing documentation**
+- **Added comprehensive test suite** with pytest integration
+- **Updated command-line interface documentation**
+- **Improved test script organization** and clarity
+- **Removed outdated debug mode references**
+- **Added detailed test module descriptions**
+- **Added pytest and pytest-cov dependencies**
+- **Created dedicated test files** for each component
+- **Implemented both pytest and standalone test runners**
+- **Fixed inconsistencies** in command-line arguments
+- **Standardized test command formats**
+- **Enhanced test coverage reporting**
+- **Improved code organization**
 
-Fixed README formatting and structure
-Updated hardware integration documentation
-Corrected file path references
-Improved documentation clarity
-Enhanced version history organization
-Standardized section headers
-Fixed duplicate sections
-Updated component references
-Improved code block formatting
-Enhanced readability of technical sections
-v0.6.3
+### v0.6.2 (March 25, 2024) - Enhanced Character Support
+- **Added support for multiple character encodings**
+- **Improved LED matrix visualization**
+- **Enhanced error handling** for hardware integration
+- **Updated documentation** with detailed examples
+- **Fixed GPIO pin mapping issues**
+- **Resolved character encoding edge cases**
+- **Improved error messages** for invalid punch patterns
+- **Added comprehensive hardware setup guide**
+- **Updated installation instructions**
+- **Expanded troubleshooting section**
 
-Restored and reorganized testing documentation
-Added comprehensive test suite with pytest integration
-Updated command-line interface documentation
-Improved test script organization and clarity
-Removed outdated debug mode references
-Added detailed test module descriptions
-Added pytest and pytest-cov dependencies
-Created dedicated test files for each component
-Implemented both pytest and standalone test runners
-Fixed inconsistencies in command-line arguments
-Standardized test command formats
-Enhanced test coverage reporting
-Improved code organization
-v0.6.2
-
-Added support for multiple character encodings
-Improved LED matrix visualization
-Enhanced error handling for hardware integration
-Updated documentation with detailed examples
-Fixed GPIO pin mapping issues
-Resolved character encoding edge cases
-Improved error messages for invalid punch patterns
-Added comprehensive hardware setup guide
-Updated installation instructions
-Expanded troubleshooting section
-v0.6.1
-
-Implemented secure API key handling
-Added automated testing framework
-Enhanced error reporting
-Improved documentation clarity
-Fixed minor UI bugs
+### v0.6.1 (March 24, 2024) - Security & Testing
+- **Implemented secure API key handling**
+- **Added automated testing framework**
+- **Enhanced error reporting**
+- **Improved documentation clarity**
+- **Fixed minor UI bugs**
 
 ### v0.6.0 (March 24, 2024) - Major Project Reorganization
 - **Complete Directory Structure Reorganization**: Implemented a modern, well-organized directory structure
