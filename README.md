@@ -596,8 +596,9 @@ See the `RPiHardwareController` class in `src/hardware_controller.py` for detail
 ## 🗓️ Version History
 
 A summary of version changes is provided below. For more detailed information, see:
-- [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
-- [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
+- [Version History Wiki](https://github.com/griffingilreath/Punch-Card-Project/wiki/Version-History) - Comprehensive version history
+- [CHANGELOG.md](docs/versions/CHANGELOG.md) - Technical changelog with detailed changes
+- [Release Notes](docs/versions/release_notes.md) - User-focused update notes
 
 ### v0.6.5 (March 25, 2024) - GUI Default Interface
 - Made the GUI the default interface when no arguments are provided
