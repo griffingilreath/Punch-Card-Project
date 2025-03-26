@@ -160,6 +160,13 @@ The project is structured around the following key components:
 4. **Display Adapter** - Connects the punch card display to hardware
 5. **Terminal Display** - Provides terminal visualization of LED states
 
+**Future Features & Planning**
+
+Explore our detailed planning for upcoming features:
+
+- [External Terminal Feature](docs/features/External_Terminal.md) - Documentation for the interactive terminal with receipt printer for gallery installations
+- Additional features coming soon...
+
 **Terminal Display Features**
 
 The terminal display provides visual feedback of LED states in two modes:
