@@ -22,7 +22,7 @@ def main():
     args = parser.parse_args()
     
     if args.version:
-        print("Punch Card Project v0.6.4")
+        print("Punch Card Project v0.6.5")
         print("Copyright © 2023-2024")
         return
     

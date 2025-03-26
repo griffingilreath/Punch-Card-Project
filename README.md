@@ -1,4 +1,4 @@
-# Punch Card Project v0.6.4 - Major Project Reorganization
+# Punch Card Project v0.6.5 - GUI Default Interface
 
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
@@ -16,7 +16,7 @@
 │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
 │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
 │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.4  │
+│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.5  │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -36,20 +36,12 @@
 
 **Status**: Beta - The Branching Update implements a comprehensive Git versioning strategy while building on v0.5.2's project organization.
 
-**What's New in v0.6.4**
+**What's New in v0.6.5**
 
-**Features**
-
-- Fixed README formatting and structure
-- Updated hardware integration documentation
-- Corrected file path references
-- Improved documentation clarity
-- Enhanced version history organization
-- Standardized section headers
-- Fixed duplicate sections
-- Updated component references
-- Improved code block formatting
-- Enhanced readability of technical sections
+- **GUI as Default Interface**: The application now launches the GUI by default when no arguments are provided
+- **Updated Command-Line Interface**: Improved command-line options with clearer organization
+- **Enhanced Documentation**: Revised README with updated usage examples and clearer instructions
+- **Performance Improvements**: General code optimization and cleanup
 
 **Documentation**
 
@@ -349,7 +341,7 @@ Running the program with <code>--vintage-mode</code> activates a special display
 
 ```
     ┌────────────────────────────────────────────────────────────────────────────────┐
- 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+ 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
  11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -606,6 +598,12 @@ See the `RPiHardwareController` class in `src/hardware_controller.py` for detail
 A summary of version changes is provided below. For more detailed information, see:
 - [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
 - [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
+
+### v0.6.5 (March 27, 2024) - GUI Default Interface
+- Made the GUI the default interface when no arguments are provided
+- Added clearer command-line options and documentation
+- Updated usage examples to reflect new default behavior
+- Improved error handling for GUI and terminal modes
 
 ### v0.6.4 (March 26, 2024) - Documentation Refinement
 - **Fixed README formatting** and structure
