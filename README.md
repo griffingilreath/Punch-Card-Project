@@ -2,6 +2,7 @@
 
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
+```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗██╗  ██╗     ██████╗ █████╗ ██████╗ ██████╗   │
 │ ██╔══██╗██║   ██║████╗  ██║██╔════╝██║  ██║    ██╔════╝██╔══██╗██╔══██╗██╔══██╗  │
@@ -17,6 +18,7 @@
 │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
 │ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.4  │
 └──────────────────────────────────────────────────────────────────────────────────┘
+```
 
 > **⚠️ IMPORTANT API KEY SECURITY NOTICE ⚠️**
 > 
@@ -38,34 +40,34 @@
 
 **Features**
 
-Fixed README formatting and structure
-Updated hardware integration documentation
-Corrected file path references
-Improved documentation clarity
-Enhanced version history organization
-Standardized section headers
-Fixed duplicate sections
-Updated component references
-Improved code block formatting
-Enhanced readability of technical sections
+- Fixed README formatting and structure
+- Updated hardware integration documentation
+- Corrected file path references
+- Improved documentation clarity
+- Enhanced version history organization
+- Standardized section headers
+- Fixed duplicate sections
+- Updated component references
+- Improved code block formatting
+- Enhanced readability of technical sections
 
 **Documentation**
 
-Streamlined project structure documentation
-Enhanced hardware integration guides
-Improved code block formatting
-Fixed duplicate sections
-Standardized section headers
-Updated file path references
-Enhanced technical documentation clarity
+- Streamlined project structure documentation
+- Enhanced hardware integration guides
+- Improved code block formatting
+- Fixed duplicate sections
+- Standardized section headers
+- Updated file path references
+- Enhanced technical documentation clarity
 
 **Organization**
 
-Consolidated duplicate sections
-Improved version history structure
-Enhanced component documentation
-Streamlined technical sections
-Better organized project structure
+- Consolidated duplicate sections
+- Improved version history structure
+- Enhanced component documentation
+- Streamlined technical sections
+- Better organized project structure
 
 **Project Overview**
 
@@ -73,16 +75,16 @@ This project provides a full GUI implementation of an IBM 80-column punch card s
 
 **Features**
 
-Interactive GUI with authentic punch card layout
-Card visualization and encoding
-Support for multiple character encodings
-Import/export functionality
-Historical reference materials
-Hardware integration with LED matrix
-Secure API key handling
-Comprehensive testing framework
+- Interactive GUI with authentic punch card layout
+- Card visualization and encoding
+- Support for multiple character encodings
+- Import/export functionality
+- Historical reference materials
+- Hardware integration with LED matrix
+- Secure API key handling
+- Comprehensive testing framework
 
-## Repository Organization
+**Repository Organization**
 
 The project now uses a standardized directory structure that follows best practices for Python projects:
 
@@ -144,11 +146,11 @@ Previous versions can be accessed by:
   2. Version branches: `git checkout v0.5.0`
   3. Version archives: Explore the `versions/0.1.0/` directory
 
-## What is the Punch Card Project?
+**What is the Punch Card Project?**
 
 This project implements a punch card system with LED integration for both simulated and physical hardware.
 
-## Components
+**Components**
 
 The project is structured around the following key components:
 
@@ -158,14 +160,14 @@ The project is structured around the following key components:
 4. **Display Adapter** - Connects the punch card display to hardware
 5. **Terminal Display** - Provides terminal visualization of LED states
 
-## Terminal Display Features
+**Terminal Display Features**
 
 The terminal display provides visual feedback of LED states in two modes:
 
 1. **Curses-based UI** - A split-screen interface showing LED grid and debug messages
 2. **Fallback Console Mode** - ASCII representation of the LED grid with row/column indicators
 
-### Character Sets
+**Character Sets**
 
 The terminal display supports multiple character sets for LED visualization:
 
@@ -177,7 +179,7 @@ The terminal display supports multiple character sets for LED visualization:
 
 You can select your preferred character set using the `--char-set` command-line argument.
 
-### Fallback Console Mode
+**Fallback Console Mode**
 
 When the terminal window is too small or curses initialization fails, the system automatically falls back to console mode, providing:
 
@@ -186,110 +188,128 @@ When the terminal window is too small or curses initialization fails, the system
 - Detailed status and debug messages
 - Individual LED state change notifications (when verbose mode is enabled)
 
-### Usage
+**Usage**
+
+**🚀 Usage Examples**
+
+**Running Basic Tests**
 
 ```bash
-# Run hardware verification test with star character set
-python3 test_leds.py --test hardware --use-ui --char-set star
+# Run a minimal test with ASCII character set
+python test_leds.py --test minimal --use-ui --char-set ascii
 
-# Run animations test with verbose output (showing individual LED changes)
-python3 test_leds.py --test animations --use-ui --verbose
+# Run hardware verification with star characters and verbose output
+python test_leds.py --test hardware --use-ui --char-set star --verbose
 
-# Run minimal LED test with ascii character set
-python3 test_leds.py --test minimal --use-ui --char-set ascii
-
-# Run all tests with circle character set
-python3 test_leds.py --test all --use-ui --char-set circle
+# Run animation test with circle characters
+python test_leds.py --test animations --use-ui --char-set circle
 ```
 
-## Testing
+**Terminal UI vs Console Output**
 
-Various test modes are available:
+The system provides two display modes:
 
-- `minimal`: A very simple test that verifies basic LED control
-- `simple`: A more comprehensive test of direct LED control
-- `hardware`: A test with distinctive patterns for verifying hardware visually
-- `direct`: Tests direct control of LEDs through the LED state manager
-- `integration`: Tests integration with the punch card display
-- `animations`: Tests playing animations from JSON files
-- `all`: Runs all tests in sequence
+1. **Terminal UI Mode** (requires a terminal at least 40x12 characters):
+   ```
+   ┌─ LED Display ─────────┐
+   │ . # . # . # . # . # . │
+   │ # . # . # . # . # . # │
+   │ . # . # . # . # . # . │
+   │ # . # . # . # . # . # │
+   └──────────────────────┘
+   ┌─ Debug Messages ─────────────────────┐
+   │ Connected to hardware                │
+   │ Setting LED pattern: Checkerboard    │
+   │ Pattern set successfully             │
+   │ LED test completed                   │
+   └───────────────────────────────────────┘
+   ```
 
-### Command Line Arguments
+2. **Fallback Console Mode** (automatic when terminal is too small):
+   ```
+       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 
+      +-------------------------------+
+    0 | # . # . # . # . # . # . # . # . |
+    1 | . # . # . # . # . # . # . # . # |
+    2 | # . # . # . # . # . # . # . # . |
+    3 | . # . # . # . # . # . # . # . # |
+    4 | # . # . # . # . # . # . # . # . |
+    5 | . # . # . # . # . # . # . # . # |
+    6 | # . # . # . # . # . # . # . # . |
+    7 | . # . # . # . # . # . # . # . # |
+      +-------------------------------+
+   ```
 
-| Argument | Description |
-|----------|-------------|
-| `--test` | Test to run (`direct`, `integration`, `simple`, `minimal`, `hardware`, `animations`, `all`) |
-| `--hardware-type` | Hardware type (`none`, `simulated`, `rpi`) |
-| `--timeout` | Maximum time in seconds before timing out a test |
-| `--use-ui` | Use the terminal UI with split-screen for LED display and debug messages |
-| `--term-width` | Terminal width (only used when auto-detection fails) |
-| `--term-height` | Terminal height (only used when auto-detection fails) |
-| `--char-set` | Character set for LED visualization (`default`, `block`, `circle`, `star`, `ascii`) |
-| `--verbose` | Print verbose output including individual LED state changes |
+**🔌 Hardware Integration**
 
-## Contributing
+**Simulated Hardware**
 
-To contribute to this project:
+By default, the system uses a simulated hardware controller for development and testing. This simulates the behavior of physical LEDs in the terminal.
 
-1. Ensure all tests pass with `python3 test_leds.py --test all`
-2. Add appropriate documentation for new features
-3. Follow the existing code style
+**Raspberry Pi GPIO Integration**
 
-**Version History**
+For physical LED matrix integration, the system includes a Raspberry Pi GPIO controller that maps LED states to physical pins:
+
+```bash
+# Run on Raspberry Pi with physical LEDs
+python test_leds.py --test hardware --hardware-type rpi
+```
+
+See the `RPiHardwareController` class in `hardware_controller.py` for details on pin mapping and configuration.
+
+**🗓️ Version History**
 
 A summary of version changes is provided below. For more detailed information, see:
 - [CHANGELOG.md](CHANGELOG.md) - Technical changelog with detailed changes
 - [UPDATE_NOTES.md](UPDATE_NOTES.md) - User-focused update notes
 
+**v0.6.4 (Current)**
+- Fixed README formatting and structure
+- Updated hardware integration documentation
+- Corrected file path references
+- Improved documentation clarity
+- Enhanced version history organization
+- Standardized section headers
+- Fixed duplicate sections
+- Updated component references
+- Improved code block formatting
+- Enhanced readability of technical sections
 
-v0.6.4 (Current)
+**v0.6.3**
+- Restored and reorganized testing documentation
+- Added comprehensive test suite with pytest integration
+- Updated command-line interface documentation
+- Improved test script organization and clarity
+- Removed outdated debug mode references
+- Added detailed test module descriptions
+- Added pytest and pytest-cov dependencies
+- Created dedicated test files for each component
+- Implemented both pytest and standalone test runners
+- Fixed inconsistencies in command-line arguments
+- Standardized test command formats
+- Enhanced test coverage reporting
+- Improved code organization
 
-Fixed README formatting and structure
-Updated hardware integration documentation
-Corrected file path references
-Improved documentation clarity
-Enhanced version history organization
-Standardized section headers
-Fixed duplicate sections
-Updated component references
-Improved code block formatting
-Enhanced readability of technical sections
-v0.6.3
+**v0.6.2**
+- Added support for multiple character encodings
+- Improved LED matrix visualization
+- Enhanced error handling for hardware integration
+- Updated documentation with detailed examples
+- Fixed GPIO pin mapping issues
+- Resolved character encoding edge cases
+- Improved error messages for invalid punch patterns
+- Added comprehensive hardware setup guide
+- Updated installation instructions
+- Expanded troubleshooting section
 
-Restored and reorganized testing documentation
-Added comprehensive test suite with pytest integration
-Updated command-line interface documentation
-Improved test script organization and clarity
-Removed outdated debug mode references
-Added detailed test module descriptions
-Added pytest and pytest-cov dependencies
-Created dedicated test files for each component
-Implemented both pytest and standalone test runners
-Fixed inconsistencies in command-line arguments
-Standardized test command formats
-Enhanced test coverage reporting
-Improved code organization
-v0.6.2
+**v0.6.1**
+- Implemented secure API key handling
+- Added automated testing framework
+- Enhanced error reporting
+- Improved documentation clarity
+- Fixed minor UI bugs
 
-Added support for multiple character encodings
-Improved LED matrix visualization
-Enhanced error handling for hardware integration
-Updated documentation with detailed examples
-Fixed GPIO pin mapping issues
-Resolved character encoding edge cases
-Improved error messages for invalid punch patterns
-Added comprehensive hardware setup guide
-Updated installation instructions
-Expanded troubleshooting section
-v0.6.1
-
-Implemented secure API key handling
-Added automated testing framework
-Enhanced error reporting
-Improved documentation clarity
-Fixed minor UI bugs
-
-### v0.6.0 (March 24, 2024) - Major Project Reorganization
+**v0.6.0 (March 24, 2024) - Major Project Reorganization**
 - **Complete Directory Structure Reorganization**: Implemented a modern, well-organized directory structure
 - **Module-Based Architecture**: Separated code into logical modules (display, api, core, animation, console)
 - **Enhanced Maintainability**: Improved code organization for better maintainability and collaboration
@@ -307,22 +327,22 @@ Fixed minor UI bugs
 - **Clean Project Root**: Significantly reduced clutter in the project root directory
 - **Preserved Development History**: Maintained development history in an organized structure
 
-### v0.5.9-security (March 24, 2024) - Security Enhancement
+**v0.5.9-security (March 24, 2024) - Security Enhancement**
 - **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
 - **Enhanced API Key Handling**: Improved documentation and practices for API key management
 
-### v0.5.9 (March 24, 2024) - Security & Bug Fixes
+**v0.5.9 (March 24, 2024) - Security & Bug Fixes**
 - **Enhanced Git Security**: Updated `.gitignore` to exclude backup files that might contain API keys
 - **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
 - **Visual Bug Fix**: Fixed issue with punch card holes not properly clearing
 
-### v0.5.8 (March 24, 2024) - Enhanced Message Display
+**v0.5.8 (March 24, 2024) - Enhanced Message Display**
 - **Message Display Enhancement**: Improved message display timing functionality
 - **Visual Bug Fix**: Fixed issue with punch card holes display - holes now properly clear after display
 - **Code Structure Improvements**: Enhanced code organization and readability
 - **Switched to `repaint()`**: Changed from `update()` to `repaint()` for complete widget refresh
 
-### v0.5.7 (March 23, 2024) - Non-Functional Save Point
+**v0.5.7 (March 23, 2024) - Non-Functional Save Point**
 - **Replaced Complex Implementation**: Simplified the main display module with a functional standalone version
 - **Working Punch Card Visualization**: Successfully displays IBM 026 punch card patterns 
 - **Command-Line Interface**: Preserved all command-line options from the original implementation
@@ -335,7 +355,8 @@ Fixed minor UI bugs
 - **Testing Functions**: Built-in tests for validating encoding accuracy
 - **Character Encoding Display**: Visual representation of character-to-punch mapping 
 - [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
-### v0.5.3 (March 24, 2024) - The Branching Update
+
+**v0.5.3 (March 24, 2024) - The Branching Update**
 - **Complete restructuring** of the project for optimal organization
 - **Properly separated** core, display, and utility modules
 - **Enhanced test organization** with specialized test directories
@@ -347,7 +368,7 @@ Fixed minor UI bugs
 - **Comprehensive documentation** in VERSION_CONTROL.md
 - **Enhanced GitHub Wiki** with improved organization and navigation
 
-### v0.5.2 (March 24, 2024) - Project Structure Improvements
+**v0.5.2 (March 24, 2024) - Project Structure Improvements**
 - **Reorganized code architecture**:
   - Properly separated core, display, and utility modules
   - Consolidated similar functionality
@@ -359,7 +380,7 @@ Fixed minor UI bugs
 - **Cleaner version archiving** with proper structure for previous versions
 - **Fixed duplicate files** by archiving older versions
 
-### v0.5.1 (March 23, 2024) - Documentation Enhancements
+**v0.5.1 (March 23, 2024) - Documentation Enhancements**
 - **Comprehensive Interface Design History** document covering early computing design languages
 - **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
 - **EPA's 1977 Unified Visual Design System** case study for consistent design systems
@@ -367,7 +388,7 @@ Fixed minor UI bugs
 - **Design Language summary document** acting as an index to design research resources
 - **Updated references in README** with links to all research documentation
 
-### v0.5.0 (March 23, 2024) - Visual Interface Overhaul
+**v0.5.0 (March 23, 2024) - Visual Interface Overhaul**
 - **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
 - **Space Mono font** for consistent terminal-like appearance throughout the interface
 - **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
