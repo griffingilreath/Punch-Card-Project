@@ -5,7 +5,7 @@ This directory contains detailed planning documents for current and future featu
 ## Available Feature Plans
 
 - [External Terminal](External_Terminal.md) - An interactive terminal station with receipt printer for gallery installations
-  - Created: June 20, 2024
+  - Created: March 25, 2025
   - Status: Planning
   - Description: A physical interactive component that complements the main Punch Card Project display, allowing gallery visitors to type messages that will be displayed on the main installation, complete with receipt printing.
 
