@@ -24,6 +24,7 @@ wheels/
 venv/
 env/
 ENV/
+.venv/
 
 # IDE specific files
 .idea/
@@ -33,6 +34,11 @@ ENV/
 .DS_Store
 
 # Project specific
+*.bak
+*.bak_*
+api_log_*.txt
+punch_card_settings_backup.json
+
 # Uncomment if you want to ignore the archives directory
 # archives/
 
@@ -48,6 +54,7 @@ logs/
 temp/
 tmp/
 *~
+*.tmp
 
 # Runtime data
 pids/
