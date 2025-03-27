@@ -1,5 +1,9 @@
-# Punch Card Project v0.6.5 - GUI Default Interface
+# Punch Card Project v0.6.6 - Secure Settings Management & Keychain Integration
 
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
+[![PyQt6](https://img.shields.io/badge/PyQt-6.4-green.svg)](https://www.riverbankcomputing.com/software/pyqt/)
+[![Version](https://img.shields.io/badge/version-0.6.6-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.6)
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
 ```
@@ -16,7 +20,7 @@
 │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
 │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
 │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.5  │
+│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.6  │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -36,22 +40,23 @@
 
 **Status**: Beta - The Branching Update implements a comprehensive Git versioning strategy while building on v0.5.2's project organization.
 
-**What's New in v0.6.5**
+**What's New in v0.6.6**
 
-- **GUI as Default Interface**: The application now launches the GUI by default when no arguments are provided
-- **Updated Command-Line Interface**: Improved command-line options with clearer organization
-- **Enhanced Documentation**: Revised README with updated usage examples and clearer instructions
-- **Performance Improvements**: General code optimization and cleanup
+- **Keychain Integration**: API keys are now securely stored in your system's keychain
+- **Centralized Settings Management**: New SettingsManager for better organization and access
+- **Improved Settings Dialog**: Redesigned with tabs for better organization
+- **Enhanced API Integration**: Better error handling and connection testing
+- **Usage Statistics**: Track API usage with built-in statistics
+
+[See full release notes](release_notes/v0.6.6.md)
 
 **Documentation**
 
-- Streamlined project structure documentation
-- Enhanced hardware integration guides
-- Improved code block formatting
-- Fixed duplicate sections
-- Standardized section headers
-- Updated file path references
-- Enhanced technical documentation clarity
+- [Installation Guide](docs/INSTALLATION.md) - How to install and set up the project
+- [User Guide](docs/USER_GUIDE.md) - How to use the application
+- [API Integration](docs/API_INTEGRATION.md) - How to set up and use OpenAI API
+- [Keychain Integration](docs/KEYCHAIN_INTEGRATION.md) - How secure API key storage works
+- [Version 0.6.6 Release Notes](release_notes/v0.6.6.md) - Details about the latest release
 
 **Organization**
 
@@ -75,6 +80,15 @@ This project provides a full GUI implementation of an IBM 80-column punch card s
 - Hardware integration with LED matrix
 - Secure API key handling
 - Comprehensive testing framework
+
+**Key Features**
+
+- **Authentic Design**: Faithfully recreates the look of IBM punch cards with accurate 80x12 grid layout
+- **Real-time LED Animation**: Simulates the punching of holes with smooth LED-like animations
+- **OpenAI Integration**: Generates creative messages via GPT models from OpenAI
+- **Secure API Key Storage**: Keys are stored in your system's secure keychain rather than in plaintext files
+- **Centralized Settings Management**: SettingsManager class provides typed access to all application settings
+- **Dual Interface**: Both GUI and terminal interfaces support all features
 
 **Repository Organization**
 
@@ -341,16 +355,16 @@ Running the program with <code>--vintage-mode</code> activates a special display
 
 ```
     ┌────────────────────────────────────────────────────────────────────────────────┐
- 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+ 12 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
  11 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   0 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   1 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   2 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   3 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  4 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   5 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
+  7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
     └────────────────────────────────────────────────────────────────────────────────┘
@@ -360,7 +374,6 @@ Running the program with <code>--vintage-mode</code> activates a special display
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────┐
-│□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
@@ -443,15 +456,15 @@ punch_card_system/
 ## 🔧 Installation
 
 1. Clone the repository:
-```bash
+   ```bash
 git clone https://github.com/griffingilreath/Punch-Card-Project.git
 cd Punch-Card-Project
-```
+   ```
 
 2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 3. Set up your OpenAI API key (choose one method):
 
@@ -600,7 +613,7 @@ A summary of version changes is provided below. For more detailed information, s
 - [CHANGELOG.md](docs/versions/CHANGELOG.md) - Technical changelog with detailed changes
 - [Release Notes](docs/versions/release_notes.md) - User-focused update notes
 
-### v0.6.5 (March 25, 2024) - GUI Default Interface
+### v0.6.6 (March 25, 2024) - GUI Default Interface
 - Made the GUI the default interface when no arguments are provided
 - Added clearer command-line options and documentation
 - Updated usage examples to reflect new default behavior
