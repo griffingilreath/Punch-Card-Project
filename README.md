@@ -613,13 +613,32 @@ A summary of version changes is provided below. For more detailed information, s
 - [CHANGELOG.md](docs/versions/CHANGELOG.md) - Technical changelog with detailed changes
 - [Release Notes](docs/versions/release_notes.md) - User-focused update notes
 
-### v0.6.6 (March 25, 2024) - GUI Default Interface
+### v0.6.6 (March 2025) - Secure Settings Management & Keychain Integration
+- **Added keychain integration** for secure API key storage
+- **Centralized settings management** with new SettingsManager class
+- **Improved settings dialog** with tabbed interface and better organization
+- **Enhanced API integration** with better error handling and testing
+- **Added usage statistics** for tracking API usage
+
+### v0.6.5 (March 2025) - Enhanced API Integration
+- **Improved OpenAI API integration** with expanded model selection
+- **Better error handling** for API connections
+- **Enhanced console output** for API operations
+- **Added service status monitoring**
+
+### v0.6.4 (February 2025) - UI Refinements & Performance Improvements
+- **Cleaner user interface** with better spacing and alignment
+- **Improved response time** for card animations
+- **Memory usage optimizations**
+- **Fixed several UI rendering bugs**
+
+### v0.6.3 (March 2024) - GUI Default Interface
 - Made the GUI the default interface when no arguments are provided
 - Added clearer command-line options and documentation
 - Updated usage examples to reflect new default behavior
 - Improved error handling for GUI and terminal modes
 
-### v0.6.4 (March 26, 2024) - Documentation Refinement
+### v0.6.2 (March 2024) - Documentation Refinement
 - **Fixed README formatting** and structure
 - **Updated hardware integration documentation** with improved clarity
 - **Corrected file path references** throughout documentation
@@ -631,7 +650,7 @@ A summary of version changes is provided below. For more detailed information, s
 - **Improved code block formatting**
 - **Enhanced readability** of technical sections
 
-### v0.6.3 (March 25, 2024) - Testing Infrastructure
+### v0.6.1 (March 2024) - Testing Infrastructure
 - **Restored and reorganized testing documentation**
 - **Added comprehensive test suite** with pytest integration
 - **Updated command-line interface documentation**
@@ -646,26 +665,7 @@ A summary of version changes is provided below. For more detailed information, s
 - **Enhanced test coverage reporting**
 - **Improved code organization**
 
-### v0.6.2 (March 25, 2024) - Enhanced Character Support
-- **Added support for multiple character encodings**
-- **Improved LED matrix visualization**
-- **Enhanced error handling** for hardware integration
-- **Updated documentation** with detailed examples
-- **Fixed GPIO pin mapping issues**
-- **Resolved character encoding edge cases**
-- **Improved error messages** for invalid punch patterns
-- **Added comprehensive hardware setup guide**
-- **Updated installation instructions**
-- **Expanded troubleshooting section**
-
-### v0.6.1 (March 24, 2024) - Security & Testing
-- **Implemented secure API key handling**
-- **Added automated testing framework**
-- **Enhanced error reporting**
-- **Improved documentation clarity**
-- **Fixed minor UI bugs**
-
-### v0.6.0 (March 24, 2024) - Major Project Reorganization
+### v0.6.0 (March 2024) - Major Project Reorganization
 - **Complete Directory Structure Reorganization**: Implemented a modern, well-organized directory structure
 - **Module-Based Architecture**: Separated code into logical modules (display, api, core, animation, console)
 - **Enhanced Maintainability**: Improved code organization for better maintainability and collaboration
@@ -683,22 +683,22 @@ A summary of version changes is provided below. For more detailed information, s
 - **Clean Project Root**: Significantly reduced clutter in the project root directory
 - **Preserved Development History**: Maintained development history in an organized structure
 
-### v0.5.9-security (March 24, 2024) - Security Enhancement
+### v0.5.9-security (March 2024) - Security Enhancement
 - **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
 - **Enhanced API Key Handling**: Improved documentation and practices for API key management
 
-### v0.5.9 (March 24, 2024) - Security & Bug Fixes
+### v0.5.9 (March 2024) - Security & Bug Fixes
 - **Enhanced Git Security**: Updated `.gitignore` to exclude backup files that might contain API keys
 - **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
 - **Visual Bug Fix**: Fixed issue with punch card holes not properly clearing
 
-### v0.5.8 (March 24, 2024) - Enhanced Message Display
+### v0.5.8 (March 2024) - Enhanced Message Display
 - **Message Display Enhancement**: Improved message display timing functionality
 - **Visual Bug Fix**: Fixed issue with punch card holes display - holes now properly clear after display
 - **Code Structure Improvements**: Enhanced code organization and readability
 - **Switched to `repaint()`**: Changed from `update()` to `repaint()` for complete widget refresh
 
-### v0.5.7 (March 23, 2024) - Non-Functional Save Point
+### v0.5.7 (March 2024) - Non-Functional Save Point
 - **Replaced Complex Implementation**: Simplified the main display module with a functional standalone version
 - **Working Punch Card Visualization**: Successfully displays IBM 026 punch card patterns 
 - **Command-Line Interface**: Preserved all command-line options from the original implementation
@@ -711,7 +711,7 @@ A summary of version changes is provided below. For more detailed information, s
 - **Testing Functions**: Built-in tests for validating encoding accuracy
 - **Character Encoding Display**: Visual representation of character-to-punch mapping 
 - [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
-### v0.5.3 (March 24, 2024) - The Branching Update
+### v0.5.3 (March 2024) - The Branching Update
 - **Complete restructuring** of the project for optimal organization
 - **Properly separated** core, display, and utility modules
 - **Enhanced test organization** with specialized test directories
@@ -723,7 +723,7 @@ A summary of version changes is provided below. For more detailed information, s
 - **Comprehensive documentation** in VERSION_CONTROL.md
 - **Enhanced GitHub Wiki** with improved organization and navigation
 
-### v0.5.2 (March 24, 2024) - Project Structure Improvements
+### v0.5.2 (March 2024) - Project Structure Improvements
 - **Reorganized code architecture**:
   - Properly separated core, display, and utility modules
   - Consolidated similar functionality
@@ -735,7 +735,7 @@ A summary of version changes is provided below. For more detailed information, s
 - **Cleaner version archiving** with proper structure for previous versions
 - **Fixed duplicate files** by archiving older versions
 
-### v0.5.1 (March 23, 2024) - Documentation Enhancements
+### v0.5.1 (March 2024) - Documentation Enhancements
 - **Comprehensive Interface Design History** document covering early computing design languages
 - **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
 - **EPA's 1977 Unified Visual Design System** case study for consistent design systems
@@ -743,7 +743,7 @@ A summary of version changes is provided below. For more detailed information, s
 - **Design Language summary document** acting as an index to design research resources
 - **Updated references in README** with links to all research documentation
 
-### v0.5.0 (March 23, 2024) - Visual Interface Overhaul
+### v0.5.0 (March 2024) - Visual Interface Overhaul
 - **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
 - **Space Mono font** for consistent terminal-like appearance throughout the interface
 - **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
