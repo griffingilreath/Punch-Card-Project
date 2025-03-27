@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 
 # Current version (this will be used as a fallback)
-VERSION = "0.6.2"
+VERSION = "0.6.6"
 
 def get_version():
     """

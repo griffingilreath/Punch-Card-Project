@@ -1,0 +1,134 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Run workflow on version tags, e.g. v0.6.6
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Verify version matches
+        run: |
+          # Check version in version_info.py
+          VERSION_IN_CODE=$(grep -Po 'VERSION = "\K[^"]*' src/utils/version_info.py || echo "not found")
+          if [ "$VERSION_IN_CODE" != "$VERSION" ]; then
+            echo "Error: Version in code ($VERSION_IN_CODE) doesn't match tag version ($VERSION)"
+            exit 1
+          fi
+          
+          # Check version in settings file
+          VERSION_IN_SETTINGS=$(grep -Po '"version": "\K[^"]*' punch_card_settings.json || echo "not found")
+          if [ "$VERSION_IN_SETTINGS" != "$VERSION" ]; then
+            echo "Error: Version in settings ($VERSION_IN_SETTINGS) doesn't match tag version ($VERSION)"
+            exit 1
+          fi
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build with PyInstaller (Linux)
+        run: pyinstaller --onefile --name punch_card_${{ env.VERSION }}_linux punch_card.py
+      
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Punch Card Project v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          body_path: release_notes/v${{ env.VERSION }}.md
+          files: |
+            dist/punch_card_${{ env.VERSION }}_linux
+            update_to_v${{ env.VERSION }}.py
+            README_v${{ env.VERSION }}.md
+            release_notes/v${{ env.VERSION }}.md
+            VERSION_${{ env.VERSION }}_SUMMARY.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_macos:
+    name: Build macOS Package
+    runs-on: macos-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build with PyInstaller (macOS)
+        run: pyinstaller --onefile --name punch_card_${{ env.VERSION }}_macos punch_card.py
+      
+      - name: Upload macOS Build
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/punch_card_${{ env.VERSION }}_macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_windows:
+    name: Build Windows Package
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $env:GITHUB_ENV
+        shell: bash
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build with PyInstaller (Windows)
+        run: pyinstaller --onefile --name punch_card_${{ env.VERSION }}_windows.exe punch_card.py
+      
+      - name: Upload Windows Build
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/punch_card_${{ env.VERSION }}_windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
