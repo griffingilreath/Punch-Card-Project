@@ -2827,20 +2827,27 @@ class PunchCardDisplay(QMainWindow):
         self.hardware_check_complete = True
         self.hardware_detection_finished = True
         
-        # Start the splash screen animation directly
-        self.splash_timer = QTimer()
-        self.splash_timer.timeout.connect(self.update_splash)
-        self.splash_timer.start(100)  # Update every 100ms
-        
-        # Set initial splash screen state
+        # Reset animation flags
+        self.animation_started = False
         self.splash_step = 0
-        self.splash_progress = 0  # Initialize progress counter
+        self.splash_progress = 0
+        
+        # Fill the entire card with holes to prepare for the animation
+        # This ensures our animation of clearing holes is visible
+        for row in range(NUM_ROWS):
+            for col in range(NUM_COLS):
+                self.punch_card.set_led(row, col, True)
         
         # Load the punch card sounds if not already loaded
         self.load_punch_card_sounds()
         
+        # Start the splash screen animation timer
+        self.splash_timer = QTimer()
+        self.splash_timer.timeout.connect(self.update_splash)
+        self.splash_timer.start(100)  # Update every 100ms
+        
         # Console log for debugging only
-        self.console.log("Splash screen started - simplified version", "INFO")
+        self.console.log("Splash screen started - filling card with holes first", "INFO")
     
     def update_countdown(self):
         """Update the countdown timer during hardware detection."""
@@ -2957,12 +2964,11 @@ class PunchCardDisplay(QMainWindow):
             )
     
     def update_splash(self):
-        """Simple splash animation that quickly clears the punch card."""
+        """Startup animation that punches all holes first, then clears them diagonally."""
         if not self.showing_splash:
             return
         
-        # Simple splash animation that just clears the card
-        # Calculate progress percentage
+        # Calculate progress percentage (0-100)
         self.splash_progress += 5
         progress_percent = self.splash_progress / 100
         
@@ -2986,26 +2992,52 @@ class PunchCardDisplay(QMainWindow):
             self.complete_splash_screen()
             return
         
-        # Clear a percentage of the punch card based on progress
-        total_cells = NUM_ROWS * NUM_COLS
-        cells_to_clear = int(total_cells * progress_percent)
-        
-        # Play punch sound every few frames
-        if hasattr(self, 'punch_sound') and self.splash_progress % 10 == 0:
-            self.punch_sound.play()
+        # Phase 1 (0-30%): Punch all holes in the card
+        if self.splash_progress <= 30:
+            # Calculate how many holes to punch based on progress
+            total_cells = NUM_ROWS * NUM_COLS
+            cells_to_punch = int(total_cells * (self.splash_progress / 30))
             
-        # Play card insert sound at the beginning
-        if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
-            self.card_insert_sound.play()
-        
-        # Only clear cards that haven't been cleared yet
-        if cells_to_clear > 0:
-            cells_cleared = 0
+            # Play card insert sound at the beginning
+            if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
+                self.card_insert_sound.play()
+            
+            # Play punch sound every few frames
+            if hasattr(self, 'punch_sound') and self.splash_progress % 10 == 0:
+                self.play_punch_sound()
+                
+            # Punch holes in order (row by row)
+            cells_punched = 0
             for row in range(NUM_ROWS):
                 for col in range(NUM_COLS):
-                    if cells_cleared < cells_to_clear and self.punch_card.grid[row][col]:
+                    if cells_punched < cells_to_punch and not self.punch_card.grid[row][col]:
+                        self.punch_card.set_led(row, col, True)
+                        cells_punched += 1
+                        if cells_punched >= cells_to_punch:
+                            break
+                if cells_punched >= cells_to_punch:
+                    break
+        
+        # Phase 2 (31-100%): Clear holes diagonally with 12-hole width
+        else:
+            # Calculate total steps needed for diagonal pattern
+            total_steps = NUM_ROWS + NUM_COLS - 1
+            
+            # Map 31-100% progress to 0-total_steps
+            clear_progress = ((self.splash_progress - 30) / 70) * total_steps
+            current_step = int(clear_progress)
+            
+            # Play eject sound periodically
+            if self.splash_progress % 15 == 0 and hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound.play()
+            
+            # We'll clear diagonals from top-left to bottom-right
+            # Each diagonal passes through cells where row+col = constant
+            for row in range(NUM_ROWS):
+                for col in range(NUM_COLS):
+                    if row + col <= current_step:
+                        # Clear this diagonal and all previous ones
                         self.punch_card.set_led(row, col, False)
-                        cells_cleared += 1
         
         # Force a repaint
         self.punch_card.update()
@@ -3489,10 +3521,16 @@ class PunchCardDisplay(QMainWindow):
         if hasattr(self, 'card_insert_sound'):
             self.card_insert_sound.play()
         
-        # Need to reset splash animation flag to allow animation to play
+        # Reset animation-related flags to ensure animation plays
         self.showing_splash = True
         self.splash_step = 0
         self.splash_progress = 0
+        self.animation_started = False  # Reset this flag to ensure animation plays
+        
+        # Fill the entire card with holes to prepare for the animation
+        for row in range(NUM_ROWS):
+            for col in range(NUM_COLS):
+                self.punch_card.set_led(row, col, True)
         
         # Run the startup animation - this will automatically be followed by messages
         self.start_animation()
