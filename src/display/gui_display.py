@@ -1944,8 +1944,22 @@ class WiFiStatusWidget(QWidget):
     def mousePressEvent(self, event):
         """Handle mouse press to show the popup menu."""
         if event.button() == Qt.MouseButton.LeftButton:
-            # Show popup menu below the widget
-            self.wifi_menu.popup(self.mapToGlobal(QPoint(0, self.height())))
+            # Get the window and calculate its right edge
+            window = self.window()
+            window_right_edge = window.mapToGlobal(QPoint(window.width(), 0)).x()
+            
+            # Get the menu width
+            menu_width = self.wifi_menu.sizeHint().width()
+            
+            # Calculate position to ensure menu stays within window bounds
+            pos = self.mapToGlobal(QPoint(0, self.height()))
+            
+            # Position the menu so it stays within window bounds
+            x_position = min(pos.x(), window_right_edge - menu_width)
+            adjusted_pos = QPoint(x_position, pos.y())
+            
+            # Show popup at the adjusted position
+            self.wifi_menu.popup(adjusted_pos)
     
     def paintEvent(self, event):
         """Paint the WiFi status icon with rectangular bars."""
@@ -2008,10 +2022,11 @@ class InAppMenuBar(QWidget):
         super().__init__(parent)
         self.setFixedHeight(22)
         
-        # Set background color to match the punch card theme - no CSS border, we'll draw it ourselves
+        # Set background color to match the punch card theme - no border in CSS
         self.setStyleSheet(f"""
             background-color: black;
             color: white;
+            border: none;  /* Explicitly remove any border */
         """)
         
         # Create main layout
@@ -2301,16 +2316,24 @@ class InAppMenuBar(QWidget):
     
     def paintEvent(self, event):
         """Custom paint event to draw the menu bar with classic Mac styling."""
+        # First let the base class draw the background
         super().paintEvent(event)
         
-        # Create painter for custom drawing
+        # Create painter for drawing the bottom border
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
-        # Draw bottom border line manually to ensure it spans the entire width
-        # Use a slightly thicker line (1.2px) with full opacity for better visibility
-        painter.setPen(QPen(QColor(255, 255, 255), 1.2))
+        # Ensure the line is drawn on top of all child widgets
+        # by doing it after the standard rendering
+        
+        # Use a darker, more pronounced white line with proper thickness
+        painter.setPen(QPen(QColor(255, 255, 255), 1.5))
+        
+        # Draw the line at the very bottom of the menu bar
+        # This ensures it spans the full width regardless of layout
         painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
+        
+        # Explicitly update the line area to ensure it's visible
+        self.update(QRect(0, self.height() - 2, self.width(), 2))
 
 
 class PunchCardDisplay(QMainWindow):
