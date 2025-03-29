@@ -2962,6 +2962,9 @@ class PunchCardDisplay(QMainWindow):
         if not self.showing_splash:
             return
         
+        # Determine the correct punch card object to use
+        punch_card = self.punch_card_widget if hasattr(self, 'punch_card_widget') else self.punch_card
+        
         # Calculate progress percentage
         self.splash_progress += 5
         progress_percent = self.splash_progress / 100
@@ -2998,17 +3001,27 @@ class PunchCardDisplay(QMainWindow):
         if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
             self.card_insert_sound.play()
         
-        # Only clear cards that haven't been cleared yet
+        # Only clear cells that haven't been cleared yet
         if cells_to_clear > 0:
             cells_cleared = 0
             for row in range(NUM_ROWS):
                 for col in range(NUM_COLS):
-                    if cells_cleared < cells_to_clear and self.punch_card.grid[row][col]:
-                        self.punch_card.set_led(row, col, False)
+                    # Check which grid attribute is available
+                    if hasattr(punch_card, 'grid') and punch_card.grid[row][col]:
+                        punch_card.set_led(row, col, False)
                         cells_cleared += 1
+                    elif hasattr(punch_card, '_grid') and punch_card._grid[row][col]:
+                        punch_card.set_led(row, col, False)
+                        cells_cleared += 1
+                    
+                    # Stop if we've cleared the target number of cells
+                    if cells_cleared >= cells_to_clear:
+                        break
+                if cells_cleared >= cells_to_clear:
+                    break
         
         # Force a repaint
-        self.punch_card.update()
+        punch_card.update()
     
     def complete_splash_screen(self):
         """Complete the splash screen transition and prepare for normal operation."""
