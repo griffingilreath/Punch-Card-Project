@@ -3359,8 +3359,11 @@ class PunchCardDisplay(QMainWindow):
     def show_api_settings(self):
         """Show the API settings tab."""
         self.update_status("Opening API Settings...")
-        self.settings.setCurrentIndex(1)  # Assuming API settings is on tab index 1
-        self.settings.exec()
+        # Create and show the settings dialog with API tab selected
+        from src.display.settings_dialog import SettingsDialog
+        settings_dialog = SettingsDialog(self)
+        settings_dialog.tab_widget.setCurrentIndex(2)  # OpenAI API tab index
+        settings_dialog.exec()
         
     def show_about_dialog(self):
         """Show about dialog with application information."""
