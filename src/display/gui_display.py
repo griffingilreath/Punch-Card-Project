@@ -3216,10 +3216,14 @@ class PunchCardDisplay(QMainWindow):
     def show_about_dialog(self):
         """Show about dialog with application information."""
         self.update_status("Showing About Information...")
-        QMessageBox.about(self, "About Punch Card Display",
-                         f"<h3>Punch Card Display v1.0</h3>"
-                         f"<p>A minimalist punch card display application.</p>"
-                         f"<p>© 2023 All Rights Reserved</p>")
+        QMessageBox.about(self, "About This Punch Card",
+                         "<h3>Punch Card Simulator v1.0.2</h3>"
+                         "<p>A minimalist punch card display system with "
+                         "authentic IBM punch card specifications.</p>"
+                         "<p>GitHub: <a href='https://github.com/griffingilreath/Punch-Card-Project'>"
+                         "github.com/griffingilreath/Punch-Card-Project</a></p>"
+                         "<p>© 2023-2025 Griffin Gilreath</p>"
+                         "<p><small>Built with PyQt6 and a passion for digital history</small></p>")
                          
     def toggle_quick_settings(self):
         """Toggle the quick settings panel."""
