@@ -15,11 +15,11 @@ import socket
 import threading
 from functools import partial
 from typing import List, Optional, Dict, Any, Tuple
+from datetime import datetime  # Import datetime directly from module
 import json
 import logging
 import shutil
 import platform
-import datetime  # Import the datetime module
 import random
 import threading
 import queue
@@ -30,16 +30,15 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit, QLineEdit, QFileDialog, QMenuBar, QMenu,
     QCheckBox, QComboBox, QProgressBar, QSplitter, QGridLayout,
     QSpinBox, QFrame, QSlider, QTabWidget, QTextEdit, QSpacerItem,
-    QSizePolicy, QFormLayout, QDoubleSpinBox, QGroupBox, QDialogButtonBox
+    QSizePolicy, QFormLayout, QDoubleSpinBox, QGroupBox
 )
 from PyQt6.QtCore import (
     Qt, QTimer, QThread, pyqtSignal, QSize, QRect, 
-    QUrl, QObject, QEvent, QCoreApplication, QDateTime, QRectF, QPoint
+    QUrl, QObject, QEvent, QCoreApplication, QDateTime
 )
 from PyQt6.QtGui import (
     QIcon, QFont, QColor, QPalette, QTextCursor, 
-    QPixmap, QKeyEvent, QTextCharFormat, QPainter, QPainterPath,
-    QBrush, QPen
+    QPixmap, QKeyEvent, QTextCharFormat
 )
     
 try:
@@ -392,7 +391,7 @@ class ConsoleWindow(QDialog):
     
     def log(self, message: str, level: str = "INFO"):
         """Add a message to the console with timestamp and level."""
-        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+        timestamp = datetime.now().strftime("%H:%M:%S")
         level_color = {
             "INFO": "white",
             "LED": "cyan",
@@ -410,7 +409,7 @@ class ConsoleWindow(QDialog):
 
     def save_log(self):
         """Save the console log to a file."""
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"console_log_{timestamp}.txt"
         try:
             with open(filename, 'w') as f:
@@ -509,7 +508,7 @@ class SettingsDialog(QDialog):
             "openai": 0,
             "database": 0,
             "system": 0,
-            "last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "last_message": "",
             "last_source": ""
         }
@@ -1143,7 +1142,7 @@ class SettingsDialog(QDialog):
                     "prompt_tokens": 0,
                     "completion_tokens": 0,
                     "estimated_cost": 0.0,
-                    "last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "history": []
                 }
                 
@@ -1302,7 +1301,7 @@ class SettingsDialog(QDialog):
                 "openai": 0,
                 "database": 0,
                 "system": 0,
-                "last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "last_message": "",
                 "last_source": ""
             }
@@ -1339,7 +1338,7 @@ class SettingsDialog(QDialog):
         
         import requests
         url = "https://status.openai.com/api/v2/status.json"
-        service_status["openai"]["last_checked"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        service_status["openai"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         try:
             # Try to make a simple API request
@@ -1369,7 +1368,7 @@ class SettingsDialog(QDialog):
         
         import requests
         url = "https://status.fly.io/api/v2/status.json"
-        service_status["flyio"]["last_checked"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        service_status["flyio"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         try:
             # Try to make a simple API request
@@ -1513,7 +1512,7 @@ class SettingsDialog(QDialog):
                 "prompt_tokens": 0,
                 "completion_tokens": 0,
                 "estimated_cost": 0.0,
-                "last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "history": []
             }
         
@@ -1799,7 +1798,7 @@ class APIConsoleWindow(QDialog):
             level == "STATUS" and not self.show_status.isChecked()):
             return
             
-        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+        timestamp = datetime.now().strftime("%H:%M:%S")
         level_color = {
             "INFO": "white",
             "REQUEST": "cyan",
@@ -1842,7 +1841,7 @@ class APIConsoleWindow(QDialog):
 
     def save_log(self):
         """Save the console log to a file."""
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"api_log_{timestamp}.txt"
         try:
             with open(filename, 'w') as f:
@@ -2405,104 +2404,151 @@ class PunchCardDisplay(QMainWindow):
         self.main_layout.addWidget(menu_spacer)
         
         # ================== CONTENT CONTAINER ==================
-        # Create container for all content below menu bar with proper margins
+        # Create container for all content below menu bar (with proper margins)
         content_container = QWidget()
         content_layout = QVBoxLayout(content_container)
-        content_layout.setContentsMargins(20, 20, 20, 20)  # Normal margins
-        content_layout.setSpacing(10)  # EXACTLY 10px spacing between all elements
+        content_layout.setContentsMargins(20, 20, 20, 20)
+        content_layout.setSpacing(0)
         self.main_layout.addWidget(content_container)
         
-        # ================== TOP SECTION (MESSAGE LABEL) ==================
-        # Create message label in its own container
-        message_container = QWidget()
-        message_layout = QHBoxLayout(message_container)
-        message_layout.setContentsMargins(35, 10, 0, 0)  # Left padding (reduced by 5px) and top padding to move down
+        # ================== TOP SECTION ==================
+        # Create a container for the top section (message label) with fixed height
+        top_section = QWidget()
+        top_section.setFixedHeight(60)  # Fixed height to prevent layout shifts
+        top_layout = QVBoxLayout(top_section)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(0)
         
-        self.message_label = QLabel("SYSTEM READY")
-        self.message_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # Create message display label container with proper alignment
+        self.message_container = QWidget()
+        message_layout = QHBoxLayout(self.message_container)
+        message_layout.setContentsMargins(0, 0, 0, 0)
+        message_layout.setSpacing(0)
+        
+        # Create message display label - left aligned
+        self.message_label = QLabel("")
+        self.message_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.message_label.setStyleSheet(f"""
-            {get_font_css(size=14)}
+            {get_font_css(bold=False, size=FONT_SIZE+2)}
             color: {COLORS['text'].name()};
+            padding: 10px 0px;
         """)
-        message_layout.addWidget(self.message_label)
-        message_layout.addStretch(1)  # Push everything to the left
+        self.message_label.setFont(get_font(bold=False, size=FONT_SIZE+2))
         
-        content_layout.addWidget(message_container)
+        # Add message label to container with proper alignment
+        message_layout.addWidget(self.message_label, 1)  # 1 = stretch factor
+        top_layout.addWidget(self.message_container)
         
-        # ================== CENTER SECTION (CARD) ==================
-        # Create punch card in content layout - always create a new PunchCardWidget
+        # Add the top section to the content layout
+        content_layout.addWidget(top_section)
+        
+        # ================== MIDDLE SECTION (PUNCH CARD) ==================
+        # Create a fixed container for the punch card to ensure it stays in place
+        punch_card_container = QWidget()
+        punch_card_layout = QVBoxLayout(punch_card_container)
+        punch_card_layout.setContentsMargins(0, 0, 0, 0)
+        punch_card_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Create punch card widget
         self.punch_card = PunchCardWidget()
-        content_layout.addWidget(self.punch_card)
+        punch_card_layout.addWidget(self.punch_card)
         
-        # ================== BOTTOM SECTION (STATUS LABEL) ==================
-        # Create status label in its own container
-        status_container = QWidget()
-        status_layout = QHBoxLayout(status_container)
-        status_layout.setContentsMargins(35, 0, 0, 10)  # Left padding (reduced by 5px) and bottom padding
+        # Add the punch card container to the content layout with stretch factor
+        content_layout.addWidget(punch_card_container, 1)  # 1 = stretch factor
         
-        self.status_label = QLabel("READY")
-        self.status_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # ================== BOTTOM SECTION ==================
+        # Create a container for the bottom section with fixed height
+        # This ensures that the punch card position remains stable
+        bottom_section = QWidget()
+        bottom_section.setFixedHeight(80)  # Reduced from 190px since we removed buttons
+        bottom_layout = QVBoxLayout(bottom_section)
+        bottom_layout.setContentsMargins(0, 0, 0, 0)
+        bottom_layout.setSpacing(5)
+        
+        # Create status label
+        self.status_label = QLabel("")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.status_label.setStyleSheet(f"""
-            {get_font_css(size=14)}
+            {get_font_css(bold=False, size=FONT_SIZE)}
             color: {COLORS['text'].name()};
+            padding: 5px 0px;
         """)
-        status_layout.addWidget(self.status_label)
-        status_layout.addStretch(1)  # Push everything to the left
+        self.status_label.setFont(get_font(bold=False, size=FONT_SIZE))
+        self.status_label.setFixedHeight(40)
+        bottom_layout.addWidget(self.status_label)
         
-        content_layout.addWidget(status_container)
-        
-        # Position the labels initially
-        self.position_text_elements()
-        
-        # Add the hidden UI elements in a container
-        hidden_container = QWidget()
-        hidden_layout = QVBoxLayout(hidden_container)
-        hidden_layout.setContentsMargins(0, 0, 0, 0)
-        hidden_layout.setSpacing(0)
-        
+        # Create hardware status label for initialization phase
         self.hardware_status_label = QLabel("")
-        self.hardware_status_label.setVisible(False)
-        self.hardware_status_label.setMaximumHeight(0)
-        hidden_layout.addWidget(self.hardware_status_label)
+        self.hardware_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.hardware_status_label.setStyleSheet(f"""
+            {get_font_css(bold=False, size=FONT_SIZE-2)}
+            color: {COLORS['text'].name()};
+            padding: 5px;
+        """)
+        self.hardware_status_label.setFont(get_font(bold=False, size=FONT_SIZE-2))
+        self.hardware_status_label.setFixedHeight(30)
+        bottom_layout.addWidget(self.hardware_status_label)
         
-        self.keyboard_hint_label = QLabel("")
-        self.keyboard_hint_label.setVisible(False)
-        self.keyboard_hint_label.setMaximumHeight(0)
-        hidden_layout.addWidget(self.keyboard_hint_label)
+        # Create keyboard shortcut hint label
+        self.keyboard_hint_label = QLabel("Press [SPACE] to skip hardware detection and use virtual mode")
+        self.keyboard_hint_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.keyboard_hint_label.setStyleSheet(f"""
+            {get_font_css(italic=True, size=FONT_SIZE-2)}
+            color: {QColor(150, 150, 150).name()};
+            padding: 5px;
+        """)
+        self.keyboard_hint_label.setFixedHeight(30)
+        bottom_layout.addWidget(self.keyboard_hint_label)
         
-        self.api_status_label = QLabel("")
-        self.api_status_label.setVisible(False)
-        self.api_status_label.setMaximumHeight(0)
-        hidden_layout.addWidget(self.api_status_label)
+        # Create API status label
+        self.api_status_label = QLabel("API: Unknown")
+        self.api_status_label.setStyleSheet(f"""
+            QLabel {{
+                color: {COLORS['text'].name()};
+                background-color: {COLORS['card_bg'].name()};
+                padding: 3px 8px;
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-radius: 2px;
+                {get_font_css(bold=True, size=10)}
+            }}
+        """)
+        self.api_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.api_status_label.setVisible(False)  # Hide the API status label completely
+        bottom_layout.addWidget(self.api_status_label)
         
-        # Create hidden button container
+        # Create a spacer widget to maintain spacing even when elements are hidden
+        spacer = QWidget()
+        spacer.setFixedHeight(10)
+        bottom_layout.addWidget(spacer)
+        
+        # Create control buttons in a container with fixed height - all buttons now hidden
         self.button_container = QWidget()
-        self.button_container.setVisible(False)
-        self.button_container.setMaximumHeight(0)
+        self.button_container.setVisible(False)  # Hide all buttons
         button_layout = QHBoxLayout(self.button_container)
+        button_layout.setSpacing(10)
         
-        # Create required buttons (hidden)
         self.start_button = RetroButton("DISPLAY MESSAGE")
         self.clear_button = RetroButton("CLEAR")
         self.api_button = RetroButton("API CONSOLE")
         self.exit_button = RetroButton("EXIT")
         
-        # Connect button signals
         self.start_button.clicked.connect(self.start_display)
         self.clear_button.clicked.connect(self.punch_card.clear_grid)
         self.api_button.clicked.connect(self.show_api_console)
         self.exit_button.clicked.connect(self.close)
         
-        # Add buttons to layout
+        button_layout.addStretch(1)
         button_layout.addWidget(self.start_button)
         button_layout.addWidget(self.clear_button)
         button_layout.addWidget(self.api_button)
         button_layout.addWidget(self.exit_button)
+        button_layout.addStretch(1)
         
-        hidden_layout.addWidget(self.button_container)
+        self.button_container.setFixedHeight(60)
+        bottom_layout.addWidget(self.button_container)
         
-        # Add the hidden container to the content layout
-        content_layout.addWidget(hidden_container, 0)  # 0 = fixed, non-stretching
+        # Add the bottom section to the content layout
+        content_layout.addWidget(bottom_section)
         
         # Initialize variables
         self.showing_splash = True  # Start with splash screen
@@ -2585,45 +2631,77 @@ class PunchCardDisplay(QMainWindow):
         
         # Load settings from file
         self.load_settings()
-        
-        # Finish initialization 
-        self.load_settings()
-        
-        # Create overlay labels for precise positioning
-        self.create_overlay_labels()
     
-    def create_overlay_labels(self):
-        """This method is no longer needed as labels are now children of the punch card."""
-        pass
+    def validate_led_state(self, row: int, col: int, expected_state: bool, phase: str):
+        """Validate that an LED is in the expected state and fix if necessary."""
+        actual_state = self.punch_card.grid[row][col]
+        if actual_state != expected_state:
+            self.console.log(f"LED STATE ERROR: LED at ({row},{col}) is {actual_state} but should be {expected_state} during {phase}", "ERROR")
+            self.punch_card.set_led(row, col, expected_state)
+            return False
+        else:
+            self.console.log(f"LED STATE VALID: LED at ({row},{col}) is correctly {expected_state} during {phase}", "INFO")
+            return True
+            
+    def verify_top_left_corner(self, expected_state: bool, phase: str):
+        """Verify that the top-left corner LED is in the expected state."""
+        return self.validate_led_state(0, 0, expected_state, phase)
     
-    def position_overlay_labels(self):
-        """This method is no longer needed as labels are now children of the punch card."""
-        pass
+    def generate_next_message(self):
+        """Generate and display the next random message."""
+        if not self.running and not self.showing_splash:
+            message = self.message_generator.generate_message()
+            self.display_message(message)
     
-    def resizeEvent(self, event):
-        """Handle resize events."""
-        super().resizeEvent(event)
-        # No need to reposition text elements as they're managed by layouts
-    
-    def showEvent(self, event):
-        """Handle show event."""
-        super().showEvent(event)
-        # No need to position text elements as they're managed by layouts
+    def keyPressEvent(self, event: QKeyEvent):
+        """Handle keyboard shortcuts."""
+        if event.key() == Qt.Key.Key_C:
+            self.console.show()
+        elif event.key() == Qt.Key.Key_A:
+            self.api_console.show()
+        elif event.key() == Qt.Key.Key_S:
+            if self.settings.exec() == QDialog.DialogCode.Accepted:
+                settings = self.settings.get_settings()
+                self.led_delay = settings['led_delay']
+                self.message_display_time = settings['message_display_time']
+                self.timer.setInterval(self.led_delay)
+                self.console.log(f"Settings updated: {settings}")
+                self.console.log(f"Message display time set to {self.message_display_time} seconds", "INFO")
+        elif event.key() == Qt.Key.Key_Space and self.showing_splash and not self.hardware_check_complete:
+            # Skip hardware detection and use virtual mode
+            self.auto_skip_hardware_detection()
     
     def update_status(self, status: str):
-        """Update the status overlay with a new status message."""
-        if hasattr(self, 'status_overlay'):
-            self.status_overlay.setText(status)
-            self.status_overlay.adjustSize()
-            self.position_overlay_labels()
+        """Update the status label with a new status message."""
+        self.status_label.setText(status)
         
-        # Keep the console log
-        if hasattr(self, 'console'):
-            self.console.log(f"Status: {status}")
+        # Make sure the status always has consistent styling
+        QTimer.singleShot(10, self.align_message_with_card)
+            
+        self.console.log(f"Status: {status}")
     
     def display_message(self, message: str, source: str = "", delay: int = 100):
         """Display a message with optional source information."""
-        # Don't display messages during splash screen or when animations are running
+        # Update source information if provided (including API status)
+        if source:
+            # Check if source includes API status
+            if "API:" in source:
+                api_status = source.split("|")[0].strip().replace("API: ", "")
+                self.update_api_status(api_status)
+                
+                # Update status label with just the serial number part
+                if "|" in source:
+                    serial_info = source.split("|")[1].strip()
+                    self.status_label.setText(serial_info)
+                else:
+                    self.status_label.setText("")
+            else:
+                # Traditional source display (backward compatibility)
+                self.status_label.setText(source)
+        else:
+            self.status_label.setText("")
+            
+        # Don't display messages during splash screen
         if self.showing_splash:
             self.console.log("Ignoring message display request during splash animation", "WARNING")
             return
@@ -2633,12 +2711,10 @@ class PunchCardDisplay(QMainWindow):
         self.punch_card.clear_grid()
         self.led_delay = delay
         self.timer.setInterval(delay)
-        
-        # Update message label
         self.message_label.setText(message)
         
-        # Update label margins to align with punch card
-        QTimer.singleShot(50, self.update_label_margins)
+        # Ensure the message is always aligned with the punch card
+        QTimer.singleShot(10, self.align_message_with_card)
         
         self.update_status(f"PROCESSING: {message}")
         self.start_display()
@@ -2670,9 +2746,6 @@ class PunchCardDisplay(QMainWindow):
             self.timer.stop()
             self.running = False
             self.update_status("DISPLAY COMPLETE")
-            
-            # Update text positioning to ensure alignment
-            self.position_text_elements()
             
             # Start the message display timer
             display_time_ms = self.message_display_time * 1000  # Convert seconds to milliseconds
@@ -2807,9 +2880,6 @@ class PunchCardDisplay(QMainWindow):
         elif animation_type == AnimationType.WAKE:
             # Update status
             self.update_status("READY")
-        
-        # Update text positioning
-        self.position_text_elements()
 
     def start_animation(self):
         """Start the animation timer for the splash screen."""
@@ -2848,33 +2918,46 @@ class PunchCardDisplay(QMainWindow):
         """Update the hardware status label."""
         # If hardware detection is complete and animation hasn't started yet
         if self.hardware_detector.detection_complete and not self.animation_started:
-            # Completely hide the hardware status label - don't show any status text at all
-            self.hardware_status_label.setText("")
+            # Show hardware detection results
+            pi_status = self.hardware_detector.raspberry_pi_status
+            led_status = self.hardware_detector.led_controller_status
             
-            # Keep this part to set flags and start animation if not already started
+            # Format status for display
+            pi_color = "green" if pi_status == "Connected" else "yellow" if pi_status == "Virtual Mode" else "red"
+            led_color = "green" if led_status == "Ready" else "yellow" if led_status == "Virtual Mode" else "red"
+            
+            # Update the hardware status label with colored status indicators
+            self.hardware_status_label.setText(
+                f'Raspberry Pi: <span style="color:{pi_color};">{pi_status}</span>, ' +
+                f'LED Controller: <span style="color:{led_color};">{led_status}</span>'
+            )
+            
+            # Set flags and start animation if not already started
             if not self.hardware_check_complete:
                 self.hardware_check_complete = True
                 self.hardware_detection_finished = True
-                
-                # Log to console but don't show in the UI
                 mode_type = "hardware" if not self.hardware_detector.using_virtual_mode else "virtual"
                 self.console.log(f"Hardware detection complete - using {mode_type} mode", "INFO")
                 
-                # Intentionally set empty text for all labels that might show mode
-                self.keyboard_hint_label.setText("")
-                self.hardware_status_label.setText("")
-                
-                # Make the labels invisible to be safe
-                self.keyboard_hint_label.setVisible(False)
-                self.hardware_status_label.setVisible(False)
+                # Update keyboard hint to show the active mode
+                self.keyboard_hint_label.setText(f"System ready - using {mode_type.upper()} mode")
+                color = QColor(100, 200, 100) if mode_type == "hardware" else QColor(200, 200, 100)
+                self.keyboard_hint_label.setStyleSheet(f"""
+                    {get_font_css(italic=True, size=FONT_SIZE-2)}
+                    color: {color.name()};
+                    padding: 5px;
+                """)
                 
                 # Start the animation
                 self.start_animation()
                 
         # If hardware detection is still in progress and animation hasn't started
         elif not self.hardware_detector.detection_complete and not self.animation_started:
-            # Hardware detection still in progress - but don't show status
-            self.hardware_status_label.setText("")
+            # Hardware detection still in progress - update status
+            self.hardware_status_label.setText(
+                f'Raspberry Pi: <span style="color:yellow;">Detecting...</span>, ' +
+                f'LED Controller: <span style="color:yellow;">Waiting...</span>'
+            )
     
     def update_splash(self):
         """Simple splash animation that gradually clears the punch card."""
@@ -3012,19 +3095,19 @@ class PunchCardDisplay(QMainWindow):
         if hasattr(self, 'console'):
             self.console.log("Splash screen completed, ready for operation", "INFO")
         
-        # Display system ready message
+        # Display system ready message with simplified style
         self.message_label.setText("SYSTEM READY")
+        self.message_label.setStyleSheet("color: white; font-size: 14pt; padding: 10px 0px;")
         
-        # AGGRESSIVELY hide ALL hardware status elements 
+        # Ensure message label aligns with the punch card
+        QTimer.singleShot(10, self.align_message_with_card)
+        
+        # Hide hardware status elements with simple styling
         if hasattr(self, 'hardware_status_label'):
-            self.hardware_status_label.setText("")
-            self.hardware_status_label.setVisible(False)
-            self.hardware_status_label.setStyleSheet("color: transparent; padding: 0px; margin: 0px; height: 0px;")
+            self.hardware_status_label.setStyleSheet("color: transparent; padding: 5px;")
         
         if hasattr(self, 'keyboard_hint_label'):
-            self.keyboard_hint_label.setText("")
-            self.keyboard_hint_label.setVisible(False)
-            self.keyboard_hint_label.setStyleSheet("color: transparent; padding: 0px; margin: 0px; height: 0px;")
+            self.keyboard_hint_label.setStyleSheet("color: transparent; padding: 5px;")
         
         # Restore button styles with simple styling
         for button in [self.start_button, self.clear_button, self.exit_button]:
@@ -3040,44 +3123,42 @@ class PunchCardDisplay(QMainWindow):
         # Start auto messages after delay
         QTimer.singleShot(5000, lambda: self.auto_timer.start(5000))
     
-    def on_animation_finished(self, animation_type):
-        """Handle animation completion events"""
-        if hasattr(self, 'console'):
-            self.console.log(f"Animation finished: {animation_type}", "INFO")
-            
-        # Handle specific animation completion events
-        if animation_type == AnimationType.STARTUP:
-            # Play final sound
-            if hasattr(self, 'card_eject_sound'):
-                self.card_eject_sound.play()
-        elif animation_type == AnimationType.SLEEP:
-            # Update status
-            self.update_status("SLEEPING")
-        elif animation_type == AnimationType.WAKE:
-            # Update status
-            self.update_status("READY")
+    def resizeEvent(self, event):
+        """Handle resize events to ensure message label aligns with punch card."""
+        super().resizeEvent(event)
         
-        # Update text positioning
-        self.position_text_elements()
+        # Update message label alignment when window is resized
+        # We need a small delay to ensure the punch card widget has been properly laid out
+        QTimer.singleShot(20, self.align_message_with_card)
     
-    def force_text_positioning(self):
-        """Force text layout update (no longer needed with layout containers)."""
-        # Force a visual update immediately
-        self.message_label.update()
-        self.status_label.update()
-        # Log the action
-        self.console.log("Text layout updated", "INFO")
-    
-    def position_text_elements(self):
-        """No longer needed as we're using layout containers."""
-        pass  # Labels are now positioned by the layout system
-    
-    def showEvent(self, event):
-        """Handle show event to ensure proper text positioning after window is rendered."""
-        super().showEvent(event)
-        # Position text elements after the window has been shown
-        QTimer.singleShot(100, self.position_text_elements)
-    
+    def align_message_with_card(self):
+        """Align the message label with the left edge of the punch card."""
+        # Calculate the exact left edge position of the punch card
+        card_margin = (self.width() - self.punch_card.card_width) // 2
+        
+        # We need to account for the main layout's margins as well
+        main_left_margin = self.main_layout.contentsMargins().left()
+        
+        # Calculate the exact margin needed for alignment
+        left_margin = card_margin - main_left_margin
+        
+        # Update the message container margins
+        self.message_container.layout().setContentsMargins(left_margin, 0, 0, 0)
+        
+        # Update the status label alignment and margins
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.status_label.setStyleSheet(f"""
+            {get_font_css(bold=False, size=FONT_SIZE)}
+            color: {COLORS['text'].name()};
+            padding: 5px 0px;
+            margin-left: {left_margin}px;
+        """)
+        
+        # Debug logging to help diagnose alignment issues
+        self.console.log(f"Alignment: window={self.width()}, card={self.punch_card.card_width}, " +
+                         f"card_margin={card_margin}, main_margin={main_left_margin}, " +
+                         f"applied_margin={left_margin}", "INFO")
+
     def update_api_status(self, status: str):
         """Update the API status display."""
         # API status label was removed from UI, so just log the status
@@ -3375,185 +3456,17 @@ class PunchCardDisplay(QMainWindow):
         
         # Update the message label
         self.message_label.setText("SYSTEM READY")
+        try:
+            # Simple styling to avoid parser errors
+            self.message_label.setStyleSheet("color: white; font-size: 14pt; padding: 10px 0px;")
+        except:
+            pass
+        
+        # Ensure message label aligns with the punch card
+        QTimer.singleShot(10, self.align_message_with_card)
         
         # Restart auto message timer
         QTimer.singleShot(2000, lambda: self.auto_timer.start(5000))
-
-    def update_countdown(self):
-        """Update the countdown timer display"""
-        if hasattr(self, 'countdown_seconds'):
-            self.countdown_seconds -= 1
-            if self.countdown_seconds <= 0:
-                self.countdown_timer.stop()
-                self.hardware_detector.enable_virtual_mode()
-                self.hardware_check_complete = True
-                self.hardware_detection_finished = True
-                self.status_label.setText("USING VIRTUAL MODE")
-                self.keyboard_hint_label.setText("Hardware detection skipped - using VIRTUAL MODE")
-                self.keyboard_hint_label.setStyleSheet(f"""
-                    {get_font_css(italic=True, size=FONT_SIZE-2)}
-                    color: {QColor(200, 200, 100).name()};
-                    padding: 5px;
-                """)
-                # Start animation after short delay
-                QTimer.singleShot(500, self.start_animation)
-            else:
-                # Update hardware hint label with countdown
-                self.keyboard_hint_label.setText(f"Press [SPACE] to skip hardware detection ({self.countdown_seconds}s remaining)")
-
-    def auto_skip_hardware_detection(self):
-        """Skip hardware detection and use virtual mode"""
-        # Stop the countdown timer if it's running
-        if hasattr(self, 'countdown_timer') and self.countdown_timer.isActive():
-            self.countdown_timer.stop()
-        
-        # Set up virtual mode
-        self.hardware_detector.enable_virtual_mode()
-        self.hardware_check_complete = True
-        self.hardware_detection_finished = True
-        
-        # Update UI
-        self.status_label.setText("SKIPPING HARDWARE DETECTION")
-        self.keyboard_hint_label.setText("Using VIRTUAL MODE - hardware detection skipped")
-        self.keyboard_hint_label.setStyleSheet(f"""
-            {get_font_css(italic=True, size=FONT_SIZE-2)}
-            color: {QColor(200, 200, 100).name()};
-            padding: 5px;
-        """)
-        
-        # Log the action
-        if hasattr(self, 'console'):
-            self.console.log("Hardware detection skipped by user - using virtual mode", "WARNING")
-        
-        # Start animation after short delay
-        QTimer.singleShot(500, self.start_animation)
-
-    def generate_next_message(self):
-        """Generate and display the next random message."""
-        # Only generate messages when not running, not showing splash screen, and no animation is playing
-        if (not self.running and 
-            not self.showing_splash and 
-            hasattr(self, 'animation_manager') and 
-            self.animation_manager.state != AnimationState.PLAYING):
-            
-            message = self.message_generator.generate_message()
-            self.display_message(message)
-        else:
-            # Log reason for skipping message generation
-            if self.running:
-                self.console.log("Skipping message generation: already displaying message", "INFO")
-            elif self.showing_splash:
-                self.console.log("Skipping message generation: splash screen active", "INFO")
-            elif hasattr(self, 'animation_manager') and self.animation_manager.state == AnimationState.PLAYING:
-                self.console.log("Skipping message generation: animation is playing", "INFO")
-                
-    def keyPressEvent(self, event: QKeyEvent):
-        """Handle keyboard shortcuts."""
-        if event.key() == Qt.Key.Key_C:
-            self.console.show()
-        elif event.key() == Qt.Key.Key_A:
-            self.api_console.show()
-        elif event.key() == Qt.Key.Key_S:
-            if self.settings.exec() == QDialog.DialogCode.Accepted:
-                settings = self.settings.get_settings()
-                self.led_delay = settings['led_delay']
-                self.message_display_time = settings['message_display_time']
-                self.timer.setInterval(self.led_delay)
-                self.console.log(f"Settings updated: {settings}")
-                self.console.log(f"Message display time set to {self.message_display_time} seconds", "INFO")
-        elif event.key() == Qt.Key.Key_Space and self.showing_splash and not self.hardware_check_complete:
-            # Skip hardware detection and use virtual mode
-            self.auto_skip_hardware_detection()
-            
-    def validate_led_state(self, row: int, col: int, expected_state: bool, phase: str):
-        """Validate that an LED is in the expected state and fix if necessary."""
-        actual_state = self.punch_card.grid[row][col]
-        if actual_state != expected_state:
-            self.console.log(f"LED STATE ERROR: LED at ({row},{col}) is {actual_state} but should be {expected_state} during {phase}", "ERROR")
-            self.punch_card.set_led(row, col, expected_state)
-            return False
-        else:
-            self.console.log(f"LED STATE VALID: LED at ({row},{col}) is correctly {expected_state} during {phase}", "INFO")
-            return True
-            
-    def verify_top_left_corner(self, expected_state: bool, phase: str):
-        """Verify that the top-left corner LED is in the expected state."""
-        return self.validate_led_state(0, 0, expected_state, phase)
-
-    def update_label_margins(self):
-        """Update the message and status container margins to align with the punch card.
-        This is a simplified version that just adjusts the left padding."""
-        try:
-            # Only proceed if all required widgets exist
-            if not hasattr(self, 'punch_card') or not hasattr(self, 'message_label') or not hasattr(self, 'status_label'):
-                return
-                
-            # Ensure the layouts exist
-            message_container = self.message_label.parent()
-            status_container = self.status_label.parent()
-            
-            if not message_container or not status_container:
-                return
-                
-            # Get the punch card's container and actual width
-            card_width = getattr(self.punch_card, 'card_width', 562)  # Default to CARD_WIDTH
-            container_width = self.punch_card.width()
-            
-            # Calculate the offset needed to align with punch card's left edge
-            # This is approximately (content_width - card_width) / 2 + side_margin
-            side_margin = getattr(self.punch_card, 'side_margin', 14)  # Default to SIDE_MARGIN
-            left_offset = max(35, ((container_width - card_width) // 2) + side_margin - 5)  # 5px less to the right
-            
-            # Update container margins
-            message_layout = message_container.layout()
-            status_layout = status_container.layout()
-            
-            if message_layout:
-                message_layout.setContentsMargins(left_offset, 10, 0, 0)  # Add 10px top margin
-            
-            if status_layout:
-                status_layout.setContentsMargins(left_offset, 0, 0, 10)  # Add 10px bottom margin
-                
-            if hasattr(self, 'console'):
-                self.console.log(f"Updated label margins to {left_offset}px", "INFO")
-                
-        except Exception as e:
-            if hasattr(self, 'console'):
-                self.console.log(f"Error updating label margins: {str(e)}", "ERROR")
-    
-    def resizeEvent(self, event):
-        """Handle resize events."""
-        super().resizeEvent(event)
-        # Adjust label margins on resize
-        QTimer.singleShot(100, self.update_label_margins)
-    
-    def showEvent(self, event):
-        """Handle show event."""
-        super().showEvent(event)
-        # Update margins after the window is shown
-        QTimer.singleShot(200, self.update_label_margins)
-        
-    def display_message(self, message: str, source: str = "", delay: int = 100):
-        """Display a message with optional source information."""
-        # Don't display messages during splash screen or when animations are running
-        if self.showing_splash:
-            self.console.log("Ignoring message display request during splash animation", "WARNING")
-            return
-            
-        self.current_message = message.upper()
-        self.current_char_index = 0
-        self.punch_card.clear_grid()
-        self.led_delay = delay
-        self.timer.setInterval(delay)
-        
-        # Update message label
-        self.message_label.setText(message)
-        
-        # Update label margins
-        self.update_label_margins()
-        
-        self.update_status(f"PROCESSING: {message}")
-        self.start_display()
 
 
 def run_gui_app():

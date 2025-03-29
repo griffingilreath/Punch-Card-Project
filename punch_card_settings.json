@@ -5,7 +5,7 @@
     "temperature": 0.85,
     "led_delay": 190,
     "interval": 5,
-    "message_display_time": 3,
+    "message_display_time": 10,
     "delay_factor": 1.0,
     "random_delay": false,
     "show_splash": true,

@@ -17,13 +17,43 @@ from functools import partial
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime
 import json
+import logging
+import shutil
+import platform
+import datetime
+import random
+import threading
+import queue
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                            QHBoxLayout, QLabel, QPushButton, QStackedLayout,
-                            QSizePolicy, QFrame, QDialog, QTextEdit, QSpinBox,
-                            QCheckBox, QFormLayout, QGroupBox)
-from PyQt6.QtCore import Qt, QTimer, QSize, QRect, QRectF, pyqtSignal, QDir
-from PyQt6.QtGui import QPainter, QColor, QPen, QFont, QPalette, QBrush, QPainterPath, QKeyEvent
+try:
+    from PyQt6.QtWidgets import (
+        QApplication, QMainWindow, QWidget, QVBoxLayout, 
+        QHBoxLayout, QLabel, QPushButton, QDialog, QMessageBox,
+        QPlainTextEdit, QLineEdit, QFileDialog, QMenuBar, QMenu,
+        QCheckBox, QComboBox, QProgressBar, QSplitter, QGridLayout,
+        QSpinBox, QFrame, QSlider, QTabWidget, QTextEdit, QSpacerItem,
+        QSizePolicy, QFormLayout, QDoubleSpinBox, QGroupBox
+    )
+    from PyQt6.QtCore import (
+        Qt, QTimer, QThread, pyqtSignal, QSize, QRect, 
+        QUrl, QObject, QEvent, QCoreApplication, QDateTime
+    )
+    from PyQt6.QtGui import (
+        QIcon, QFont, QColor, QPalette, QTextCursor, 
+        QPixmap, QKeyEvent, QTextCharFormat
+    )
+    
+    try:
+        from PyQt6.QtMultimedia import QSoundEffect
+    except ImportError:
+        print("QSoundEffect not available - running without sound effects")
+except ImportError:
+    raise ImportError("PyQt6 package not found. Please install PyQt6 to run this application.")
+
+# Import animation manager
+from src.animation.animation_manager import AnimationManager, AnimationType, AnimationState
+
+from src.display.settings_dialog import SettingsDialog
 
 # Color scheme
 COLORS = {
@@ -48,14 +78,14 @@ COLORS = {
 }
 
 # Font configuration
-# Use a fallback approach for fonts - try Space Mono first, then fall back to system fonts
-FONT_FAMILY = "Space Mono, Courier New, monospace"
+# Use system fonts that are guaranteed to be available on macOS
+FONT_FAMILY = "Courier New"
 FONT_SIZE = 12  # Use consistent font size throughout the application
 
 def get_font(bold=False, italic=False, size=FONT_SIZE) -> QFont:
     """Get a font with the specified style."""
     font = QFont()
-    font.setFamily("Space Mono")
+    font.setFamily("Courier New")
     font.setPointSize(size)
     font.setBold(bold)
     font.setItalic(italic)
@@ -398,11 +428,13 @@ class ConsoleWindow(QDialog):
         self.log("Console cleared", "INFO")
 
 class SettingsDialog(QDialog):
-    """Settings dialog for configuring the punch card display."""
+    """Dialog for configuring punch card settings."""
+
     def __init__(self, parent=None):
+        """Initialize the settings dialog."""
         super().__init__(parent)
-        self.setWindowTitle("Settings")
-        self.setMinimumWidth(400)
+        self.setWindowTitle("Punch Card Settings")
+        self.resize(550, 650)  # Make dialog larger to accommodate tabs
         
         # Set dark theme
         self.setStyleSheet(f"""
@@ -410,54 +442,146 @@ class SettingsDialog(QDialog):
                 background-color: {COLORS['background'].name()};
                 color: {COLORS['text'].name()};
             }}
-            QLabel, QSpinBox, QCheckBox {{
+            QLabel, QSpinBox, QCheckBox, QLineEdit, QComboBox, QTextEdit, QSlider {{
                 color: {COLORS['text'].name()};
+            }}
+            QTabWidget::pane {{
+                border: 1px solid {COLORS['hole_outline'].name()};
+                background-color: {COLORS['background'].name()};
+            }}
+            QTabBar::tab {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                padding: 6px 12px;
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-bottom: none;
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {COLORS['button_hover'].name()};
             }}
         """)
         
-        layout = QFormLayout(self)
+        # Create the main layout
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
         
-        # Display settings
-        display_group = QGroupBox("Display Settings")
-        display_layout = QFormLayout()
+        # Create tab widget
+        self.tab_widget = QTabWidget()
+        self.layout.addWidget(self.tab_widget)
         
+        # Create tabs
+        self.display_tab = QWidget()
+        self.card_tab = QWidget()
+        self.openai_tab = QWidget()
+        self.stats_tab = QWidget()  # New stats tab
+        
+        # Set up tabs
+        self._setup_display_tab()
+        self._setup_card_tab()
+        self._setup_openai_tab()
+        self._setup_stats_tab()  # Set up stats tab
+        
+        # Add tabs to widget
+        self.tab_widget.addTab(self.display_tab, "Display")
+        self.tab_widget.addTab(self.card_tab, "Card Dimensions")
+        self.tab_widget.addTab(self.openai_tab, "🤖 OpenAI API")
+        self.tab_widget.addTab(self.stats_tab, "📊 Statistics")
+        
+        # Add buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        self.layout.addWidget(button_box)
+        
+        # Load existing settings
+        self._load_settings()
+        
+        # Initialize message stats if not exists
+        global message_stats
+        if 'message_stats' not in globals():
+            self._initialize_message_stats()
+
+    def _initialize_message_stats(self):
+        """Initialize global message stats variable if it doesn't exist."""
+        global message_stats
+        message_stats = {
+            "total": 0,
+            "local": 0,
+            "openai": 0,
+            "database": 0,
+            "system": 0,
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_message": "",
+            "last_source": ""
+        }
+        
+        # Initialize service status tracking
+        global service_status
+        service_status = {
+            "openai": {
+                "status": "unknown",
+                "message": "Not checked yet",
+                "last_checked": "Never"
+            },
+            "flyio": {
+                "status": "unknown",
+                "message": "Not checked yet",
+                "last_checked": "Never"
+            }
+        }
+
+    def _setup_display_tab(self):
+        """Set up the display settings tab."""
+        layout = QFormLayout()
+        self.display_tab.setLayout(layout)
+        
+        # LED Update Delay
         self.led_delay = QSpinBox()
         self.led_delay.setRange(50, 500)
         self.led_delay.setValue(100)
         self.led_delay.setSuffix(" ms")
-        display_layout.addRow("LED Update Delay:", self.led_delay)
+        layout.addRow("LED Update Delay:", self.led_delay)
         
-        self.message_delay = QSpinBox()
-        self.message_delay.setRange(1000, 10000)
-        self.message_delay.setValue(3000)
-        self.message_delay.setSuffix(" ms")
-        display_layout.addRow("Message Delay:", self.message_delay)
+        # Message interval
+        self.interval_spin = QSpinBox()
+        self.interval_spin.setRange(1, 3600)
+        self.interval_spin.setSuffix(" seconds")
+        layout.addRow("Message interval:", self.interval_spin)
         
-        self.message_display_time = QSpinBox()
-        self.message_display_time.setRange(1, 60)
-        self.message_display_time.setValue(5)
-        self.message_display_time.setSuffix(" seconds")
-        display_layout.addRow("Message Display Time:", self.message_display_time)
+        # Message display time
+        self.display_time_spin = QSpinBox()
+        self.display_time_spin.setRange(1, 3600)
+        self.display_time_spin.setSuffix(" seconds")
+        layout.addRow("Message display time:", self.display_time_spin)
         
+        # Delay factor
+        self.delay_factor_spin = QDoubleSpinBox()
+        self.delay_factor_spin.setRange(0.1, 10.0)
+        self.delay_factor_spin.setSingleStep(0.1)
+        layout.addRow("Typing delay factor:", self.delay_factor_spin)
+        
+        # Random Delay
         self.random_delay = QCheckBox()
         self.random_delay.setChecked(True)
-        display_layout.addRow("Random Delay:", self.random_delay)
+        layout.addRow("Random Delay:", self.random_delay)
         
+        # Show Splash Screen
         self.show_splash = QCheckBox()
         self.show_splash.setChecked(True)
-        display_layout.addRow("Show Splash Screen:", self.show_splash)
+        layout.addRow("Show Splash Screen:", self.show_splash)
         
+        # Auto-Open Console
         self.auto_console = QCheckBox()
         self.auto_console.setChecked(True)
-        display_layout.addRow("Auto-Open Console:", self.auto_console)
-        
-        display_group.setLayout(display_layout)
-        layout.addRow(display_group)
+        layout.addRow("Auto-Open Console:", self.auto_console)
         
         # Card dimensions settings
         card_group = QGroupBox("Card Dimensions")
         card_layout = QFormLayout()
         
+        # Scale Factor
         self.scale_factor = QSpinBox()
         self.scale_factor.setRange(1, 10)
         self.scale_factor.setValue(3)
@@ -465,6 +589,18 @@ class SettingsDialog(QDialog):
         self.scale_factor.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Scale Factor:", self.scale_factor)
         
+        # Width and Height
+        self.width_spin = QSpinBox()
+        self.width_spin.setRange(10, 1000)
+        self.width_spin.setSuffix(" pixels")
+        card_layout.addRow("Card width:", self.width_spin)
+        
+        self.height_spin = QSpinBox()
+        self.height_spin.setRange(10, 1000)
+        self.height_spin.setSuffix(" pixels")
+        card_layout.addRow("Card height:", self.height_spin)
+        
+        # Top/Bottom Margin
         self.top_margin = QSpinBox()
         self.top_margin.setRange(1, 20)
         self.top_margin.setValue(4)
@@ -472,6 +608,7 @@ class SettingsDialog(QDialog):
         self.top_margin.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Top/Bottom Margin:", self.top_margin)
         
+        # Side Margin
         self.side_margin = QSpinBox()
         self.side_margin.setRange(1, 20)
         self.side_margin.setValue(5)
@@ -479,6 +616,7 @@ class SettingsDialog(QDialog):
         self.side_margin.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Side Margin:", self.side_margin)
         
+        # Row Spacing
         self.row_spacing = QSpinBox()
         self.row_spacing.setRange(1, 10)
         self.row_spacing.setValue(2)
@@ -486,6 +624,7 @@ class SettingsDialog(QDialog):
         self.row_spacing.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Row Spacing:", self.row_spacing)
         
+        # Column Spacing
         self.column_spacing = QSpinBox()
         self.column_spacing.setRange(1, 10)
         self.column_spacing.setValue(1)
@@ -493,6 +632,7 @@ class SettingsDialog(QDialog):
         self.column_spacing.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Column Spacing:", self.column_spacing)
         
+        # Hole Width
         self.hole_width = QSpinBox()
         self.hole_width.setRange(1, 5)
         self.hole_width.setValue(1)
@@ -500,6 +640,7 @@ class SettingsDialog(QDialog):
         self.hole_width.valueChanged.connect(self.update_card_dimensions)
         card_layout.addRow("Hole Width:", self.hole_width)
         
+        # Hole Height
         self.hole_height = QSpinBox()
         self.hole_height.setRange(1, 10)
         self.hole_height.setValue(3)
@@ -550,6 +691,885 @@ class SettingsDialog(QDialog):
             'hole_width': self.hole_width.value(),
             'hole_height': self.hole_height.value()
         }
+
+    def _setup_openai_tab(self):
+        """Set up the OpenAI API tab."""
+        layout = QVBoxLayout()
+        self.openai_tab.setLayout(layout)
+        
+        # API Key Section
+        api_key_group = QGroupBox("API Key")
+        api_key_layout = QVBoxLayout()
+        api_key_group.setLayout(api_key_layout)
+        
+        # API Key input with layout
+        key_input_layout = QHBoxLayout()
+        
+        self.api_key_edit = QLineEdit()
+        self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.api_key_edit.setPlaceholderText("Enter your OpenAI API key")
+        key_input_layout.addWidget(self.api_key_edit)
+        
+        # Toggle visibility button
+        toggle_btn = RetroButton("👁")
+        toggle_btn.setMaximumWidth(30)
+        toggle_btn.clicked.connect(self.toggle_key_visibility)
+        key_input_layout.addWidget(toggle_btn)
+        
+        api_key_layout.addLayout(key_input_layout)
+        
+        # API key status label
+        self.api_key_status = QLabel("Status: Not verified")
+        api_key_layout.addWidget(self.api_key_status)
+        
+        # API Key action buttons
+        key_buttons_layout = QHBoxLayout()
+        
+        verify_btn = RetroButton("Verify Key")
+        verify_btn.clicked.connect(self.verify_api_key)
+        key_buttons_layout.addWidget(verify_btn)
+        
+        save_btn = RetroButton("Save Key")
+        save_btn.clicked.connect(self.save_api_key)
+        key_buttons_layout.addWidget(save_btn)
+        
+        api_key_layout.addLayout(key_buttons_layout)
+        
+        # Add the API key group to the main layout
+        layout.addWidget(api_key_group)
+        
+        # Add separator
+        separator1 = QFrame()
+        separator1.setFrameShape(QFrame.Shape.HLine)
+        separator1.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator1)
+        
+        # Model Selection Section
+        model_group = QGroupBox("Model Selection")
+        model_layout = QVBoxLayout()
+        model_group.setLayout(model_layout)
+        
+        # Model dropdown with refresh button
+        model_select_layout = QHBoxLayout()
+        
+        model_layout.addWidget(QLabel("Select OpenAI Model:"))
+        self.model_combo = QComboBox()
+        
+        # Add models
+        self.model_combo.addItems([
+            "gpt-4o",
+            "gpt-4-turbo",
+            "gpt-4",
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-16k"
+        ])
+        self.model_combo.currentIndexChanged.connect(self.update_model_description)
+        model_select_layout.addWidget(self.model_combo)
+        
+        # Refresh models button
+        refresh_button = RetroButton("Refresh")
+        refresh_button.setFixedWidth(80)
+        refresh_button.clicked.connect(self.refresh_models)
+        model_select_layout.addWidget(refresh_button)
+        
+        model_layout.addLayout(model_select_layout)
+        
+        # Model description
+        self.model_description = QLabel("GPT 4o: OpenAI's most capable multimodal model")
+        self.model_description.setWordWrap(True)
+        model_layout.addWidget(self.model_description)
+        
+        # Temperature setting
+        model_layout.addWidget(QLabel("Temperature (randomness):"))
+        
+        temp_layout = QHBoxLayout()
+        self.temperature_slider = QSlider(Qt.Orientation.Horizontal)
+        self.temperature_slider.setRange(0, 100)
+        self.temperature_slider.setValue(70)
+        self.temperature_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.temperature_slider.setTickInterval(10)
+        temp_layout.addWidget(self.temperature_slider)
+        
+        self.temperature_label = QLabel("0.7")
+        self.temperature_slider.valueChanged.connect(lambda v: self.temperature_label.setText(f"{v/100:.1f}"))
+        temp_layout.addWidget(self.temperature_label)
+        
+        model_layout.addLayout(temp_layout)
+        
+        model_layout.addWidget(QLabel("Higher values = more random outputs"))
+        
+        # Add model group to main layout
+        layout.addWidget(model_group)
+        
+        # Add separator
+        separator2 = QFrame()
+        separator2.setFrameShape(QFrame.Shape.HLine)
+        separator2.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator2)
+        
+        # Usage and Cost Tracking Section
+        usage_group = QGroupBox("Usage and Cost Tracking")
+        usage_layout = QVBoxLayout()
+        usage_group.setLayout(usage_layout)
+        
+        # Add usage display
+        self.usage_text = QTextEdit()
+        self.usage_text.setReadOnly(True)
+        self.usage_text.setMaximumHeight(150)
+        self.usage_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        usage_layout.addWidget(self.usage_text)
+        
+        # Buttons for usage stats
+        usage_buttons = QHBoxLayout()
+        
+        update_usage_btn = RetroButton("Update Stats")
+        update_usage_btn.clicked.connect(self.update_usage_stats)
+        usage_buttons.addWidget(update_usage_btn)
+        
+        reset_usage_btn = RetroButton("Reset Stats")
+        reset_usage_btn.clicked.connect(self.reset_usage_stats)
+        usage_buttons.addWidget(reset_usage_btn)
+        
+        usage_layout.addLayout(usage_buttons)
+        
+        # Add usage group to main layout
+        layout.addWidget(usage_group)
+        
+        # Add separator
+        separator3 = QFrame()
+        separator3.setFrameShape(QFrame.Shape.HLine)
+        separator3.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator3)
+        
+        # Service status section
+        service_group = QGroupBox("OpenAI Service Status")
+        service_layout = QHBoxLayout()
+        service_group.setLayout(service_layout)
+        
+        self.service_status_label = QLabel("Status: Not checked")
+        service_layout.addWidget(self.service_status_label)
+        
+        check_status_btn = RetroButton("Check Status")
+        check_status_btn.clicked.connect(self.check_openai_service)
+        service_layout.addWidget(check_status_btn)
+        
+        layout.addWidget(service_group)
+
+    def toggle_key_visibility(self):
+        """Toggle visibility of the API key."""
+        if self.api_key_edit.echoMode() == QLineEdit.EchoMode.Password:
+            self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Normal)
+        else:
+            self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+
+    def update_model_description(self, index):
+        """Update the model description when selection changes."""
+        model = self.model_combo.currentText()
+        
+        descriptions = {
+            "gpt-3.5-turbo": "Fast and cost-effective for most tasks",
+            "gpt-4": "More capable than GPT-3.5 but slower and more expensive",
+            "gpt-4-turbo": "Improved version of GPT-4 with better performance",
+            "gpt-4o": "Most advanced model with visual capabilities",
+            "gpt-3.5-turbo-16k": "GPT-3.5 Turbo with extended context window"
+        }
+        
+        description = descriptions.get(model, "No description available")
+        self.model_description.setText(f"{model}: {description}")
+    
+    def refresh_models(self):
+        """Refresh the available models list."""
+        try:
+            # Try to get the models from the API if we have a key
+            api_key = self.api_key_edit.text().strip()
+            if api_key and len(api_key) > 20 and api_key != "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+                # Import OpenAI
+                try:
+                    from openai import OpenAI
+                    
+                    # Create a temporary client
+                    temp_client = OpenAI(api_key=api_key)
+                    
+                    # Try to get models
+                    models = temp_client.models.list()
+                    
+                    # Extract model names that are appropriate for chat
+                    model_names = [
+                        model.id for model in models.data
+                        if model.id.startswith(("gpt-3", "gpt-4")) and not model.id.endswith("-vision")
+                    ]
+                    
+                    if model_names:
+                        # Remember the current selection
+                        current_model = self.model_combo.currentText()
+                        
+                        # Update the combo box
+                        self.model_combo.clear()
+                        self.model_combo.addItems(model_names)
+                        
+                        # Try to restore previous selection
+                        index = self.model_combo.findText(current_model)
+                        if index >= 0:
+                            self.model_combo.setCurrentIndex(index)
+                        
+                        self.model_description.setText("Models refreshed from API")
+                        return
+                    
+                except ImportError:
+                    self.model_description.setText("Error: OpenAI module not installed")
+                except Exception as e:
+                    self.model_description.setText(f"Error refreshing models: {str(e)[:60]}")
+            
+            # Fallback to default models if we can't get them from the API
+            self.model_combo.clear()
+            self.model_combo.addItems([
+                "gpt-4o",
+                "gpt-4-turbo",
+                "gpt-4",
+                "gpt-3.5-turbo",
+                "gpt-3.5-turbo-16k"
+            ])
+            self.model_description.setText("Using default model list (API key not set or error)")
+            
+        except Exception as e:
+            self.model_description.setText(f"Error: {str(e)[:60]}")
+
+    def verify_api_key(self):
+        """Check if the API key is valid."""
+        # Get API key from input
+        api_key = self.api_key_edit.text()
+        
+        # Check if we have text entered
+        if not api_key or len(api_key.strip()) < 10:
+            self.api_key_status.setText("Status: Invalid key (too short)")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+            return
+        
+        # Update UI
+        self.api_key_status.setText("Status: Verifying...")
+        self.api_key_status.setStyleSheet("color: #AAAAAA;")
+        
+        # Try to initialize a client to test the key
+        try:
+            # Import OpenAI
+            from openai import OpenAI, APIError
+            
+            # Create a temporary client
+            temp_client = OpenAI(api_key=api_key)
+            
+            # Try a lightweight API call to verify the key
+            try:
+                models = temp_client.models.list(limit=1)
+                
+                # Key is valid
+                self.api_key_status.setText(f"Status: Valid ✅")
+                self.api_key_status.setStyleSheet("color: #55AA55;")
+                
+            except APIError as e:
+                # API-specific errors (usually authentication or permissions)
+                self.api_key_status.setText(f"Status: Invalid key - {str(e)[:60]}")
+                self.api_key_status.setStyleSheet("color: #FF5555;")
+                
+        except ImportError:
+            self.api_key_status.setText("Status: OpenAI module not installed")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+        except Exception as e:
+            self.api_key_status.setText(f"Status: Error - {str(e)[:60]}")
+            self.api_key_status.setStyleSheet("color: #FF5555;")
+
+    def save_api_key(self):
+        """Update the API key in the configuration."""
+        api_key = self.api_key_edit.text()
+        
+        # Skip if key is just placeholder asterisks
+        if api_key == "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            QMessageBox.warning(
+                self, 
+                "API Key Update", 
+                "Please enter your actual API key, not the placeholder."
+            )
+            return
+        
+        if not api_key:
+            QMessageBox.warning(
+                self, 
+                "API Key Update", 
+                "API key cannot be empty."
+            )
+            return
+        
+        # Save the API key to settings
+        try:
+            import json
+            import os
+            
+            # Load existing settings
+            settings_path = "punch_card_settings.json"
+            settings = {}
+            
+            if os.path.exists(settings_path):
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+            
+            # Update with new API key
+            settings["openai_api_key"] = api_key
+            
+            # Add model and temperature if they don't exist
+            settings["openai_model"] = self.model_combo.currentText()
+            settings["temperature"] = float(self.temperature_slider.value()) / 100.0
+            
+            # Save updated settings
+            with open(settings_path, "w") as f:
+                json.dump(settings, f, indent=4)
+            
+            QMessageBox.information(
+                self, 
+                "API Key Update", 
+                "✅ API key successfully saved to settings file."
+            )
+            
+            # Update API key status
+            self.verify_api_key()
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "API Key Update Error",
+                f"An error occurred while updating your API key: {str(e)}"
+            )
+
+    def check_openai_service(self):
+        """Check the OpenAI service status."""
+        self.service_status_label.setText("Status: Checking...")
+        
+        try:
+            import requests
+            
+            url = "https://status.openai.com/api/v2/status.json"
+            response = requests.get(url, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                status_indicator = data.get("status", {}).get("indicator", "unknown")
+                status_description = data.get("status", {}).get("description", "Unknown status")
+                
+                if status_indicator == "none":
+                    self.service_status_label.setText("Status: All systems operational")
+                    self.service_status_label.setStyleSheet("color: #55AA55;")
+                else:
+                    self.service_status_label.setText(f"Status: {status_description}")
+                    
+                    # Set color based on status
+                    if status_indicator == "minor":
+                        self.service_status_label.setStyleSheet("color: #FFAA55;")
+                    elif status_indicator == "major" or status_indicator == "critical":
+                        self.service_status_label.setStyleSheet("color: #FF5555;")
+                    else:
+                        self.service_status_label.setStyleSheet("color: #AAAAAA;")
+            else:
+                self.service_status_label.setText(f"Status: Error (HTTP {response.status_code})")
+                self.service_status_label.setStyleSheet("color: #FF5555;")
+                
+        except Exception as e:
+            self.service_status_label.setText(f"Status: Error - {str(e)[:60]}")
+            self.service_status_label.setStyleSheet("color: #FF5555;")
+
+    def update_usage_stats(self):
+        """Update the OpenAI usage statistics display."""
+        import json
+        import os
+        
+        # Default display if no stats available
+        usage_text = "No OpenAI usage data available."
+        
+        try:
+            # Load settings file to get usage data
+            settings_path = "punch_card_settings.json"
+            
+            if os.path.exists(settings_path):
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+                
+                # Check if we have OpenAI usage data
+                if "openai_usage" in settings:
+                    usage = settings["openai_usage"]
+                    
+                    # Format the usage statistics
+                    usage_text = "=== OpenAI API Usage ===\n"
+                    usage_text += f"Total API calls: {usage.get('total_calls', 0)}\n"
+                    usage_text += f"Total tokens: {usage.get('total_tokens', 0)}\n"
+                    usage_text += f"Prompt tokens: {usage.get('prompt_tokens', 0)}\n"
+                    usage_text += f"Completion tokens: {usage.get('completion_tokens', 0)}\n"
+                    usage_text += f"Estimated cost: ${usage.get('estimated_cost', 0):.4f}\n"
+                    
+                    # Add last updated timestamp if available
+                    if "last_updated" in usage:
+                        usage_text += f"\nLast updated: {usage.get('last_updated', 'Never')}"
+            
+            # Update the usage text display
+            self.usage_text.setText(usage_text)
+            
+        except Exception as e:
+            self.usage_text.setText(f"Error loading usage stats: {str(e)}")
+
+    def reset_usage_stats(self):
+        """Reset the OpenAI usage statistics."""
+        import json
+        import os
+        from datetime import datetime
+        
+        # Confirm with user
+        confirm = QMessageBox.question(
+            self,
+            "Reset Usage Statistics",
+            "Are you sure you want to reset all OpenAI usage statistics?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            try:
+                # Load settings file
+                settings_path = "punch_card_settings.json"
+                settings = {}
+                
+                if os.path.exists(settings_path):
+                    with open(settings_path, "r") as f:
+                        settings = json.load(f)
+                
+                # Reset OpenAI usage stats
+                settings["openai_usage"] = {
+                    "total_calls": 0,
+                    "total_tokens": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "estimated_cost": 0.0,
+                    "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "history": []
+                }
+                
+                # Save updated settings
+                with open(settings_path, "w") as f:
+                    json.dump(settings, f, indent=4)
+                
+                # Update the display
+                self.update_usage_stats()
+                
+                QMessageBox.information(
+                    self,
+                    "Usage Statistics Reset",
+                    "OpenAI usage statistics have been reset."
+                )
+                
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Reset Error",
+                    f"An error occurred while resetting usage statistics: {str(e)}"
+                )
+
+    def _setup_stats_tab(self):
+        """Set up the statistics tab."""
+        layout = QVBoxLayout()
+        self.stats_tab.setLayout(layout)
+        
+        # Message Statistics Section
+        stats_group = QGroupBox("Message Statistics")
+        stats_layout = QVBoxLayout()
+        stats_group.setLayout(stats_layout)
+        
+        # Add stats display
+        self.stats_text = QTextEdit()
+        self.stats_text.setReadOnly(True)
+        self.stats_text.setMinimumHeight(150)
+        self.stats_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        stats_layout.addWidget(self.stats_text)
+        
+        # Reset stats button
+        reset_stats_btn = RetroButton("Reset Statistics")
+        reset_stats_btn.clicked.connect(self.reset_message_stats)
+        stats_layout.addWidget(reset_stats_btn)
+        
+        # Add stats group to main layout
+        layout.addWidget(stats_group)
+        
+        # Add separator
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator)
+        
+        # Service Status Section
+        service_group = QGroupBox("Service Status")
+        service_layout = QVBoxLayout()
+        service_group.setLayout(service_layout)
+        
+        # Add service status display
+        self.service_status_text = QTextEdit()
+        self.service_status_text.setReadOnly(True)
+        self.service_status_text.setMinimumHeight(150)
+        self.service_status_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        service_layout.addWidget(self.service_status_text)
+        
+        # Refresh status button
+        refresh_status_btn = RetroButton("Refresh Service Status")
+        refresh_status_btn.clicked.connect(self.refresh_service_status)
+        service_layout.addWidget(refresh_status_btn)
+        
+        # Add service group to main layout
+        layout.addWidget(service_group)
+        
+        # Update the statistics display
+        self.update_stats_display()
+
+    def update_stats_display(self):
+        """Update the statistics display with current stats."""
+        # Update message statistics
+        self.stats_text.setText(self.get_stats_text())
+        
+        # Update service status
+        self.service_status_text.setText(self.get_service_status_text())
+        
+        # Update OpenAI usage stats
+        self.update_usage_stats()
+
+    def get_stats_text(self):
+        """Format and return statistics as text."""
+        global message_stats
+        if 'message_stats' not in globals():
+            self._initialize_message_stats()
+            
+        ms = message_stats
+        text = "=== Message Counts ===\n"
+        text += f"Total messages: {ms.get('total', 0)}\n"
+        text += f"Local messages: {ms.get('local', 0)}\n"
+        text += f"OpenAI messages: {ms.get('openai', 0)}\n"
+        text += f"Database messages: {ms.get('database', 0)}\n"
+        text += f"System messages: {ms.get('system', 0)}\n\n"
+        
+        text += f"Last updated: {ms.get('last_updated', 'Never')}\n"
+        
+        if ms.get('last_message') and ms.get('last_source'):
+            text += f"Last message: '{ms.get('last_message', '')}'\n"
+            text += f"Source: {ms.get('last_source', '')}\n"
+        
+        return text
+
+    def get_service_status_text(self):
+        """Get formatted text of service statuses."""
+        global service_status
+        if 'service_status' not in globals():
+            self._initialize_message_stats()
+            
+        openai_status = service_status.get("openai", {})
+        flyio_status = service_status.get("flyio", {})
+        
+        text = "=== Service Status ===\n"
+        text += f"OpenAI: {openai_status.get('status', 'Unknown')} - {openai_status.get('message', 'No message')}\n"
+        text += f"Last checked: {openai_status.get('last_checked', 'Never')}\n\n"
+        
+        text += f"Fly.io: {flyio_status.get('status', 'Unknown')} - {flyio_status.get('message', 'No message')}\n"
+        text += f"Last checked: {flyio_status.get('last_checked', 'Never')}\n"
+        
+        return text
+
+    def reset_message_stats(self):
+        """Reset the message statistics."""
+        global message_stats
+        
+        # Confirm with user
+        confirm = QMessageBox.question(
+            self,
+            "Reset Statistics",
+            "Are you sure you want to reset all message statistics?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            # Reset stats
+            message_stats = {
+                "total": 0,
+                "local": 0,
+                "openai": 0,
+                "database": 0,
+                "system": 0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "last_message": "",
+                "last_source": ""
+            }
+            
+            # Update display
+            self.update_stats_display()
+            
+            QMessageBox.information(
+                self,
+                "Statistics Reset",
+                "Message statistics have been reset."
+            )
+
+    def refresh_service_status(self):
+        """Refresh the service status display."""
+        global service_status
+        
+        # Update the status
+        self.check_openai_status()
+        self.check_flyio_status()
+        
+        # Update the display
+        self.service_status_text.setText(self.get_service_status_text())
+        
+        QMessageBox.information(
+            self,
+            "Service Status",
+            "Service status has been refreshed."
+        )
+
+    def check_openai_status(self):
+        """Check OpenAI API status and update global status tracking."""
+        global service_status
+        
+        import requests
+        from datetime import datetime
+        
+        url = "https://status.openai.com/api/v2/status.json"
+        service_status["openai"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        try:
+            # Try to make a simple API request
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            
+            data = response.json()
+            status_indicator = data.get("status", {}).get("indicator", "unknown")
+            status_description = data.get("status", {}).get("description", "Unknown status")
+            
+            if status_indicator == "none":
+                service_status["openai"]["status"] = "operational"
+                service_status["openai"]["message"] = "All systems operational"
+            else:
+                service_status["openai"]["status"] = status_indicator
+                service_status["openai"]["message"] = status_description
+                
+            return True
+        except Exception as e:
+            service_status["openai"]["status"] = "error"
+            service_status["openai"]["message"] = f"Error checking status: {str(e)[:50]}"
+            return False
+
+    def check_flyio_status(self):
+        """Check fly.io status and update global status tracking."""
+        global service_status
+        
+        import requests
+        from datetime import datetime
+        
+        url = "https://status.fly.io/api/v2/status.json"
+        service_status["flyio"]["last_checked"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        try:
+            # Try to make a simple API request
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            
+            data = response.json()
+            status_indicator = data.get("status", {}).get("indicator", "unknown")
+            status_description = data.get("status", {}).get("description", "Unknown status")
+            
+            service_status["flyio"]["status"] = status_indicator
+            service_status["flyio"]["message"] = status_description
+                
+            return True
+        except Exception as e:
+            service_status["flyio"]["status"] = "error"
+            service_status["flyio"]["message"] = f"Error checking status: {str(e)[:50]}"
+            return False
+
+    def _load_settings(self):
+        """Load existing settings into the dialog."""
+        import json
+        import os
+        
+        settings_path = "punch_card_settings.json"
+        
+        if os.path.exists(settings_path):
+            try:
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+                
+                # Load display settings
+                self.led_delay.setValue(settings.get("led_delay", 100))
+                self.interval_spin.setValue(settings.get("interval", 5))
+                self.display_time_spin.setValue(settings.get("message_display_time", 3))
+                self.delay_factor_spin.setValue(settings.get("delay_factor", 1.0))
+                self.random_delay.setChecked(settings.get("random_delay", True))
+                self.show_splash.setChecked(settings.get("show_splash", True))
+                self.auto_console.setChecked(settings.get("auto_console", True))
+                
+                # Load dimension settings
+                self.width_spin.setValue(settings.get("card_width", 300))
+                self.height_spin.setValue(settings.get("card_height", 200))
+                
+                # Load card settings if available
+                if "scale_factor" in settings:
+                    self.scale_factor.setValue(settings.get("scale_factor", 3))
+                if "top_margin" in settings:
+                    self.top_margin.setValue(settings.get("top_margin", 4))
+                if "side_margin" in settings:
+                    self.side_margin.setValue(settings.get("side_margin", 5))
+                if "row_spacing" in settings:
+                    self.row_spacing.setValue(settings.get("row_spacing", 2))
+                if "column_spacing" in settings:
+                    self.column_spacing.setValue(settings.get("column_spacing", 1))
+                if "hole_width" in settings:
+                    self.hole_width.setValue(settings.get("hole_width", 1))
+                if "hole_height" in settings:
+                    self.hole_height.setValue(settings.get("hole_height", 3))
+                
+                # Load OpenAI settings
+                if "openai_api_key" in settings:
+                    self.api_key_edit.setText("●●●●●●●●●●●●●●●●●●●●●●●●●●●●")
+                
+                # Set model if it exists
+                if "openai_model" in settings:
+                    index = self.model_combo.findText(settings["openai_model"])
+                    if index >= 0:
+                        self.model_combo.setCurrentIndex(index)
+                
+                # Set temperature if it exists
+                if "temperature" in settings:
+                    temp_value = int(settings["temperature"] * 100)
+                    self.temperature_slider.setValue(temp_value)
+                
+            except Exception as e:
+                print(f"Error loading settings: {e}")
+
+    def accept(self):
+        """Save settings and close the dialog."""
+        self.save_settings()
+        super().accept()
+
+    def save_settings(self):
+        """Save settings to a file."""
+        import json
+        import os
+        from datetime import datetime
+        
+        # Get settings from form
+        settings = {
+            # Display settings
+            "led_delay": self.led_delay.value(),
+            "interval": self.interval_spin.value(),
+            "message_display_time": self.display_time_spin.value(),
+            "delay_factor": self.delay_factor_spin.value(),
+            "random_delay": self.random_delay.isChecked(),
+            "show_splash": self.show_splash.isChecked(),
+            "auto_console": self.auto_console.isChecked(),
+            
+            # Card dimensions
+            "card_width": self.width_spin.value(),
+            "card_height": self.height_spin.value(),
+            
+            # Card detailed settings
+            "scale_factor": self.scale_factor.value(),
+            "top_margin": self.top_margin.value(),
+            "side_margin": self.side_margin.value(),
+            "row_spacing": self.row_spacing.value(),
+            "column_spacing": self.column_spacing.value(),
+            "hole_width": self.hole_width.value(),
+            "hole_height": self.hole_height.value(),
+            
+            # OpenAI settings (don't overwrite API key if placeholder)
+            "openai_model": self.model_combo.currentText(),
+            "temperature": float(self.temperature_slider.value()) / 100.0
+        }
+        
+        # API key - only save if it's not the placeholder
+        api_key = self.api_key_edit.text()
+        if api_key and api_key != "●●●●●●●●●●●●●●●●●●●●●●●●●●●●":
+            settings["openai_api_key"] = api_key
+        
+        # Load existing settings to preserve other values
+        settings_path = "punch_card_settings.json"
+        existing_settings = {}
+        
+        if os.path.exists(settings_path):
+            try:
+                with open(settings_path, "r") as f:
+                    existing_settings = json.load(f)
+            except json.JSONDecodeError:
+                print("Warning: Could not parse settings file. Creating new file.")
+        
+        # Merge with existing settings
+        existing_settings.update(settings)
+        
+        # Initialize OpenAI usage section if it doesn't exist
+        if "openai_usage" not in existing_settings:
+            existing_settings["openai_usage"] = {
+                "total_calls": 0,
+                "total_tokens": 0,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "estimated_cost": 0.0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "history": []
+            }
+        
+        # Save settings
+        with open(settings_path, "w") as f:
+            json.dump(existing_settings, f, indent=4)
+
+    def _setup_card_tab(self):
+        """Set up the card dimensions tab."""
+        self.card_tab = QWidget()
+        card_layout = QVBoxLayout(self.card_tab)
+        
+        # Create form for card dimensions
+        card_form = QFormLayout()
+        card_form.setSpacing(10)
+        
+        # Card width input
+        self.card_width_input = QSpinBox()
+        self.card_width_input.setRange(10, 200)
+        self.card_width_input.setValue(80)
+        self.card_width_input.setFixedWidth(100)
+        card_form.addRow("Card Width:", self.card_width_input)
+        
+        # Card height input
+        self.card_height_input = QSpinBox()
+        self.card_height_input.setRange(5, 50)
+        self.card_height_input.setValue(12)
+        self.card_height_input.setFixedWidth(100)
+        card_form.addRow("Card Height:", self.card_height_input)
+        
+        # Add explanation
+        card_explanation = QLabel(
+            "Card dimensions determine how many columns and rows are displayed in the punch card."
+            "\nChanges will take effect after restarting the application."
+        )
+        card_explanation.setStyleSheet("color: gray; font-style: italic;")
+        card_explanation.setWordWrap(True)
+        
+        # Add form and explanation to layout
+        card_layout.addLayout(card_form)
+        card_layout.addWidget(card_explanation)
+        card_layout.addStretch(1)
+        
+        # Update values from settings
+        self.update_card_dimensions()
 
 class MessageGenerator:
     """Generates random messages for display."""
@@ -876,13 +1896,498 @@ class APIConsoleWindow(QDialog):
             self.log_error("Failed to connect to API", e)
             self.update_status("Unavailable")
 
+class WiFiStatusWidget(QWidget):
+    """Custom widget for displaying WiFi status with rectangular bars."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedWidth(30)
+        self.setFixedHeight(22)
+        self.setProperty("status", "connected")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)  # Show pointer cursor on hover
+        
+        # Create popup menu for WiFi settings
+        self.wifi_menu = QMenu(self)
+        self.wifi_menu.setStyleSheet("""
+            QMenu {
+                background-color: black;
+                color: white;
+                border: 1px solid white;
+                font-family: Courier New, monospace;
+                font-size: 12px;
+            }
+            QMenu::item {
+                padding: 4px 25px;
+            }
+            QMenu::item:selected {
+                background-color: white;
+                color: black;
+            }
+            QMenu::separator {
+                height: 1px;
+                background-color: #444444;
+                margin: 4px 2px;
+            }
+        """)
+        
+        # Add menu items
+        self.connected_action = self.wifi_menu.addAction("Connected")
+        self.connected_action.setCheckable(True)
+        self.connected_action.setChecked(True)
+        self.connected_action.triggered.connect(lambda: self.set_wifi_status("connected"))
+        
+        self.weak_action = self.wifi_menu.addAction("Weak Signal")
+        self.weak_action.setCheckable(True)
+        self.weak_action.triggered.connect(lambda: self.set_wifi_status("weak"))
+        
+        self.disconnected_action = self.wifi_menu.addAction("Disconnected")
+        self.disconnected_action.setCheckable(True)
+        self.disconnected_action.triggered.connect(lambda: self.set_wifi_status("disconnected"))
+        
+        self.wifi_menu.addSeparator()
+        self.wifi_menu.addAction("WiFi Settings...").triggered.connect(self.show_wifi_settings)
+    
+    def set_wifi_status(self, status):
+        """Set the WiFi status and update checked actions."""
+        self.setProperty("status", status)
+        
+        # Update checked states
+        self.connected_action.setChecked(status == "connected")
+        self.weak_action.setChecked(status == "weak")
+        self.disconnected_action.setChecked(status == "disconnected")
+        
+        # Repaint the widget
+        self.update()
+    
+    def show_wifi_settings(self):
+        """Show more detailed WiFi settings dialog."""
+        QMessageBox.information(self, "WiFi Settings", 
+                               "This would show a detailed WiFi configuration dialog.\n"
+                               "Currently in simulation mode only.")
+    
+    def mousePressEvent(self, event):
+        """Handle mouse press to show the popup menu."""
+        if event.button() == Qt.MouseButton.LeftButton:
+            # Get the window and calculate its right edge
+            window = self.window()
+            window_right_edge = window.mapToGlobal(QPoint(window.width(), 0)).x()
+            
+            # Get the menu width
+            menu_width = self.wifi_menu.sizeHint().width()
+            
+            # Get position - x from current widget, y from menu bar bottom
+            x_pos = self.mapToGlobal(QPoint(0, 0)).x()
+            
+            # Get parent menu bar to determine its bottom edge
+            parent_menubar = self.parent()
+            y_pos = parent_menubar.mapToGlobal(QPoint(0, parent_menubar.height() - 1)).y()  # Moved down 1 pixel
+            
+            # Make sure menu doesn't go off screen
+            x_position = min(x_pos, window_right_edge - menu_width)
+            
+            # Show popup at the adjusted position
+            self.wifi_menu.popup(QPoint(x_position, y_pos))
+    
+    def paintEvent(self, event):
+        """Paint the WiFi status icon with rectangular bars."""
+        super().paintEvent(event)
+        
+        # Get WiFi connection status
+        status = self.property("status") or "disconnected"
+        
+        # Create painter for this widget
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Use white color for WiFi bars in all states
+        color = QColor(255, 255, 255)
+        
+        # Determine number of bars based on connection status
+        if status == "connected":
+            bars = 3
+        elif status == "weak":
+            bars = 2
+        else:  # Disconnected
+            bars = 1
+        
+        # Configure painter
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QBrush(color))
+        
+        # Calculate position centered in widget
+        center_x = self.width() // 2
+        y_base = self.height() - 7  # Add more space at the bottom (was 6)
+        
+        # Calculate total width of all bars
+        bar_width = 3
+        spacing = 2
+        total_width = (3 * bar_width) + (2 * spacing)  # Always show 3 bars (some empty)
+        start_x = center_x - (total_width // 2)
+        
+        # Draw all three bars (filled or empty based on status)
+        for i in range(3):
+            x = start_x + (i * (bar_width + spacing))
+            bar_height = 4 + (i * 2)  # Slightly shorter bars (was i*3)
+            y = y_base - bar_height
+            
+            # If this bar should be filled based on status
+            if i < bars:
+                painter.setBrush(QBrush(color))
+            else:
+                # Draw outline for inactive bars
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.setPen(QPen(color, 0.8))
+            
+            painter.drawRect(x, y, bar_width, bar_height)
+            painter.setPen(Qt.PenStyle.NoPen)  # Reset pen for next iteration
+
+
+class InAppMenuBar(QWidget):
+    """Custom in-app menu bar that simulates classic Mac menu bar appearance."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedHeight(22)
+        
+        # Set NO background styling in CSS - we'll handle all drawing manually
+        self.setStyleSheet("""
+            background-color: transparent;
+            color: white;
+            border: none;
+        """)
+        
+        # Create main layout
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)  # Zero margins to ensure full width
+        self.layout.setSpacing(1)  # Reduced spacing between menu items
+        
+        # Left side - Menu items
+        # Create left container to hold all menu buttons
+        self.left_container = QWidget()
+        self.left_layout = QHBoxLayout(self.left_container)
+        self.left_layout.setContentsMargins(0, 0, 0, 0)
+        self.left_layout.setSpacing(1)  # Reduced spacing
+        
+        # Apple menu button
+        self.apple_menu = QPushButton("▭")  # Rectangle symbol for a punch card
+        self.apple_menu.setFlat(True)
+        self.apple_menu.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: white;
+                border: none;
+                padding: 0px 8px;
+                text-align: center;
+                font-size: 22px;
+                font-weight: normal;
+                min-width: 24px;
+                min-height: 22px;
+                margin: 0px;
+                margin-top: -4px;  /* Move up by adding negative top margin */
+                line-height: 15px;  /* Reduced further to move symbol up */
+                vertical-align: top;
+                padding-top: 0px;  /* Remove top padding */
+            }}
+            QPushButton:hover {{
+                background-color: white;
+                color: black;
+            }}
+            QPushButton:pressed {{
+                background-color: #444444;
+                color: white;
+            }}
+        """)
+        self.left_layout.addWidget(self.apple_menu)
+        
+        # Other menu buttons
+        self.card_menu = self.create_menu_button("Punch Card")
+        self.settings_menu = self.create_menu_button("Settings")
+        self.console_menu = self.create_menu_button("Console")
+        
+        # Right side - Status indicators
+        # Create right container to hold all status indicators
+        self.right_container = QWidget()
+        self.right_layout = QHBoxLayout(self.right_container)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_layout.setSpacing(5)  # Spacing between WiFi and clock
+        
+        # Add a small spacer to push WiFi icon to the right
+        right_spacer = QSpacerItem(10, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.right_layout.addItem(right_spacer)
+        
+        # Create WiFi indicator using our custom widget
+        self.wifi_status = WiFiStatusWidget(self)
+        
+        # Create clock button instead of label
+        self.clock_button = QPushButton()
+        self.clock_button.setFlat(True)
+        self.clock_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: white;
+                border: none;
+                padding: 2px 8px;
+                text-align: center;
+                {get_font_css(size=11, bold=False)}
+            }}
+            QPushButton:hover {{
+                background-color: white;
+                color: black;
+            }}
+            QPushButton:pressed {{
+                background-color: #444444;
+                color: white;
+            }}
+        """)
+        self.clock_button.setMinimumWidth(140)  # Ensure enough space for the date format
+        
+        # Add status indicators to right container
+        self.right_layout.addWidget(self.wifi_status)
+        self.right_layout.addWidget(self.clock_button)
+        
+        # Add left and right containers to main layout
+        self.layout.addWidget(self.left_container)
+        self.layout.addStretch(1)  # Push items to the sides
+        self.layout.addWidget(self.right_container)
+        
+        # Create empty menus to be set up later
+        self.apple_menu_popup = QMenu(self)
+        self.card_menu_popup = QMenu(self)
+        self.settings_menu_popup = QMenu(self)
+        self.console_menu_popup = QMenu(self)
+        self.notifications_popup = QMenu(self)
+        
+        # Connect menu buttons to popup functions
+        self.apple_menu.clicked.connect(self.show_apple_menu)
+        self.card_menu.clicked.connect(self.show_card_menu)
+        self.settings_menu.clicked.connect(self.show_settings_menu)
+        self.console_menu.clicked.connect(self.show_console_menu)
+        self.clock_button.clicked.connect(self.show_notifications)
+        
+        # Setup clock timer
+        self.clock_timer = QTimer(self)
+        self.clock_timer.timeout.connect(self.update_clock)
+        self.clock_timer.start(1000)  # Update every second
+        self.update_clock()
+        
+        # Update WiFi status periodically
+        self.wifi_timer = QTimer(self)
+        self.wifi_timer.timeout.connect(self.update_wifi_status)
+        self.wifi_timer.start(5000)  # Check every 5 seconds
+        self.update_wifi_status()
+
+    def create_menu_button(self, text):
+        """Create a button that looks like a menu item."""
+        button = QPushButton(text)
+        button.setFlat(True)
+        button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: white;
+                border: none;
+                padding: 2px 8px;
+                text-align: center;
+                {get_font_css(size=12)}
+            }}
+            QPushButton:hover {{
+                background-color: white;
+                color: black;
+            }}
+            QPushButton:pressed {{
+                background-color: #444444;
+                color: white;
+            }}
+        """)
+        self.left_layout.addWidget(button)
+        return button
+    
+    def setup_menu_actions(self, main_window):
+        """Set up menu actions after the main window is fully initialized."""
+        # Define common menu style
+        menu_style = f"""
+            QMenu {{
+                background-color: black;
+                color: white;
+                border: 1px solid white;
+                {get_font_css(size=12)}
+            }}
+            QMenu::item {{
+                padding: 4px 25px;
+            }}
+            QMenu::item:selected {{
+                background-color: white;
+                color: black;
+            }}
+            QMenu::separator {{
+                height: 1px;
+                background-color: #444444;
+                margin: 4px 2px;
+            }}
+        """
+        
+        # Apply styles to all menus
+        self.apple_menu_popup.setStyleSheet(menu_style)
+        self.card_menu_popup.setStyleSheet(menu_style)
+        self.settings_menu_popup.setStyleSheet(menu_style)
+        self.console_menu_popup.setStyleSheet(menu_style)
+        self.notifications_popup.setStyleSheet(menu_style)
+        
+        # ---- Apple menu items ----
+        about_action = self.apple_menu_popup.addAction("About This Punch Card")
+        self.apple_menu_popup.addSeparator()
+        sleep_action = self.apple_menu_popup.addAction("Sleep")
+        restart_action = self.apple_menu_popup.addAction("Restart")
+        shutdown_action = self.apple_menu_popup.addAction("Shut Down")
+        
+        # Connect Apple menu signals
+        about_action.triggered.connect(main_window.show_about_dialog)
+        sleep_action.triggered.connect(main_window.start_sleep_mode)
+        restart_action.triggered.connect(main_window.restart_app)
+        shutdown_action.triggered.connect(main_window.safe_shutdown)  # Use safe shutdown
+        
+        # ---- Punch Card menu ----
+        display_message_action = self.card_menu_popup.addAction("Display Message")
+        clear_card_action = self.card_menu_popup.addAction("Clear Card")
+        self.card_menu_popup.addSeparator()
+        card_settings_action = self.card_menu_popup.addAction("Card Dimensions...")
+        
+        # Connect Punch Card menu signals
+        display_message_action.triggered.connect(main_window.start_display)
+        if hasattr(main_window, 'punch_card'):
+            clear_card_action.triggered.connect(main_window.punch_card.clear_grid)
+        card_settings_action.triggered.connect(main_window.show_card_settings)
+        
+        # ---- Settings menu ----
+        display_settings_action = self.settings_menu_popup.addAction("Display Settings...")
+        api_settings_action = self.settings_menu_popup.addAction("API Settings...")
+        self.settings_menu_popup.addSeparator()
+        inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
+        
+        # Connect Settings menu signals
+        display_settings_action.triggered.connect(main_window.show_card_settings)  # Use card settings instead
+        api_settings_action.triggered.connect(main_window.show_api_settings)
+        inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
+        
+        # ---- Console menu ----
+        system_console_action = self.console_menu_popup.addAction("System Console")
+        api_console_action = self.console_menu_popup.addAction("API Console")
+        
+        # Connect Console menu signals
+        system_console_action.triggered.connect(lambda: main_window.console.show())
+        api_console_action.triggered.connect(lambda: main_window.api_console.show())
+        
+        # ---- Notifications menu (for future use) ----
+        self.notifications_popup.addAction("No New Notifications")
+        self.notifications_popup.addSeparator()
+        notification_settings = self.notifications_popup.addAction("Notification Settings...")
+        clear_all = self.notifications_popup.addAction("Clear All")
+        
+        # These actions don't need to do anything yet - placeholder for future functionality
+    
+    def show_apple_menu(self):
+        """Show the Apple menu popup."""
+        # Get the absolute position of the menu bar's bottom edge
+        pos = self.mapToGlobal(QPoint(0, self.height() - 1))  # Moved down 1 pixel (was -2)
+        # No vertical adjustment needed - this lines up with the bottom border
+        self.apple_menu_popup.popup(pos)
+    
+    def show_card_menu(self):
+        """Show the Punch Card menu popup."""
+        # Get horizontal position from the button but vertical from menu bar bottom
+        x_pos = self.card_menu.mapToGlobal(QPoint(0, 0)).x()
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()  # Moved down 1 pixel (was -2)
+        self.card_menu_popup.popup(QPoint(x_pos, y_pos))
+    
+    def show_settings_menu(self):
+        """Show the Settings menu popup."""
+        # Get horizontal position from the button but vertical from menu bar bottom
+        x_pos = self.settings_menu.mapToGlobal(QPoint(0, 0)).x()
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()  # Moved down 1 pixel (was -2)
+        self.settings_menu_popup.popup(QPoint(x_pos, y_pos))
+    
+    def show_console_menu(self):
+        """Show the Console menu popup."""
+        # Get horizontal position from the button but vertical from menu bar bottom
+        x_pos = self.console_menu.mapToGlobal(QPoint(0, 0)).x()
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()  # Moved down 1 pixel (was -2)
+        self.console_menu_popup.popup(QPoint(x_pos, y_pos))
+    
+    def show_notifications(self):
+        """Show the notifications popup menu."""
+        # Get the menu width to calculate proper positioning
+        menu_width = self.notifications_popup.sizeHint().width()
+        
+        # Get the global position of the right edge of the window
+        window = self.window()
+        window_right_edge = window.mapToGlobal(QPoint(window.width(), 0)).x()
+        
+        # Get y position from menu bar bottom (moved down 1 pixel)
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()
+        
+        # Position the menu so its right edge aligns with the window right edge
+        x_position = window_right_edge - menu_width
+        
+        # Create final position
+        adjusted_pos = QPoint(x_position, y_pos)
+        
+        # Show the popup at the calculated position
+        self.notifications_popup.popup(adjusted_pos)
+    
+    def update_clock(self):
+        """Update the clock display with date and time in macOS style."""
+        current_time = QDateTime.currentDateTime()
+        # Use macOS style format: "Thu Apr 4 2:15 PM" or abbreviated "Thu 2:15 PM"
+        day_name = current_time.toString("ddd")
+        date_str = current_time.toString("MMM d")
+        time_str = current_time.toString("h:mm AP")
+        self.clock_button.setText(f"{day_name} {date_str} {time_str}")
+    
+    def update_wifi_status(self):
+        """Update the WiFi status indicator."""
+        # Simulate WiFi status check - in a real app, this would check actual connectivity
+        import random
+        status = random.choice(["connected", "weak", "disconnected"])
+        
+        # Update the custom WiFi widget with the new status
+        self.wifi_status.set_wifi_status(status)
+    
+    def paintEvent(self, event):
+        """Custom paint event to draw the menu bar with classic Mac styling."""
+        # Create painter for drawing
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)  # Turn off antialiasing for crisp lines
+        
+        # Step 1: Draw the black background over everything
+        painter.fillRect(self.rect(), QColor(0, 0, 0))
+        
+        # Step 2: Let the base class handle child widgets
+        painter.end()
+        super().paintEvent(event)
+        
+        # Step 3: Create a new painter to draw on top of everything
+        painter = QPainter(self)
+        
+        # Set up a pen for the white bottom border
+        pen = QPen(QColor(255, 255, 255))
+        pen.setWidth(1)
+        pen.setStyle(Qt.PenStyle.SolidLine)
+        painter.setPen(pen)
+        
+        # Draw the line precisely at the bottom of the widget
+        bottom_y = self.height() - 1
+        painter.drawLine(0, bottom_y, self.width(), bottom_y)
+
+
 class PunchCardDisplay(QMainWindow):
     """Main window for the minimalist punch card display application."""
     
-    def __init__(self):
+    def __init__(self, punch_card=None):
         super().__init__()
         self.setWindowTitle("Punch Card Display")
         self.setMinimumSize(900, 600)
+        
+        # Store the punch card instance
+        self.punch_card_instance = punch_card
         
         # Set window style and background color
         self.setStyleSheet(f"""
@@ -897,8 +2402,26 @@ class PunchCardDisplay(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         self.main_layout = QVBoxLayout(central_widget)
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)  # No margins to allow full-width menu bar
         self.main_layout.setSpacing(0)  # Reduce spacing to minimize shifts
+        
+        # ================== MENU BAR SECTION ==================
+        # Add custom in-app menu bar
+        self.menu_bar = InAppMenuBar(self)
+        self.main_layout.addWidget(self.menu_bar)
+        
+        # Add spacer to separate menu bar from content
+        menu_spacer = QWidget()
+        menu_spacer.setFixedHeight(5)
+        self.main_layout.addWidget(menu_spacer)
+        
+        # ================== CONTENT CONTAINER ==================
+        # Create container for all content below menu bar (with proper margins)
+        content_container = QWidget()
+        content_layout = QVBoxLayout(content_container)
+        content_layout.setContentsMargins(20, 20, 20, 20)
+        content_layout.setSpacing(0)
+        self.main_layout.addWidget(content_container)
         
         # ================== TOP SECTION ==================
         # Create a container for the top section (message label) with fixed height
@@ -928,8 +2451,8 @@ class PunchCardDisplay(QMainWindow):
         message_layout.addWidget(self.message_label, 1)  # 1 = stretch factor
         top_layout.addWidget(self.message_container)
         
-        # Add the top section to the main layout
-        self.main_layout.addWidget(top_section)
+        # Add the top section to the content layout
+        content_layout.addWidget(top_section)
         
         # ================== MIDDLE SECTION (PUNCH CARD) ==================
         # Create a fixed container for the punch card to ensure it stays in place
@@ -942,14 +2465,14 @@ class PunchCardDisplay(QMainWindow):
         self.punch_card = PunchCardWidget()
         punch_card_layout.addWidget(self.punch_card)
         
-        # Add the punch card container to the main layout with stretch factor
-        self.main_layout.addWidget(punch_card_container, 1)  # 1 = stretch factor
+        # Add the punch card container to the content layout with stretch factor
+        content_layout.addWidget(punch_card_container, 1)  # 1 = stretch factor
         
         # ================== BOTTOM SECTION ==================
         # Create a container for the bottom section with fixed height
         # This ensures that the punch card position remains stable
         bottom_section = QWidget()
-        bottom_section.setFixedHeight(190)  # Increased from 170 to prevent button cutoff
+        bottom_section.setFixedHeight(80)  # Reduced from 190px since we removed buttons
         bottom_layout = QVBoxLayout(bottom_section)
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         bottom_layout.setSpacing(5)
@@ -1002,6 +2525,7 @@ class PunchCardDisplay(QMainWindow):
             }}
         """)
         self.api_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.api_status_label.setVisible(False)  # Hide the API status label completely
         bottom_layout.addWidget(self.api_status_label)
         
         # Create a spacer widget to maintain spacing even when elements are hidden
@@ -1009,8 +2533,9 @@ class PunchCardDisplay(QMainWindow):
         spacer.setFixedHeight(10)
         bottom_layout.addWidget(spacer)
         
-        # Create control buttons in a container with fixed height
+        # Create control buttons in a container with fixed height - all buttons now hidden
         self.button_container = QWidget()
+        self.button_container.setVisible(False)  # Hide all buttons
         button_layout = QHBoxLayout(self.button_container)
         button_layout.setSpacing(10)
         
@@ -1034,8 +2559,8 @@ class PunchCardDisplay(QMainWindow):
         self.button_container.setFixedHeight(60)
         bottom_layout.addWidget(self.button_container)
         
-        # Add the bottom section to the main layout
-        self.main_layout.addWidget(bottom_section)
+        # Add the bottom section to the content layout
+        content_layout.addWidget(bottom_section)
         
         # Initialize variables
         self.showing_splash = True  # Start with splash screen
@@ -1065,6 +2590,14 @@ class PunchCardDisplay(QMainWindow):
         
         # Create API console window
         self.api_console = APIConsoleWindow(self)
+        
+        # Setup menu bar actions
+        self.menu_bar.setup_menu_actions(self)
+        
+        # Initialize clock timer to update clock in menu bar
+        self.clock_timer = QTimer()
+        self.clock_timer.timeout.connect(self.update_clock)
+        self.clock_timer.start(1000)  # Update every second
         
         # Show console automatically
         self.console.show()
@@ -1100,6 +2633,10 @@ class PunchCardDisplay(QMainWindow):
         # Add more variables for animation control
         self.hardware_detection_finished = False
         self.animation_started = False
+        
+        # Initialize animation manager
+        self.animation_manager = AnimationManager(self.punch_card, self)
+        self.animation_manager.animation_finished.connect(self.on_animation_finished)
         
         # Always start with splash screen
         self.start_splash_screen()
@@ -1294,138 +2831,101 @@ class PunchCardDisplay(QMainWindow):
         self.console.log(f"Card dimensions updated: {settings}")
 
     def start_splash_screen(self):
-        """Start the splash screen animation."""
+        """Start the splash screen animation using the animation manager."""
+        # Set initial state
         self.showing_splash = True
-        self.splash_step = 0
-        self.hardware_check_complete = False
-        self.countdown_seconds = 10  # Reset countdown to 10 seconds
-        self.hardware_detection_finished = False
-        self.animation_started = False
-        
-        # Instead of hiding UI elements, just make them invisible or empty
-        # This preserves their space in the layout
         self.message_label.setText("")
-        self.message_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE+2)}
-            color: {COLORS['background'].name()};  # Make text invisible
-            padding: 10px 0px;
-        """)
+        self.status_label.setText("INITIALIZING SYSTEM...")
         
-        # Calculate the left edge position of the punch card - ensure it works for splash screen too
-        self.align_message_with_card()
-        
-        self.status_label.setText("DETECTING HARDWARE...")
-        
-        self.hardware_status_label.setText("Starting hardware detection...")
-        self.hardware_status_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE-2)}
-            color: {COLORS['text'].name()};
-            padding: 5px;
-        """)
-        
-        # Update keyboard hint text with countdown
-        self.keyboard_hint_label.setText(f"Press [SPACE] to skip hardware detection ({self.countdown_seconds}s)")
-        self.keyboard_hint_label.setStyleSheet(f"""
-            {get_font_css(italic=True, size=FONT_SIZE-2)}
-            color: {QColor(150, 150, 150).name()};
-            padding: 5px;
-        """)
-        
-        # Start the countdown timer
-        self.countdown_timer.start(1000)  # 1000ms = 1 second
-        
-        # Make buttons invisible but keep their space in the layout
-        for button in [self.start_button, self.clear_button, self.exit_button]:
-            button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {COLORS['background'].name()};
-                    color: {COLORS['background'].name()};
-                    border: 0px solid {COLORS['background'].name()};
-                    padding: 6px 12px;
-                    {get_font_css(size=12)}
-                    border-radius: 3px;
-                }}
-            """)
-            button.setEnabled(False)
-        
-        self.console.log("Starting hardware detection - clearing all LEDs", "INFO")
-        
-        # Clear any potential artifacts
+        # Clear the punch card grid for animation
         self.punch_card.clear_grid()
         
-        # Start the hardware detection process
-        self.console.log("Starting hardware detection", "INFO")
-        self.hardware_detector.detect_hardware()
-    
-    def update_countdown(self):
-        """Update the countdown timer during hardware detection."""
-        self.countdown_seconds -= 1
+        # Disable buttons during splash
+        for button in [self.start_button, self.clear_button, self.exit_button]:
+            button.setEnabled(False)
+            button.setStyleSheet("""
+                background-color: #2A2A2A;
+                color: #AAAAAA;
+                border: 1px solid #444444;
+                padding: 6px 12px;
+                border-radius: 3px;
+                opacity: 0.5;
+            """)
         
-        # Update the keyboard hint with the remaining seconds
-        self.keyboard_hint_label.setText(f"Press [SPACE] to skip hardware detection ({self.countdown_seconds}s)")
-        
-        # If countdown has reached zero or hardware detection is already complete
-        if self.countdown_seconds <= 0 or self.hardware_detector.detection_complete:
-            # Auto-skip when countdown reaches zero
-            self.auto_skip_hardware_detection()
-    
-    def auto_skip_hardware_detection(self):
-        """Skip hardware detection and enable virtual mode."""
-        # Stop the countdown timer 
-        self.countdown_timer.stop()
-        
-        # Only proceed if hardware detection is not already complete
-        if not self.hardware_check_complete:
-            self.console.log("Auto-skipping hardware detection - enabling virtual mode", "WARNING")
-            
-            # Force the hardware detector into virtual mode
+        # Skip hardware detection
+        if hasattr(self, 'hardware_detector'):
             self.hardware_detector.enable_virtual_mode()
-            
-            # Set ALL the necessary flags to ensure we can proceed
             self.hardware_check_complete = True
             self.hardware_detection_finished = True
+        
+        # Reset animation flags
+        self.animation_started = False
+        
+        # Load the punch card sounds if not already loaded
+        if hasattr(self, 'load_punch_card_sounds'):
+            self.load_punch_card_sounds()
+        
+        # Console log for debugging
+        if hasattr(self, 'console'):
+            self.console.log("Splash screen started using animation manager", "INFO")
             
-            # Update hardware status message
-            self.hardware_status_label.setText("Hardware detection skipped - using virtual mode")
-            self.hardware_status_label.setStyleSheet(f"""
-                {get_font_css(bold=False, size=FONT_SIZE-2)}
-                color: {COLORS['warning'].name()};
-                padding: 5px;
-            """)
+        # Start the startup animation
+        self.animation_manager.play_animation(AnimationType.STARTUP, callback=self.complete_splash_screen)
+        
+        # Schedule post-wake setup after animation completes (if waking from sleep)
+        if hasattr(self, 'sleeping') and not self.sleeping:
+            QTimer.singleShot(5000, self.post_wake_setup)
+
+    def on_animation_finished(self, animation_type):
+        """Handle animation completion events"""
+        if hasattr(self, 'console'):
+            self.console.log(f"Animation finished: {animation_type}", "INFO")
             
-            # Update the keyboard hint message
-            self.keyboard_hint_label.setText("Hardware virtualization will be used instead")
-            self.keyboard_hint_label.setStyleSheet(f"""
-                {get_font_css(italic=True, size=FONT_SIZE-2)}
-                color: {COLORS['warning'].name()};
-                padding: 5px;
-            """)
-            
-            # Start the animation immediately
-            self.start_animation()
-    
+        # Handle specific animation completion events
+        if animation_type == AnimationType.STARTUP:
+            # Play final sound
+            if hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound.play()
+        elif animation_type == AnimationType.SLEEP:
+            # Update status
+            self.update_status("SLEEPING")
+        elif animation_type == AnimationType.WAKE:
+            # Update status
+            self.update_status("READY")
+
     def start_animation(self):
-        """Start the splash animation after hardware detection is complete."""
+        """Start the animation timer for the splash screen."""
         # If the animation is already started, don't restart it
-        if self.animation_started:
+        if hasattr(self, 'animation_started') and self.animation_started:
             return
             
         # Set animation as started regardless of hardware detection status
         self.animation_started = True
-        self.status_label.setText("STARTING ANIMATION...")
-        self.console.log("Starting splash animation", "INFO")
+        
+        # Update the status text
+        if hasattr(self, 'status_label'):
+            self.status_label.setText("STARTING ANIMATION...")
+        
+        # Log the animation start
+        if hasattr(self, 'console'):
+            self.console.log("Starting splash animation", "INFO")
+        elif hasattr(self, 'console_window'):
+            self.console_window.log("Starting splash animation", "INFO")
         
         # Make sure hardware detection is considered finished
-        self.hardware_detection_finished = True
-        self.hardware_check_complete = True
+        if hasattr(self, 'hardware_detection_finished'):
+            self.hardware_detection_finished = True
         
-        # Ensure the hardware detector is in a valid state
-        if not self.hardware_detector.detection_complete:
+        if hasattr(self, 'hardware_check_complete'):
+            self.hardware_check_complete = True
+        
+        # Ensure the hardware detector is in a valid state if it exists
+        if hasattr(self, 'hardware_detector') and not self.hardware_detector.detection_complete:
             self.hardware_detector.enable_virtual_mode()
         
-        # Start the splash animation timer
-        self.splash_timer.start(100)
-    
+        # Start the startup animation
+        self.animation_manager.play_animation(AnimationType.STARTUP, callback=self.complete_splash_screen)
+
     def update_hardware_status(self):
         """Update the hardware status label."""
         # If hardware detection is complete and animation hasn't started yet
@@ -1472,233 +2972,169 @@ class PunchCardDisplay(QMainWindow):
             )
     
     def update_splash(self):
-        """Update the splash screen animation."""
-        if not self.showing_splash:
+        """Simple splash animation that gradually clears the punch card."""
+        # Check if we're in splash mode
+        if not hasattr(self, 'showing_splash') or not self.showing_splash:
             return
             
-        # Calculate total steps needed to cover the entire card
-        total_steps = NUM_COLS + NUM_ROWS - 1  # This ensures we cover the entire diagonal
+        # Calculate total steps needed for the animation
+        NUM_ROWS = self.punch_card.num_rows
+        NUM_COLS = self.punch_card.num_cols
+        total_steps = NUM_COLS + NUM_ROWS - 1  # Total for diagonal coverage
         
-        # Log the current splash step to console only
-        self.console.log(f"Splash step: {self.splash_step} of {total_steps*2 + 12}", "INFO")
+        # Get punch card reference
+        punch_card = self.punch_card
         
-        # Ensure we have hardware detection complete - critical fix
-        if not self.hardware_check_complete:
-            # Double-check that we're in a valid state before proceeding
-            if self.hardware_detector.detection_complete or self.hardware_detector.using_virtual_mode:
-                # Hardware detection completed naturally since last check
-                self.hardware_check_complete = True
-                self.hardware_detection_finished = True
-            else:
-                # Still waiting - skip again to avoid getting stuck
-                self.auto_skip_hardware_detection()
-                return
+        # Update progress
+        if not hasattr(self, 'splash_progress'):
+            self.splash_progress = 0
             
-        # Phase transitions - verify top-left corner state
-        if self.splash_step == 0:
-            # At the very beginning, make sure top-left corner is OFF
-            self.verify_top_left_corner(False, "Initial state")
-        elif self.splash_step == total_steps:
-            # At start of Phase 2, verify top-left corner is OFF before we turn it ON
-            self.verify_top_left_corner(False, "Start of Phase 2")
-        elif self.splash_step == total_steps * 2:
-            # At start of Phase 3, verify that top-left corner is either ON or OFF depending on current animation
-            # Logic below will ensure it gets properly set
-            pass
+        self.splash_progress += 2
+        
+        # Log progress periodically
+        if self.splash_progress % 5 == 0:
+            self.console.log(f"Animation progress: {self.splash_progress} of {total_steps*2 + 12}", "INFO")
+        
+        # Update status text in phases
+        if self.splash_progress < 25:
+            self.status_label.setText("INITIALIZING...")
+        elif self.splash_progress < 50:
+            self.status_label.setText("STARTING UP...")
+        elif self.splash_progress < 75:
+            self.status_label.setText("ALMOST READY...")
+        elif self.splash_progress < 95:
+            self.status_label.setText("SYSTEM READY")
+        else:
+            # Completed animation
+            if hasattr(self, 'splash_timer'):
+                self.splash_timer.stop()
+                
+            # Play final sound
+            if hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound.play()
+                
+            # Complete splash screen setup
+            self.complete_splash_screen()
+            return
+        
+        # Play sound effects
+        if self.splash_progress % 10 == 0 and hasattr(self, 'punch_sound'):
+            self.punch_sound.play()
+            
+        if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
+            self.card_insert_sound.play()
+            
+        # Phase transitions based on progress
+        current_phase = 0
+        if self.splash_progress < total_steps:
+            current_phase = 1  # Phase 1: Clearing
+        elif self.splash_progress < total_steps * 2:
+            current_phase = 2  # Phase 2: Diagonal illumination
+        else:
+            current_phase = 3  # Phase 3: Final clearing
             
         # Phase 1: Initial clearing (empty card)
-        if self.splash_step < total_steps:
+        if current_phase == 1:
             # Make sure the top-left corner (0,0) is explicitly cleared first
-            if self.splash_step == 0:
-                self.console.log(f"LED: Explicitly clearing top-left corner (0,0)", "LED")
-                self.punch_card.set_led(0, 0, False)
-                # Verify it got cleared
-                self.verify_top_left_corner(False, "Phase 1 start")
+            if self.splash_progress == 0:
+                self.console.log("Phase 1: Starting with empty grid and clearing diagonally", "INFO")
+                punch_card.set_led(0, 0, False)
             
-            # Clear the current diagonal
-            for row in range(NUM_ROWS):
-                col = self.splash_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Clearing row {row}, col {col} (Phase 1)", "LED")
-                        self.punch_card.set_led(row, col, False)
-            
-            # Only show phase information in console, not in main GUI
-            self.console.log(f"SPLASH ANIMATION - CLEARING {self.splash_step}/{total_steps}", "INFO")
-        
-        # Phase 2: Punching holes with a 12-hole width
-        elif self.splash_step < total_steps * 2:
-            current_step = self.splash_step - total_steps
-            
-            # At the beginning of Phase 2, explicitly turn on the top-left corner
-            if current_step == 0:
-                self.console.log(f"LED: Explicitly turning ON top-left corner (0,0)", "LED")
-                self.punch_card.set_led(0, 0, True)
-                # Verify it got turned on
-                self.verify_top_left_corner(True, "Phase 2 start")
-            elif current_step <= 12:
-                # During the first 12 steps of Phase 2, keep checking that the top-left corner is ON
-                if not self.verify_top_left_corner(True, f"Phase 2 step {current_step}"):
-                    # If verification failed, explicitly turn it back ON
-                    self.console.log(f"LED: Re-enabling top-left corner (0,0) that was incorrectly OFF", "LED")
-                    self.punch_card.set_led(0, 0, True)
-            
-            # Punch new holes at the current diagonal
+            # Calculate current diagonal position
+            current_step = self.splash_progress
             for row in range(NUM_ROWS):
                 col = current_step - row
                 if 0 <= col < NUM_COLS:
                     # Skip the top-left corner as we've already handled it
                     if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} ON (Phase 2)", "LED")
-                        self.punch_card.set_led(row, col, True)
+                        punch_card.set_led(row, col, False)
+        
+        # Phase 2: Diagonal illumination with 12-column wide band
+        elif current_phase == 2:
+            current_step = self.splash_progress - total_steps
             
-            # Clear old holes (trailing diagonal pattern - 12 columns wide)
+            # At the beginning of Phase 2, explicitly turn on the top-left corner
+            if current_step == 0:
+                self.console.log("Phase 2: Creating diagonal pattern of illuminated LEDs", "INFO")
+                punch_card.set_led(0, 0, True)
+            
+            # Illuminate LEDs at the current diagonal
+            for row in range(NUM_ROWS):
+                col = current_step - row
+                if 0 <= col < NUM_COLS:
+                    # Skip the top-left corner as we've already handled it
+                    if not (row == 0 and col == 0):
+                        punch_card.set_led(row, col, True)
+            
+            # Clear old illuminated LEDs (trailing diagonal - 12 columns wide)
             trailing_step = max(0, current_step - 12)
             for row in range(NUM_ROWS):
                 col = trailing_step - row
                 if 0 <= col < NUM_COLS:
-                    # Only clear top-left corner when it's definitely time to clear it
-                    # This prevents it from being cleared too early
+                    # Only clear top-left corner when it's definitely time
                     if row == 0 and col == 0 and current_step >= 12:
-                        self.console.log(f"LED: Explicitly turning OFF top-left corner (0,0)", "LED")
-                        self.punch_card.set_led(0, 0, False)
-                        # Verify it got turned off
-                        self.verify_top_left_corner(False, f"Phase 2 trailing step {current_step}")
+                        punch_card.set_led(0, 0, False)
                     elif not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} OFF (Phase 2 trailing)", "LED")
-                        self.punch_card.set_led(row, col, False)
-            
-            # Only show phase information in console, not in main GUI
-            self.console.log(f"SPLASH ANIMATION - ILLUMINATING {current_step}/{total_steps}", "INFO")
+                        punch_card.set_led(row, col, False)
         
-        # Phase 3: Clear the remaining 12 columns in a diagonal pattern
-        elif self.splash_step < total_steps * 2 + 12:
-            current_clear_step = self.splash_step - (total_steps * 2) + (total_steps - 12)
-            
-            # Make sure top-left corner is OFF by this phase
-            if self.splash_step == total_steps * 2:
-                self.console.log(f"LED: Final check - ensuring top-left corner (0,0) is OFF", "LED")
-                self.punch_card.set_led(0, 0, False)
-                # Verify it got turned off
-                self.verify_top_left_corner(False, "Phase 3 start")
+        # Phase 3: Clear the remaining illuminated LEDs
+        elif current_phase == 3:
+            current_clear_step = self.splash_progress - (total_steps * 2) + (total_steps - 12)
             
             for row in range(NUM_ROWS):
                 col = current_clear_step - row
                 if 0 <= col < NUM_COLS:
                     # Skip the top-left corner as we've already handled it
                     if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} OFF (Phase 3)", "LED")
-                        self.punch_card.set_led(row, col, False)
-            
-            # Only show phase information in console, not in main GUI
-            remaining_steps = (total_steps * 2 + 12) - self.splash_step
-            self.console.log(f"SPLASH ANIMATION - FINISHING (REMAINING: {remaining_steps})", "INFO")
+                        punch_card.set_led(row, col, False)
         
-        else:
-            # Wait for hardware detection to complete before ending splash screen
-            # This check is now redundant since we only start animation after hardware detection
-            # but keeping it for safety
-            if not self.hardware_check_complete:
-                # Keep the animation paused at this step
-                self.status_label.setText("WAITING FOR HARDWARE...")
-                return
-                
-            # Stop all timers
-            if self.countdown_timer.isActive():
-                self.countdown_timer.stop()
-            self.splash_timer.stop()
-            self.hardware_status_timer.stop()
-            
-            # Hide all initialization messages immediately
-            self.status_label.setText("")
-            self.hardware_status_label.setText("")
-            self.keyboard_hint_label.setText("")
-            
-            # Verify all LEDs are OFF before final clearing
-            if self.punch_card.grid[0][0]:
-                self.console.log(f"LED STATE ERROR: Top-left corner (0,0) is still ON at end of animation!", "ERROR")
-            
-            # Clear all LEDs and log each one
-            for row in range(NUM_ROWS):
-                for col in range(NUM_COLS):
-                    if self.punch_card.grid[row][col]:
-                        self.console.log(f"LED: Final clearing row {row}, col {col}", "LED")
-                        
-            # Clear the grid with a single operation after logging
-            self.punch_card.clear_grid()
-            self.punch_card.update()
-            self.console.log("Splash animation completed, transitioning to ready state", "INFO")
-            
-            # Schedule actual UI reveal and message generation after a delay
-            QTimer.singleShot(500, self.complete_splash_screen)
-            return
-        
-        # Force a repaint to ensure LED changes are displayed
-        self.punch_card.update()
-        self.splash_step += 1
+        # Force a repaint to show the updated grid
+        punch_card.update()
     
     def complete_splash_screen(self):
         """Complete the splash screen transition and prepare for normal operation."""
+        # Set state
         self.showing_splash = False
         
         # Make sure countdown timer is stopped
-        if self.countdown_timer.isActive():
+        if hasattr(self, 'countdown_timer') and hasattr(self.countdown_timer, 'isActive') and self.countdown_timer.isActive():
             self.countdown_timer.stop()
         
-        # First update the status text while other elements are hidden
+        # Update the status text
         self.status_label.setText("READY")
-        self.console.log("Splash screen completed, ready for operation", "INFO")
         
-        # Determine the operation mode based on hardware detection
-        mode_type = "HARDWARE" if not self.hardware_detector.using_virtual_mode else "VIRTUAL"
+        # Log completion
+        if hasattr(self, 'console'):
+            self.console.log("Splash screen completed, ready for operation", "INFO")
         
-        # Pre-set the message label content before showing it
-        self.message_label.setText(f"SYSTEM READY - {mode_type} MODE")
-        self.message_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE+2)}
-            color: {COLORS['text'].name()};
-            padding: 10px 0px;
-        """)
+        # Display system ready message with simplified style
+        self.message_label.setText("SYSTEM READY")
+        self.message_label.setStyleSheet("color: white; font-size: 14pt; padding: 10px 0px;")
         
-        # Ensure message label aligns with the left edge of the punch card
+        # Ensure message label aligns with the punch card
         QTimer.singleShot(10, self.align_message_with_card)
         
-        # Hide hardware-specific status indicators by making them transparent
-        # but keep their space in the layout
-        self.hardware_status_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE-2)}
-            color: {COLORS['background'].name()};
-            padding: 5px;
-        """)
+        # Hide hardware status elements with simple styling
+        if hasattr(self, 'hardware_status_label'):
+            self.hardware_status_label.setStyleSheet("color: transparent; padding: 5px;")
         
-        self.keyboard_hint_label.setStyleSheet(f"""
-            {get_font_css(italic=True, size=FONT_SIZE-2)}
-            color: {COLORS['background'].name()};
-            padding: 5px;
-        """)
+        if hasattr(self, 'keyboard_hint_label'):
+            self.keyboard_hint_label.setStyleSheet("color: transparent; padding: 5px;")
         
-        # Restore button styles
+        # Restore button styles with simple styling
         for button in [self.start_button, self.clear_button, self.exit_button]:
-            button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {COLORS['button_bg'].name()};
-                    color: {COLORS['button_text'].name()};
-                    border: 1px solid {COLORS['hole_outline'].name()};
-                    padding: 6px 12px;
-                    {get_font_css(size=12)}
-                    border-radius: 3px;
-                }}
-                QPushButton:hover {{
-                    background-color: {COLORS['button_hover'].name()};
-                }}
+            button.setStyleSheet("""
+                background-color: #2A2A2A;
+                color: white;
+                border: 1px solid #444444;
+                padding: 6px 12px;
+                border-radius: 3px;
             """)
             button.setEnabled(True)
         
-        # Wait a significant time before starting auto messages
-        # This gives the user time to see the initial state
+        # Start auto messages after delay
         QTimer.singleShot(5000, lambda: self.auto_timer.start(5000))
-        
+    
     def resizeEvent(self, event):
         """Handle resize events to ensure message label aligns with punch card."""
         super().resizeEvent(event)
@@ -1737,27 +3173,8 @@ class PunchCardDisplay(QMainWindow):
 
     def update_api_status(self, status: str):
         """Update the API status display."""
-        self.api_status_label.setText(f"API: {status}")
-        
-        # Set color based on status
-        color = COLORS['text'].name()
-        if status == "Connected":
-            color = COLORS['success'].name()
-        elif status == "Fallback Mode":
-            color = COLORS['warning'].name()
-        elif status in ["Error", "Unavailable", "No API Key"]:
-            color = COLORS['error'].name()
-            
-        self.api_status_label.setStyleSheet(f"""
-            QLabel {{
-                color: {color};
-                background-color: {COLORS['card_bg'].name()};
-                padding: 3px 8px;
-                border: 1px solid {COLORS['hole_outline'].name()};
-                border-radius: 2px;
-                {get_font_css(bold=True, size=10)}
-            }}
-        """)
+        # API status label was removed from UI, so just log the status
+        self.console.log(f"API Status: {status}", "INFO")
         
         # Update API console window if it exists
         if hasattr(self, 'api_console'):
@@ -1829,21 +3246,265 @@ class PunchCardDisplay(QMainWindow):
         except Exception as e:
             self.console.log(f"Error loading settings: {str(e)}", "ERROR")
 
+    def update_clock(self):
+        """Update the clock in the menu bar."""
+        if hasattr(self, 'menu_bar'):
+            self.menu_bar.update_clock()
+            
+    def restart_app(self):
+        """Restart the application."""
+        QMessageBox.information(self, "Restart", "The application will now restart.")
+        self.close()
+        
+    def safe_shutdown(self):
+        """Safely shut down the application."""
+        self.close()
+        
+    def show_card_settings(self):
+        """Show the card dimensions settings tab."""
+        self.update_status("Opening Card Settings...")
+        self.settings.setCurrentIndex(2)  # Assuming card settings is on tab index 2
+        self.settings.exec()
+        
+    def show_api_settings(self):
+        """Show the API settings tab."""
+        self.update_status("Opening API Settings...")
+        # Create and show the settings dialog with API tab selected
+        from src.display.settings_dialog import SettingsDialog
+        settings_dialog = SettingsDialog(self)
+        settings_dialog.tab_widget.setCurrentIndex(2)  # OpenAI API tab index
+        settings_dialog.exec()
+        
+    def show_about_dialog(self):
+        """Show about dialog with application information."""
+        self.update_status("Showing About Information...")
+        QMessageBox.about(self, "About This Punch Card",
+                         "<h3>Punch Card Simulator v1.0.2</h3>"
+                         "<p>A minimalist punch card display system with "
+                         "authentic IBM punch card specifications.</p>"
+                         "<p>GitHub: <a href='https://github.com/griffingilreath/Punch-Card-Project'>"
+                         "github.com/griffingilreath/Punch-Card-Project</a></p>"
+                         "<p>© 2023-2025 Griffin Gilreath</p>"
+                         "<p><small>Built with PyQt6 and a passion for digital history</small></p>")
+                         
+    def toggle_quick_settings(self):
+        """Toggle the quick settings panel."""
+        self.update_status("Quick Settings Panel (Not Yet Implemented)")
+        QMessageBox.information(self, "Quick Settings", 
+                               "This would show a quick settings panel.\n"
+                               "Feature not yet implemented.")
+                               
+    def show_settings_dialog(self):
+        """Show the settings dialog."""
+        self.update_status("Opening Settings...")
+        # Create and show the settings dialog
+        settings_dialog = SettingsDialog(self)
+        if settings_dialog.exec() == QDialog.DialogCode.Accepted:
+            self.refresh_ui_from_settings()
 
-def main():
-    """Run the application."""
-    app = QApplication.instance() if QApplication.instance() else QApplication([])
+    def start_sleep_mode(self):
+        """Start the sleep mode animation sequence."""
+        # Don't start if already sleeping
+        if hasattr(self, 'sleeping') and self.sleeping:
+            return
+            
+        # Log the start of sleep mode
+        if hasattr(self, 'console'):
+            self.console.log("Starting sleep mode", "INFO")
+            
+        # Update status
+        self.update_status("ENTERING SLEEP MODE...")
+            
+        # Set sleeping state
+        self.sleeping = True
+        
+        # CRITICAL: Stop any ongoing message display or animations
+        for timer_attr in ['timer', 'display_timer', 'message_display_timer', 'auto_timer', 'splash_timer']:
+            if hasattr(self, timer_attr) and hasattr(getattr(self, timer_attr), 'isActive') and getattr(self, timer_attr).isActive():
+                getattr(self, timer_attr).stop()
+                if hasattr(self, 'console'):
+                    self.console.log(f"Stopped {timer_attr} for sleep mode", "INFO")
+        
+        # Clear any running processes
+        self.running = False
+        
+        # Disable buttons
+        for button in [self.start_button, self.clear_button, self.exit_button]:
+            button.setEnabled(False)
+            button.setStyleSheet("""
+                background-color: #2A2A2A;
+                color: #AAAAAA;
+                border: 1px solid #444444;
+                padding: 6px 12px;
+                border-radius: 4px;
+            """)
+        
+        # Create wake button if it doesn't exist
+        if not hasattr(self, 'wake_button'):
+            self.wake_button = RetroButton("WAKE", self)
+            self.wake_button.clicked.connect(self.wake_from_sleep)
+            self.wake_button.setFixedSize(100, 30)
+            
+            # Center the wake button
+            self.wake_button.move(
+                (self.width() - self.wake_button.width()) // 2,
+                self.height() - 70
+            )
+        
+        # Show the wake button
+        self.wake_button.show()
+        
+        # Play sleep animation
+        self.animation_manager.play_animation(AnimationType.SLEEP, callback=self.on_sleep_complete)
+        
+        # Play card insert sound
+        if hasattr(self, 'card_insert_sound'):
+            self.card_insert_sound.play()
     
-    # Create and show the display
-    display = PunchCardDisplay()
-    display.show()
+    def on_sleep_complete(self):
+        """Called when sleep animation completes"""
+        # Log completion
+        if hasattr(self, 'console'):
+            self.console.log("Sleep animation completed, system is now sleeping", "SUCCESS")
+        
+        # Update status
+        self.update_status("SLEEPING")
     
-    # If this is run as a script, start the event loop
-    if __name__ == "__main__":
+    def wake_from_sleep(self):
+        """Wake up from sleep mode and restart the animation sequence."""
+        # Only proceed if we're sleeping
+        if not hasattr(self, 'sleeping') or not self.sleeping:
+            return
+        
+        # Remove the wake button
+        if hasattr(self, 'wake_button'):
+            self.wake_button.deleteLater()
+            delattr(self, 'wake_button')
+        
+        # Update state
+        self.sleeping = False
+        self.update_status("WAKING UP...")
+        
+        # Log the wake event
+        if hasattr(self, 'console'):
+            self.console.log("Waking from sleep mode", "INFO")
+        
+        # Play card insert sound
+        if hasattr(self, 'card_insert_sound'):
+            self.card_insert_sound.play()
+        
+        # Reset animation-related flags
+        self.showing_splash = True
+        self.animation_started = False
+        
+        # Clear the grid to start fresh
+        self.punch_card.clear_grid()
+        
+        # Start wake animation
+        self.animation_manager.play_animation(AnimationType.WAKE, callback=self.on_wake_complete)
+    
+    def on_wake_complete(self):
+        """Called when wake animation completes"""
+        # Perform post-wake setup after a delay
+        QTimer.singleShot(500, self.post_wake_setup)
+
+    def load_punch_card_sounds(self):
+        """Load punch card sounds for animations."""
+        try:
+            from PyQt6.QtMultimedia import QSoundEffect
+            from PyQt6.QtCore import QUrl
+            import os
+            
+            self.console.log("Loading punch card sounds...", "INFO")
+            
+            # Define sound paths relative to the project
+            sound_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../assets/sounds")
+            
+            # Create sound effects if they don't exist
+            if not hasattr(self, 'punch_sound'):
+                self.punch_sound = QSoundEffect()
+                punch_path = os.path.join(sound_dir, "punch.wav")
+                if os.path.exists(punch_path):
+                    self.punch_sound.setSource(QUrl.fromLocalFile(punch_path))
+                    self.punch_sound.setVolume(0.5)
+                    self.console.log(f"Loaded punch sound from {punch_path}", "INFO")
+                else:
+                    self.console.log(f"Sound file not found: {punch_path}", "WARNING")
+            
+            if not hasattr(self, 'card_insert_sound'):
+                self.card_insert_sound = QSoundEffect()
+                insert_path = os.path.join(sound_dir, "card_insert.wav")
+                if os.path.exists(insert_path):
+                    self.card_insert_sound.setSource(QUrl.fromLocalFile(insert_path))
+                    self.card_insert_sound.setVolume(0.5)
+                    self.console.log(f"Loaded card insert sound from {insert_path}", "INFO")
+                else:
+                    self.console.log(f"Sound file not found: {insert_path}", "WARNING")
+            
+            if not hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound = QSoundEffect()
+                eject_path = os.path.join(sound_dir, "card_eject.wav")
+                if os.path.exists(eject_path):
+                    self.card_eject_sound.setSource(QUrl.fromLocalFile(eject_path))
+                    self.card_eject_sound.setVolume(0.5)
+                    self.console.log(f"Loaded card eject sound from {eject_path}", "INFO")
+                else:
+                    self.console.log(f"Sound file not found: {eject_path}", "WARNING")
+                    
+        except ImportError:
+            self.console.log("QSoundEffect not available, running without sound", "WARNING")
+        except Exception as e:
+            self.console.log(f"Error loading sounds: {str(e)}", "ERROR")
+    
+    def play_punch_sound(self):
+        """Play the punch card sound if available."""
+        if hasattr(self, 'punch_sound') and hasattr(self.punch_sound, 'play'):
+            self.punch_sound.play()
+    
+    def post_wake_setup(self):
+        """Actions to perform after wake sequence completes."""
+        # Update status
+        self.update_status("READY")
+        
+        # Update the message label
+        self.message_label.setText("SYSTEM READY")
+        try:
+            # Simple styling to avoid parser errors
+            self.message_label.setStyleSheet("color: white; font-size: 14pt; padding: 10px 0px;")
+        except:
+            pass
+        
+        # Ensure message label aligns with the punch card
+        QTimer.singleShot(10, self.align_message_with_card)
+        
+        # Restart auto message timer
+        QTimer.singleShot(2000, lambda: self.auto_timer.start(5000))
+
+
+def run_gui_app():
+    """
+    Main entry point for the GUI application.
+    """
+    import sys
+    from PyQt6.QtWidgets import QApplication
+    from src.core.punch_card import PunchCard
+    
+    try:
+        # Initialize application
+        app = QApplication.instance() if QApplication.instance() else QApplication(sys.argv)
+        punch_card = PunchCard()
+        gui = PunchCardDisplay(punch_card)
+        gui.show()
+        
+        # Run application
         sys.exit(app.exec())
-    
-    return display, app
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.exception(f"Error in GUI application: {e}")
+        print(f"\nAn error occurred: {e}")
 
-
+# If run directly, start the GUI application
 if __name__ == "__main__":
-    main() 
+    run_gui_app() 

@@ -1,0 +1,61 @@
+{
+    "name": "Checkerboard Pattern",
+    "description": "A simple animation that alternates between checkerboard patterns",
+    "author": "Punch Card Project",
+    "version": "1.0",
+    "fps": 4,
+    "interruptible": true,
+    "phases": [
+        {
+            "name": "First Pattern",
+            "description": "Standard checkerboard pattern",
+            "steps": [
+                [
+                    [false, false, false, false],
+                    [false, false, false, false],
+                    [false, false, false, false],
+                    [false, false, false, false]
+                ],
+                [
+                    [true, false, true, false],
+                    [false, true, false, true],
+                    [true, false, true, false],
+                    [false, true, false, true]
+                ]
+            ],
+            "transition_pause": 200
+        },
+        {
+            "name": "Second Pattern",
+            "description": "Inverted checkerboard pattern",
+            "steps": [
+                [
+                    [false, true, false, true],
+                    [true, false, true, false],
+                    [false, true, false, true],
+                    [true, false, true, false]
+                ],
+                [
+                    [true, false, true, false],
+                    [false, true, false, true],
+                    [true, false, true, false],
+                    [false, true, false, true]
+                ]
+            ],
+            "transition_pause": 200
+        },
+        {
+            "name": "Final Clear",
+            "description": "Clear all LEDs",
+            "steps": [
+                [
+                    [false, false, false, false],
+                    [false, false, false, false],
+                    [false, false, false, false],
+                    [false, false, false, false]
+                ]
+            ],
+            "transition_pause": 0
+        }
+    ]
+} 
