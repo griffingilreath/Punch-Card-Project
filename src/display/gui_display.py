@@ -2448,7 +2448,7 @@ class PunchCardDisplay(QMainWindow):
         # Create a container for the bottom section with fixed height
         # This ensures that the punch card position remains stable
         bottom_section = QWidget()
-        bottom_section.setFixedHeight(190)  # Increased from 170 to prevent button cutoff
+        bottom_section.setFixedHeight(80)  # Reduced from 190px since we removed buttons
         bottom_layout = QVBoxLayout(bottom_section)
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         bottom_layout.setSpacing(5)
@@ -2501,6 +2501,7 @@ class PunchCardDisplay(QMainWindow):
             }}
         """)
         self.api_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.api_status_label.setVisible(False)  # Hide the API status label completely
         bottom_layout.addWidget(self.api_status_label)
         
         # Create a spacer widget to maintain spacing even when elements are hidden
@@ -2508,8 +2509,9 @@ class PunchCardDisplay(QMainWindow):
         spacer.setFixedHeight(10)
         bottom_layout.addWidget(spacer)
         
-        # Create control buttons in a container with fixed height
+        # Create control buttons in a container with fixed height - all buttons now hidden
         self.button_container = QWidget()
+        self.button_container.setVisible(False)  # Hide all buttons
         button_layout = QHBoxLayout(self.button_container)
         button_layout.setSpacing(10)
         
@@ -3244,27 +3246,8 @@ class PunchCardDisplay(QMainWindow):
 
     def update_api_status(self, status: str):
         """Update the API status display."""
-        self.api_status_label.setText(f"API: {status}")
-        
-        # Set color based on status
-        color = COLORS['text'].name()
-        if status == "Connected":
-            color = COLORS['success'].name()
-        elif status == "Fallback Mode":
-            color = COLORS['warning'].name()
-        elif status in ["Error", "Unavailable", "No API Key"]:
-            color = COLORS['error'].name()
-            
-        self.api_status_label.setStyleSheet(f"""
-            QLabel {{
-                color: {color};
-                background-color: {COLORS['card_bg'].name()};
-                padding: 3px 8px;
-                border: 1px solid {COLORS['hole_outline'].name()};
-                border-radius: 2px;
-                {get_font_css(bold=True, size=10)}
-            }}
-        """)
+        # API status label was removed from UI, so just log the status
+        self.console.log(f"API Status: {status}", "INFO")
         
         # Update API console window if it exists
         if hasattr(self, 'api_console'):
