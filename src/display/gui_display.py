@@ -1975,7 +1975,7 @@ class WiFiStatusWidget(QWidget):
         
         # Calculate position centered in widget
         center_x = self.width() // 2
-        y_base = self.height() - 6  # Position from bottom
+        y_base = self.height() - 4  # Position from bottom (moved up slightly)
         
         # Calculate total width of all bars
         bar_width = 3
@@ -1986,7 +1986,7 @@ class WiFiStatusWidget(QWidget):
         # Draw all three bars (filled or empty based on status)
         for i in range(3):
             x = start_x + (i * (bar_width + spacing))
-            bar_height = 4 + (i * 3)  # Increasing heights
+            bar_height = 5 + (i * 3)  # Slightly taller bars
             y = y_base - bar_height
             
             # If this bar should be filled based on status
@@ -1995,7 +1995,7 @@ class WiFiStatusWidget(QWidget):
             else:
                 # Draw outline for inactive bars
                 painter.setBrush(Qt.BrushStyle.NoBrush)
-                painter.setPen(QPen(color, 0.5))
+                painter.setPen(QPen(color, 0.8))  # Slightly thicker outline
             
             painter.drawRect(x, y, bar_width, bar_height)
             painter.setPen(Qt.PenStyle.NoPen)  # Reset pen for next iteration
@@ -2012,7 +2012,6 @@ class InAppMenuBar(QWidget):
         self.setStyleSheet(f"""
             background-color: black;
             color: white;
-            border-bottom: 1.5px solid white; /* Direct styling for the bottom border */
         """)
         
         # Create main layout
@@ -2028,7 +2027,7 @@ class InAppMenuBar(QWidget):
         self.left_layout.setSpacing(2)
         
         # Apple menu button
-        self.apple_menu = QPushButton("▭")  # More proportional rectangle symbol
+        self.apple_menu = QPushButton("■")  # Square symbol instead of rectangle for better appearance
         self.apple_menu.setFlat(True)
         self.apple_menu.setStyleSheet(f"""
             QPushButton {{
@@ -2037,7 +2036,8 @@ class InAppMenuBar(QWidget):
                 border: none;
                 padding: 2px 8px;
                 text-align: center;
-                font-size: 16px;  /* Larger font size for the apple icon */
+                font-size: 18px;  /* Larger font size for better visibility */
+                font-weight: bold; /* Make it bolder */
             }}
             QPushButton:hover {{
                 background-color: white;
@@ -2285,9 +2285,13 @@ class InAppMenuBar(QWidget):
         """Custom paint event to draw the menu bar with classic Mac styling."""
         super().paintEvent(event)
         
-        # We use CSS border-bottom for the line, so we don't need to draw it manually
+        # Create painter for custom drawing
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Draw bottom border line manually to ensure it spans the entire width
+        painter.setPen(QPen(QColor(255, 255, 255), 1.5))  # White pen, 1.5px width
+        painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
 
 
 class PunchCardDisplay(QMainWindow):
