@@ -2803,68 +2803,46 @@ class PunchCardDisplay(QMainWindow):
         self.console.log(f"Card dimensions updated: {settings}")
 
     def start_splash_screen(self):
-        """Start the splash screen animation."""
+        """Start the splash screen animation with simplified flow."""
+        # Set initial state
         self.showing_splash = True
-        self.splash_step = 0
-        self.hardware_check_complete = False
-        self.countdown_seconds = 10  # Reset countdown to 10 seconds
-        self.hardware_detection_finished = False
-        self.animation_started = False
-        
-        # Instead of hiding UI elements, just make them invisible or empty
-        # This preserves their space in the layout
         self.message_label.setText("")
-        self.message_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE+2)}
-            color: {COLORS['background'].name()};  # Make text invisible
-            padding: 10px 0px;
-        """)
+        self.status_label.setText("INITIALIZING SYSTEM...")
         
-        # Calculate the left edge position of the punch card - ensure it works for splash screen too
-        self.align_message_with_card()
-        
-        self.status_label.setText("DETECTING HARDWARE...")
-        
-        self.hardware_status_label.setText("Starting hardware detection...")
-        self.hardware_status_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE-2)}
-            color: {COLORS['text'].name()};
-            padding: 5px;
-        """)
-        
-        # Update keyboard hint text with countdown
-        self.keyboard_hint_label.setText(f"Press [SPACE] to skip hardware detection ({self.countdown_seconds}s)")
-        self.keyboard_hint_label.setStyleSheet(f"""
-            {get_font_css(italic=True, size=FONT_SIZE-2)}
-            color: {QColor(150, 150, 150).name()};
-            padding: 5px;
-        """)
-        
-        # Start the countdown timer
-        self.countdown_timer.start(1000)  # 1000ms = 1 second
-        
-        # Make buttons invisible but keep their space in the layout
-        for button in [self.start_button, self.clear_button, self.exit_button]:
+        # Disable buttons during splash
+        for button in [self.start_button, self.clear_button, self.settings_button, self.exit_button]:
+            button.setEnabled(False)
             button.setStyleSheet(f"""
                 QPushButton {{
-                    background-color: {COLORS['background'].name()};
-                    color: {COLORS['background'].name()};
-                    border: 0px solid {COLORS['background'].name()};
+                    background-color: {COLORS['button_bg'].name()};
+                    color: {COLORS['button_text'].name()};
+                    border: 1px solid {COLORS['hole_outline'].name()};
                     padding: 6px 12px;
                     {get_font_css(size=12)}
                     border-radius: 3px;
+                    opacity: 0.5;
                 }}
             """)
-            button.setEnabled(False)
         
-        self.console.log("Starting hardware detection - clearing all LEDs", "INFO")
+        # Skip hardware detection completely - always use virtual mode
+        self.hardware_detector.enable_virtual_mode()
+        self.hardware_check_complete = True
+        self.hardware_detection_finished = True
         
-        # Clear any potential artifacts
-        self.punch_card.clear_grid()
+        # Start the splash screen animation directly
+        self.splash_timer = QTimer()
+        self.splash_timer.timeout.connect(self.update_splash)
+        self.splash_timer.start(100)  # Update every 100ms
         
-        # Start the hardware detection process
-        self.console.log("Starting hardware detection", "INFO")
-        self.hardware_detector.detect_hardware()
+        # Set initial splash screen state
+        self.splash_step = 0
+        self.splash_progress = 0  # Initialize progress counter
+        
+        # Load the punch card sounds if not already loaded
+        self.load_punch_card_sounds()
+        
+        # Console log for debugging only
+        self.console.log("Splash screen started - simplified version", "INFO")
     
     def update_countdown(self):
         """Update the countdown timer during hardware detection."""
@@ -2981,171 +2959,58 @@ class PunchCardDisplay(QMainWindow):
             )
     
     def update_splash(self):
-        """Update the splash screen animation."""
+        """Simple splash animation that quickly clears the punch card."""
         if not self.showing_splash:
             return
-            
-        # Calculate total steps needed to cover the entire card
-        total_steps = NUM_COLS + NUM_ROWS - 1  # This ensures we cover the entire diagonal
         
-        # Log the current splash step to console only
-        self.console.log(f"Splash step: {self.splash_step} of {total_steps*2 + 12}", "INFO")
+        # Simple splash animation that just clears the card
+        # Calculate progress percentage
+        self.splash_progress += 5
+        progress_percent = self.splash_progress / 100
         
-        # Ensure we have hardware detection complete - critical fix
-        if not self.hardware_check_complete:
-            # Double-check that we're in a valid state before proceeding
-            if self.hardware_detector.detection_complete or self.hardware_detector.using_virtual_mode:
-                # Hardware detection completed naturally since last check
-                self.hardware_check_complete = True
-                self.hardware_detection_finished = True
-            else:
-                # Still waiting - skip again to avoid getting stuck
-                self.auto_skip_hardware_detection()
-                return
-            
-        # Phase transitions - verify top-left corner state
-        if self.splash_step == 0:
-            # At the very beginning, make sure top-left corner is OFF
-            self.verify_top_left_corner(False, "Initial state")
-        elif self.splash_step == total_steps:
-            # At start of Phase 2, verify top-left corner is OFF before we turn it ON
-            self.verify_top_left_corner(False, "Start of Phase 2")
-        elif self.splash_step == total_steps * 2:
-            # At start of Phase 3, verify that top-left corner is either ON or OFF depending on current animation
-            # Logic below will ensure it gets properly set
-            pass
-            
-        # Phase 1: Initial clearing (empty card)
-        if self.splash_step < total_steps:
-            # Make sure the top-left corner (0,0) is explicitly cleared first
-            if self.splash_step == 0:
-                self.console.log(f"LED: Explicitly clearing top-left corner (0,0)", "LED")
-                self.punch_card.set_led(0, 0, False)
-                # Verify it got cleared
-                self.verify_top_left_corner(False, "Phase 1 start")
-            
-            # Clear the current diagonal
-            for row in range(NUM_ROWS):
-                col = self.splash_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Clearing row {row}, col {col} (Phase 1)", "LED")
-                        self.punch_card.set_led(row, col, False)
-            
-            # Only show phase information in console, not in main GUI
-            self.console.log(f"SPLASH ANIMATION - CLEARING {self.splash_step}/{total_steps}", "INFO")
-        
-        # Phase 2: Punching holes with a 12-hole width
-        elif self.splash_step < total_steps * 2:
-            current_step = self.splash_step - total_steps
-            
-            # At the beginning of Phase 2, explicitly turn on the top-left corner
-            if current_step == 0:
-                self.console.log(f"LED: Explicitly turning ON top-left corner (0,0)", "LED")
-                self.punch_card.set_led(0, 0, True)
-                # Verify it got turned on
-                self.verify_top_left_corner(True, "Phase 2 start")
-            elif current_step <= 12:
-                # During the first 12 steps of Phase 2, keep checking that the top-left corner is ON
-                if not self.verify_top_left_corner(True, f"Phase 2 step {current_step}"):
-                    # If verification failed, explicitly turn it back ON
-                    self.console.log(f"LED: Re-enabling top-left corner (0,0) that was incorrectly OFF", "LED")
-                    self.punch_card.set_led(0, 0, True)
-            
-            # Punch new holes at the current diagonal
-            for row in range(NUM_ROWS):
-                col = current_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} ON (Phase 2)", "LED")
-                        self.punch_card.set_led(row, col, True)
-            
-            # Clear old holes (trailing diagonal pattern - 12 columns wide)
-            trailing_step = max(0, current_step - 12)
-            for row in range(NUM_ROWS):
-                col = trailing_step - row
-                if 0 <= col < NUM_COLS:
-                    # Only clear top-left corner when it's definitely time to clear it
-                    # This prevents it from being cleared too early
-                    if row == 0 and col == 0 and current_step >= 12:
-                        self.console.log(f"LED: Explicitly turning OFF top-left corner (0,0)", "LED")
-                        self.punch_card.set_led(0, 0, False)
-                        # Verify it got turned off
-                        self.verify_top_left_corner(False, f"Phase 2 trailing step {current_step}")
-                    elif not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} OFF (Phase 2 trailing)", "LED")
-                        self.punch_card.set_led(row, col, False)
-            
-            # Only show phase information in console, not in main GUI
-            self.console.log(f"SPLASH ANIMATION - ILLUMINATING {current_step}/{total_steps}", "INFO")
-        
-        # Phase 3: Clear the remaining 12 columns in a diagonal pattern
-        elif self.splash_step < total_steps * 2 + 12:
-            current_clear_step = self.splash_step - (total_steps * 2) + (total_steps - 12)
-            
-            # Make sure top-left corner is OFF by this phase
-            if self.splash_step == total_steps * 2:
-                self.console.log(f"LED: Final check - ensuring top-left corner (0,0) is OFF", "LED")
-                self.punch_card.set_led(0, 0, False)
-                # Verify it got turned off
-                self.verify_top_left_corner(False, "Phase 3 start")
-            
-            for row in range(NUM_ROWS):
-                col = current_clear_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} OFF (Phase 3)", "LED")
-                        self.punch_card.set_led(row, col, False)
-            
-            # Only show phase information in console, not in main GUI
-            remaining_steps = (total_steps * 2 + 12) - self.splash_step
-            self.console.log(f"SPLASH ANIMATION - FINISHING (REMAINING: {remaining_steps})", "INFO")
-        
+        # Update status text in phases
+        if self.splash_progress < 25:
+            self.status_label.setText("INITIALIZING...")
+        elif self.splash_progress < 50:
+            self.status_label.setText("STARTING UP...")
+        elif self.splash_progress < 75:
+            self.status_label.setText("ALMOST READY...")
+        elif self.splash_progress < 95:
+            self.status_label.setText("SYSTEM READY")
         else:
-            # Wait for hardware detection to complete before ending splash screen
-            # This check is now redundant since we only start animation after hardware detection
-            # but keeping it for safety
-            if not self.hardware_check_complete:
-                # Keep the animation paused at this step
-                self.status_label.setText("WAITING FOR HARDWARE...")
-                return
-                
-            # Stop all timers
-            if self.countdown_timer.isActive():
-                self.countdown_timer.stop()
+            # Completed animation
             self.splash_timer.stop()
-            self.hardware_status_timer.stop()
             
-            # Hide all initialization messages immediately
-            self.status_label.setText("")
-            self.hardware_status_label.setText("")
-            self.keyboard_hint_label.setText("")
-            
-            # Verify all LEDs are OFF before final clearing
-            if self.punch_card.grid[0][0]:
-                self.console.log(f"LED STATE ERROR: Top-left corner (0,0) is still ON at end of animation!", "ERROR")
-            
-            # Clear all LEDs and log each one
-            for row in range(NUM_ROWS):
-                for col in range(NUM_COLS):
-                    if self.punch_card.grid[row][col]:
-                        self.console.log(f"LED: Final clearing row {row}, col {col}", "LED")
-                        
-            # Clear the grid with a single operation after logging
-            self.punch_card.clear_grid()
-            self.punch_card.update()
-            self.console.log("Splash animation completed, transitioning to ready state", "INFO")
-            
-            # Schedule actual UI reveal and message generation after a delay
-            QTimer.singleShot(500, self.complete_splash_screen)
+            # Play final sound
+            if hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound.play()
+                
+            self.complete_splash_screen()
             return
         
-        # Force a repaint to ensure LED changes are displayed
+        # Clear a percentage of the punch card based on progress
+        total_cells = NUM_ROWS * NUM_COLS
+        cells_to_clear = int(total_cells * progress_percent)
+        
+        # Play punch sound every few frames
+        if hasattr(self, 'punch_sound') and self.splash_progress % 10 == 0:
+            self.punch_sound.play()
+            
+        # Play card insert sound at the beginning
+        if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
+            self.card_insert_sound.play()
+        
+        # Only clear cards that haven't been cleared yet
+        if cells_to_clear > 0:
+            cells_cleared = 0
+            for row in range(NUM_ROWS):
+                for col in range(NUM_COLS):
+                    if cells_cleared < cells_to_clear and self.punch_card.grid[row][col]:
+                        self.punch_card.set_led(row, col, False)
+                        cells_cleared += 1
+        
+        # Force a repaint
         self.punch_card.update()
-        self.splash_step += 1
     
     def complete_splash_screen(self):
         """Complete the splash screen transition and prepare for normal operation."""
@@ -3386,18 +3251,79 @@ class PunchCardDisplay(QMainWindow):
         self.update_status("GOING TO SLEEP...")
         self.console.log("Entering sleep mode", "INFO")
         
-        # Clear any current message or animation
-        if hasattr(self, 'display_timer') and self.display_timer.isActive():
-            self.display_timer.stop()
+        # Stop ALL ongoing processes and timers
+        for timer_attr in ['timer', 'display_timer', 'message_display_timer', 'auto_timer']:
+            if hasattr(self, timer_attr) and getattr(self, timer_attr).isActive():
+                getattr(self, timer_attr).stop()
+                self.console.log(f"Stopped {timer_attr} for sleep mode", "INFO")
+        
+        # Reset any running animation flags
+        self.running = False
         
         # Clear the card first
         self.punch_card.clear_grid()
+        
+        # Load the punch card sounds if not already loaded
+        self.load_punch_card_sounds()
         
         # Start the sleep animation
         self.sleep_step = 0
         self.sleep_timer = QTimer(self)
         self.sleep_timer.timeout.connect(self.update_sleep_animation)
         self.sleep_timer.start(100)  # Same interval as startup animation
+    
+    def load_punch_card_sounds(self):
+        """Load punch card sounds for animations."""
+        try:
+            from PyQt6.QtMultimedia import QSoundEffect
+            from PyQt6.QtCore import QUrl
+            import os
+            
+            self.console.log("Loading punch card sounds...", "INFO")
+            
+            # Define sound paths relative to the project
+            sound_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../assets/sounds")
+            
+            # Create sound effects if they don't exist
+            if not hasattr(self, 'punch_sound'):
+                self.punch_sound = QSoundEffect()
+                punch_path = os.path.join(sound_dir, "punch.wav")
+                if os.path.exists(punch_path):
+                    self.punch_sound.setSource(QUrl.fromLocalFile(punch_path))
+                    self.punch_sound.setVolume(0.5)
+                    self.console.log(f"Loaded punch sound from {punch_path}", "INFO")
+                else:
+                    self.console.log(f"Sound file not found: {punch_path}", "WARNING")
+            
+            if not hasattr(self, 'card_insert_sound'):
+                self.card_insert_sound = QSoundEffect()
+                insert_path = os.path.join(sound_dir, "card_insert.wav")
+                if os.path.exists(insert_path):
+                    self.card_insert_sound.setSource(QUrl.fromLocalFile(insert_path))
+                    self.card_insert_sound.setVolume(0.5)
+                    self.console.log(f"Loaded card insert sound from {insert_path}", "INFO")
+                else:
+                    self.console.log(f"Sound file not found: {insert_path}", "WARNING")
+            
+            if not hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound = QSoundEffect()
+                eject_path = os.path.join(sound_dir, "card_eject.wav")
+                if os.path.exists(eject_path):
+                    self.card_eject_sound.setSource(QUrl.fromLocalFile(eject_path))
+                    self.card_eject_sound.setVolume(0.5)
+                    self.console.log(f"Loaded card eject sound from {eject_path}", "INFO")
+                else:
+                    self.console.log(f"Sound file not found: {eject_path}", "WARNING")
+                    
+        except ImportError:
+            self.console.log("QSoundEffect not available, running without sound", "WARNING")
+        except Exception as e:
+            self.console.log(f"Error loading sounds: {str(e)}", "ERROR")
+    
+    def play_punch_sound(self):
+        """Play the punch card sound if available."""
+        if hasattr(self, 'punch_sound') and hasattr(self.punch_sound, 'play'):
+            self.punch_sound.play()
     
     def update_sleep_animation(self):
         """Update the sleep animation (reverse and mirrored startup animation)."""
@@ -3412,27 +3338,40 @@ class PunchCardDisplay(QMainWindow):
         
         # Phase 1: Initial diagonal line from top right to middle (mirroring startup phase 3)
         if self.sleep_step < total_steps:
+            # Play card insert sound at the beginning of animation
+            if self.sleep_step == 0 and hasattr(self, 'card_insert_sound'):
+                self.card_insert_sound.play()
+                
             # Start from top right instead of top left (mirrored)
+            led_changed = False
             for row in range(NUM_ROWS):
                 # Column calculation is mirrored from startup animation
                 col = (NUM_COLS - 1) - (self.sleep_step - row)
                 if 0 <= col < NUM_COLS:
                     self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 1)", "LED")
                     self.punch_card.set_led(row, col, True)
+                    led_changed = True
+            
+            # Play punch sound if any LEDs changed
+            if led_changed and self.sleep_step % 3 == 0:  # Play every 3rd step to avoid sound overlap
+                self.play_punch_sound()
         
         # Phase 2: Rolling diagonal with 12-column width (mirroring startup phase 2)
         elif self.sleep_step < total_steps * 2:
             current_step = self.sleep_step - total_steps
             
             # Set new LEDs ON in the current diagonal (from right to left)
+            on_changed = False
             for row in range(NUM_ROWS):
                 # Column calculation is mirrored
                 col = (NUM_COLS - 1) - (current_step - row)
                 if 0 <= col < NUM_COLS:
                     self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 2)", "LED")
                     self.punch_card.set_led(row, col, True)
+                    on_changed = True
             
             # Clear old LEDs (trailing diagonal pattern - 12 columns wide)
+            off_changed = False
             trailing_step = max(0, current_step - 12)
             for row in range(NUM_ROWS):
                 # Column calculation is mirrored
@@ -3440,20 +3379,40 @@ class PunchCardDisplay(QMainWindow):
                 if 0 <= col < NUM_COLS:
                     self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 2 trailing)", "LED")
                     self.punch_card.set_led(row, col, False)
+                    off_changed = True
+            
+            # Play punch sounds
+            if on_changed and self.sleep_step % 3 == 0:  # Every 3rd step for new holes
+                self.play_punch_sound()
+            elif off_changed and self.sleep_step % 5 == 0:  # Every 5th step for clearing holes
+                if hasattr(self, 'card_eject_sound'):
+                    self.card_eject_sound.play()
         
         # Phase 3: Clear the remaining LEDs (mirroring startup phase 1)
         elif self.sleep_step < total_steps * 2 + 12:
             current_clear_step = self.sleep_step - (total_steps * 2) + (total_steps - 12)
             
+            # Clear LEDs in diagonal pattern
+            led_changed = False
             for row in range(NUM_ROWS):
                 # Column calculation is mirrored
                 col = (NUM_COLS - 1) - (current_clear_step - row)
                 if 0 <= col < NUM_COLS:
                     self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 3)", "LED")
                     self.punch_card.set_led(row, col, False)
+                    led_changed = True
+            
+            # Play eject sound if any LEDs changed
+            if led_changed and self.sleep_step % 4 == 0:  # Play every 4th step
+                if hasattr(self, 'card_eject_sound'):
+                    self.card_eject_sound.play()
         
         # Animation completed
         else:
+            # Play final card eject sound
+            if hasattr(self, 'card_eject_sound'):
+                self.card_eject_sound.play()
+                
             # Stop the timer
             self.sleep_timer.stop()
             self.console.log("Sleep animation completed, system is now sleeping", "INFO")
@@ -3507,11 +3466,18 @@ class PunchCardDisplay(QMainWindow):
         self.update_status("WAKING UP...")
         self.console.log("Waking from sleep mode", "INFO")
         
+        # Play card insert sound
+        if hasattr(self, 'card_insert_sound'):
+            self.card_insert_sound.play()
+        
         # Run the startup animation
         self.start_animation()
         
         # After animation delay, set to ready
         QTimer.singleShot(2000, lambda: self.update_status("READY"))
+        
+        # Restart auto message timer if it was previously running
+        QTimer.singleShot(5000, lambda: self.auto_timer.start(5000))
 
 
 def run_gui_app():
