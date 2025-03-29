@@ -2027,7 +2027,7 @@ class InAppMenuBar(QWidget):
         self.left_layout.setSpacing(2)
         
         # Apple menu button
-        self.apple_menu = QPushButton("■")  # Square symbol instead of rectangle for better appearance
+        self.apple_menu = QPushButton("▭")  # Use rectangle symbol to represent punch card
         self.apple_menu.setFlat(True)
         self.apple_menu.setStyleSheet(f"""
             QPushButton {{
@@ -2036,8 +2036,8 @@ class InAppMenuBar(QWidget):
                 border: none;
                 padding: 2px 8px;
                 text-align: center;
-                font-size: 18px;  /* Larger font size for better visibility */
-                font-weight: bold; /* Make it bolder */
+                font-size: 16px;  /* Restore original size */
+                font-weight: normal; /* Not bold */
             }}
             QPushButton:hover {{
                 background-color: white;
@@ -2290,7 +2290,7 @@ class InAppMenuBar(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
         # Draw bottom border line manually to ensure it spans the entire width
-        painter.setPen(QPen(QColor(255, 255, 255), 1.5))  # White pen, 1.5px width
+        painter.setPen(QPen(QColor(255, 255, 255), 1))  # White pen, 1px width
         painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
 
 
