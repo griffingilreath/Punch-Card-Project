@@ -3310,6 +3310,12 @@ class PunchCardDisplay(QMainWindow):
         QMessageBox.information(self, "Quick Settings", 
                                "This would show a quick settings panel.\n"
                                "Feature not yet implemented.")
+                               
+    def show_settings_dialog(self):
+        """Show the settings dialog."""
+        self.update_status("Opening Settings...")
+        if self.settings.exec() == QDialog.DialogCode.Accepted:
+            self.refresh_ui_from_settings()
 
 
 def run_gui_app():
