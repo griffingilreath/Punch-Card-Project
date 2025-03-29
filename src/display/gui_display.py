@@ -2059,9 +2059,10 @@ class InAppMenuBar(QWidget):
                 min-width: 24px;
                 min-height: 22px;
                 margin: 0px;
-                line-height: 16px;  /* Reduced from 20px to move symbol up further */
+                margin-top: -4px;  /* Move up by adding negative top margin */
+                line-height: 15px;  /* Reduced further to move symbol up */
                 vertical-align: top;
-                padding-top: 1px;  /* Add slight top padding to fine-tune position */
+                padding-top: 0px;  /* Remove top padding */
             }}
             QPushButton:hover {{
                 background-color: white;
