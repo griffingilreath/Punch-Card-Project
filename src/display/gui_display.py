@@ -3247,40 +3247,49 @@ class PunchCardDisplay(QMainWindow):
             self.refresh_ui_from_settings()
 
     def start_sleep_mode(self):
-        """Start sleep mode for the punch card.
-        
-        This will play the startup animation in reverse and mirrored horizontally,
-        moving from top right to bottom left, then pause all visible processes.
-        """
-        # Don't start sleep if we're already sleeping
-        if hasattr(self, 'is_sleeping') and self.is_sleeping:
-            return
+        """Start the sleep mode animation sequence."""
+        if self.sleeping:
+            return  # Don't start sleep mode if already sleeping
             
-        # Set sleep state
-        self.is_sleeping = True
-        self.update_status("GOING TO SLEEP...")
-        self.console.log("Entering sleep mode", "INFO")
+        self.console_window.log("Starting sleep mode", "INFO")
+        self.update_status("ENTERING SLEEP MODE...")
+        self.sleeping = True
         
-        # Stop ALL ongoing processes and timers
-        for timer_attr in ['timer', 'display_timer', 'message_display_timer', 'auto_timer']:
-            if hasattr(self, timer_attr) and getattr(self, timer_attr).isActive():
-                getattr(self, timer_attr).stop()
-                self.console.log(f"Stopped {timer_attr} for sleep mode", "INFO")
+        # Reset animation counters and variables
+        self.sleep_animation_progress = 0
+        self.sleep_animation_started = False
         
-        # Reset any running animation flags
-        self.running = False
+        # Disable all buttons except wake
+        for button in [self.start_button, self.clear_button, self.exit_button]:
+            button.setEnabled(False)
+            button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {COLORS['button_bg'].name()};
+                    color: {COLORS['button_text'].name()};
+                    border: 1px solid {COLORS['hole_outline'].name()};
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                }}
+            """)
         
-        # Clear the card first
-        self.punch_card.clear_grid()
-        
-        # Load the punch card sounds if not already loaded
-        self.load_punch_card_sounds()
-        
-        # Start the sleep animation
-        self.sleep_step = 0
+        # Create wake button if it doesn't exist
+        if not hasattr(self, 'wake_button'):
+            self.wake_button = RetroButton("WAKE", self)
+            self.wake_button.clicked.connect(self.wake_from_sleep)
+            self.wake_button.setFixedSize(100, 30)
+            
+            # Center the wake button
+            self.wake_button.move(
+                (self.width() - self.wake_button.width()) // 2,
+                self.height() - self.wake_button.height() - 40
+            )
+        else:
+            self.wake_button.show()
+            
+        # Start sleep animation timer (only trigger once)
         self.sleep_timer = QTimer(self)
         self.sleep_timer.timeout.connect(self.update_sleep_animation)
-        self.sleep_timer.start(100)  # Same interval as startup animation
+        self.sleep_timer.start(50)  # Run every 50ms
     
     def load_punch_card_sounds(self):
         """Load punch card sounds for animations."""
@@ -3336,15 +3345,23 @@ class PunchCardDisplay(QMainWindow):
             self.punch_sound.play()
     
     def update_sleep_animation(self):
-        """Update the sleep animation (reverse of startup animation)."""
-        if not hasattr(self, 'is_sleeping') or not self.is_sleeping:
+        """Update the sleep animation with a pattern that turns off after 12 holes."""
+        # First, make sure we're using consistent variable names
+        if not hasattr(self, 'sleep_step'):
+            self.sleep_step = 0
+        
+        # Check if we're sleeping using the correct attribute
+        if not hasattr(self, 'sleeping') or not self.sleeping:
             return
             
         # Calculate total steps needed to cover the entire card
         total_steps = NUM_COLS + NUM_ROWS - 1
         
         # Log animation progress
-        self.console.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
+        if hasattr(self, 'console_window'):
+            self.console_window.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
+        elif hasattr(self, 'console'):
+            self.console.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
         
         # Phase 1: Starting punch pattern from bottom-right to top-left
         if self.sleep_step < total_steps:
@@ -3355,8 +3372,12 @@ class PunchCardDisplay(QMainWindow):
                     self.card_insert_sound.play()
                     
                 # Start animation from bottom-right (reverse of top-left in startup)
-                self.console.log(f"LED: Starting from bottom-right corner", "LED")
-                self.punch_card.set_led(NUM_ROWS-1, NUM_COLS-1, True)
+                if hasattr(self, 'console_window'):
+                    self.console_window.log(f"LED: Starting from bottom-right corner", "LED")
+                elif hasattr(self, 'console'):
+                    self.console.log(f"LED: Starting from bottom-right corner", "LED")
+                    
+                self.punch_card_widget.set_led(NUM_ROWS-1, NUM_COLS-1, True)
             
             # Set the LEDs in the current diagonal (working backward)
             led_changed = False
@@ -3366,8 +3387,7 @@ class PunchCardDisplay(QMainWindow):
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
                     # Skip bottom-right corner as we already set it
                     if not (row == NUM_ROWS-1 and col == NUM_COLS-1):
-                        self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 1)", "LED")
-                        self.punch_card.set_led(row, col, True)
+                        self.punch_card_widget.set_led(row, col, True)
                         led_changed = True
             
             # Play punch sound if any LEDs changed
@@ -3381,8 +3401,7 @@ class PunchCardDisplay(QMainWindow):
                     # Calculate column for trailing clearing (12 steps behind)
                     clear_col = (NUM_COLS - 1) - (trailing_step - ((NUM_ROWS-1) - row))
                     if 0 <= clear_col < NUM_COLS and 0 <= row < NUM_ROWS:
-                        self.console.log(f"LED: Clearing row {row}, col {clear_col} (Sleep Phase 1 trailing)", "LED")
-                        self.punch_card.set_led(row, clear_col, False)
+                        self.punch_card_widget.set_led(row, clear_col, False)
                 
                 # Play eject sound for clearing every 5th step
                 if self.sleep_step % 5 == 0 and hasattr(self, 'card_eject_sound'):
@@ -3398,8 +3417,7 @@ class PunchCardDisplay(QMainWindow):
                 # Reverse column calculation from startup animation
                 col = (NUM_COLS - 1) - (current_step - ((NUM_ROWS-1) - row))
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
-                    self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 2)", "LED")
-                    self.punch_card.set_led(row, col, True)
+                    self.punch_card_widget.set_led(row, col, True)
                     on_changed = True
             
             # Clear trailing LEDs that are 12 columns behind (opposite of startup)
@@ -3409,8 +3427,7 @@ class PunchCardDisplay(QMainWindow):
                 # Reverse column calculation for trailing clear
                 col = (NUM_COLS - 1) - (trailing_step - ((NUM_ROWS-1) - row))
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
-                    self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 2 trailing)", "LED")
-                    self.punch_card.set_led(row, col, False)
+                    self.punch_card_widget.set_led(row, col, False)
                     off_changed = True
             
             # Play sounds
@@ -3430,8 +3447,7 @@ class PunchCardDisplay(QMainWindow):
                 # Reverse column calculation
                 col = (NUM_COLS - 1) - (current_clear_step - ((NUM_ROWS-1) - row)) - (total_steps - 12)
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
-                    self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 3)", "LED")
-                    self.punch_card.set_led(row, col, False)
+                    self.punch_card_widget.set_led(row, col, False)
                     led_changed = True
             
             # Play eject sound if any LEDs changed
@@ -3447,45 +3463,25 @@ class PunchCardDisplay(QMainWindow):
                 
             # Stop the timer
             self.sleep_timer.stop()
-            self.console.log("Sleep animation completed, system is now sleeping", "INFO")
+            if hasattr(self, 'console_window'):
+                self.console_window.log("Sleep animation completed, system is now sleeping", "INFO")
+            elif hasattr(self, 'console'):
+                self.console.log("Sleep animation completed, system is now sleeping", "INFO")
             
             # Clear all LEDs
-            self.punch_card.clear_grid()
+            self.punch_card_widget.clear_grid()
             
             # Update status
             self.update_status("SLEEPING")
-            
-            # Create wake button if it doesn't exist
-            if not hasattr(self, 'wake_button'):
-                self.wake_button = RetroButton("WAKE", self)
-                self.wake_button.setStyleSheet("""
-                    background-color: rgba(50, 50, 50, 0.7);
-                    color: white;
-                    border: 1px solid white;
-                    border-radius: 5px;
-                    padding: 10px 20px;
-                    font-size: 16px;
-                """)
-                self.wake_button.clicked.connect(self.wake_from_sleep)
-                
-                # Calculate center position
-                button_width = 120
-                button_height = 40
-                center_x = (self.width() - button_width) // 2
-                center_y = (self.height() - button_height) // 2
-                
-                self.wake_button.setGeometry(center_x, center_y, button_width, button_height)
-                self.wake_button.show()
-                
             return
         
         # Force a repaint
-        self.punch_card.update()
+        self.punch_card_widget.update()
         self.sleep_step += 1
     
     def wake_from_sleep(self):
         """Wake up from sleep mode."""
-        if not hasattr(self, 'is_sleeping') or not self.is_sleeping:
+        if not hasattr(self, 'sleeping') or not self.sleeping:
             return
         
         # Remove the wake button
@@ -3494,9 +3490,13 @@ class PunchCardDisplay(QMainWindow):
             delattr(self, 'wake_button')
         
         # Update state
-        self.is_sleeping = False
+        self.sleeping = False
         self.update_status("WAKING UP...")
-        self.console.log("Waking from sleep mode", "INFO")
+        
+        if hasattr(self, 'console_window'):
+            self.console_window.log("Waking from sleep mode", "INFO")
+        elif hasattr(self, 'console'):
+            self.console.log("Waking from sleep mode", "INFO")
         
         # Play card insert sound
         if hasattr(self, 'card_insert_sound'):
