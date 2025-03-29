@@ -3363,6 +3363,9 @@ class PunchCardDisplay(QMainWindow):
         elif hasattr(self, 'console'):
             self.console.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
         
+        # Use the proper punch card widget - ensure this is the correct attribute
+        punch_card = self.punch_card_widget if hasattr(self, 'punch_card_widget') else self.punch_card
+        
         # Phase 1: Starting punch pattern from bottom-right to top-left
         if self.sleep_step < total_steps:
             # Make sure the bottom-right corner is explicitly set as the first step
@@ -3377,7 +3380,7 @@ class PunchCardDisplay(QMainWindow):
                 elif hasattr(self, 'console'):
                     self.console.log(f"LED: Starting from bottom-right corner", "LED")
                     
-                self.punch_card_widget.set_led(NUM_ROWS-1, NUM_COLS-1, True)
+                punch_card.set_led(NUM_ROWS-1, NUM_COLS-1, True)
             
             # Set the LEDs in the current diagonal (working backward)
             led_changed = False
@@ -3387,7 +3390,7 @@ class PunchCardDisplay(QMainWindow):
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
                     # Skip bottom-right corner as we already set it
                     if not (row == NUM_ROWS-1 and col == NUM_COLS-1):
-                        self.punch_card_widget.set_led(row, col, True)
+                        punch_card.set_led(row, col, True)
                         led_changed = True
             
             # Play punch sound if any LEDs changed
@@ -3401,7 +3404,7 @@ class PunchCardDisplay(QMainWindow):
                     # Calculate column for trailing clearing (12 steps behind)
                     clear_col = (NUM_COLS - 1) - (trailing_step - ((NUM_ROWS-1) - row))
                     if 0 <= clear_col < NUM_COLS and 0 <= row < NUM_ROWS:
-                        self.punch_card_widget.set_led(row, clear_col, False)
+                        punch_card.set_led(row, clear_col, False)
                 
                 # Play eject sound for clearing every 5th step
                 if self.sleep_step % 5 == 0 and hasattr(self, 'card_eject_sound'):
@@ -3417,7 +3420,7 @@ class PunchCardDisplay(QMainWindow):
                 # Reverse column calculation from startup animation
                 col = (NUM_COLS - 1) - (current_step - ((NUM_ROWS-1) - row))
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
-                    self.punch_card_widget.set_led(row, col, True)
+                    punch_card.set_led(row, col, True)
                     on_changed = True
             
             # Clear trailing LEDs that are 12 columns behind (opposite of startup)
@@ -3427,7 +3430,7 @@ class PunchCardDisplay(QMainWindow):
                 # Reverse column calculation for trailing clear
                 col = (NUM_COLS - 1) - (trailing_step - ((NUM_ROWS-1) - row))
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
-                    self.punch_card_widget.set_led(row, col, False)
+                    punch_card.set_led(row, col, False)
                     off_changed = True
             
             # Play sounds
@@ -3447,7 +3450,7 @@ class PunchCardDisplay(QMainWindow):
                 # Reverse column calculation
                 col = (NUM_COLS - 1) - (current_clear_step - ((NUM_ROWS-1) - row)) - (total_steps - 12)
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
-                    self.punch_card_widget.set_led(row, col, False)
+                    punch_card.set_led(row, col, False)
                     led_changed = True
             
             # Play eject sound if any LEDs changed
@@ -3469,14 +3472,14 @@ class PunchCardDisplay(QMainWindow):
                 self.console.log("Sleep animation completed, system is now sleeping", "INFO")
             
             # Clear all LEDs
-            self.punch_card_widget.clear_grid()
+            punch_card.clear_grid()
             
             # Update status
             self.update_status("SLEEPING")
             return
         
         # Force a repaint
-        self.punch_card_widget.update()
+        punch_card.update()
         self.sleep_step += 1
     
     def wake_from_sleep(self):
@@ -3493,6 +3496,7 @@ class PunchCardDisplay(QMainWindow):
         self.sleeping = False
         self.update_status("WAKING UP...")
         
+        # Log to the appropriate console
         if hasattr(self, 'console_window'):
             self.console_window.log("Waking from sleep mode", "INFO")
         elif hasattr(self, 'console'):
@@ -3508,8 +3512,9 @@ class PunchCardDisplay(QMainWindow):
         self.splash_progress = 0
         self.animation_started = False  # Reset this flag to ensure animation plays
         
-        # Run the startup animation - this will automatically be followed by messages
-        self.start_animation()
+        # Use the appropriate animation start method
+        if hasattr(self, 'start_animation'):
+            self.start_animation()
         
         # After animation delay, handle message display
         QTimer.singleShot(5000, self.post_wake_setup)
