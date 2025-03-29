@@ -1951,15 +1951,18 @@ class WiFiStatusWidget(QWidget):
             # Get the menu width
             menu_width = self.wifi_menu.sizeHint().width()
             
-            # Calculate position to ensure menu stays within window bounds
-            pos = self.mapToGlobal(QPoint(0, self.height()))
+            # Get position - x from current widget, y from menu bar bottom
+            x_pos = self.mapToGlobal(QPoint(0, 0)).x()
             
-            # Position the menu so it stays within window bounds
-            x_position = min(pos.x(), window_right_edge - menu_width)
-            adjusted_pos = QPoint(x_position, pos.y())
+            # Get parent menu bar to determine its bottom edge
+            parent_menubar = self.parent()
+            y_pos = parent_menubar.mapToGlobal(QPoint(0, parent_menubar.height())).y()
+            
+            # Make sure menu doesn't go off screen
+            x_position = min(x_pos, window_right_edge - menu_width)
             
             # Show popup at the adjusted position
-            self.wifi_menu.popup(adjusted_pos)
+            self.wifi_menu.popup(QPoint(x_position, y_pos))
     
     def paintEvent(self, event):
         """Paint the WiFi status icon with rectangular bars."""
@@ -2049,11 +2052,11 @@ class InAppMenuBar(QWidget):
                 background-color: transparent;
                 color: white;
                 border: none;
-                padding: 0px 7px 0px 7px;  /* Even padding on left and right */
+                padding: 0px 8px;  /* Even padding on both sides */
                 text-align: center;
-                font-size: 18px;
+                font-size: 22px;  /* Increased size */
                 font-weight: normal;
-                min-width: 22px;
+                min-width: 24px;
                 min-height: 22px;
                 margin: 0px;
                 line-height: 22px;
@@ -2256,42 +2259,49 @@ class InAppMenuBar(QWidget):
     
     def show_apple_menu(self):
         """Show the Apple menu popup."""
-        pos = self.apple_menu.mapToGlobal(QPoint(0, self.height()))
+        # Get the absolute position of the menu bar's bottom edge
+        pos = self.mapToGlobal(QPoint(0, self.height()))
+        # No vertical adjustment needed - this lines up with the bottom border
         self.apple_menu_popup.popup(pos)
     
     def show_card_menu(self):
         """Show the Punch Card menu popup."""
-        pos = self.card_menu.mapToGlobal(QPoint(0, self.height()))
-        self.card_menu_popup.popup(pos)
+        # Get horizontal position from the button but vertical from menu bar bottom
+        x_pos = self.card_menu.mapToGlobal(QPoint(0, 0)).x()
+        y_pos = self.mapToGlobal(QPoint(0, self.height())).y()
+        self.card_menu_popup.popup(QPoint(x_pos, y_pos))
     
     def show_settings_menu(self):
         """Show the Settings menu popup."""
-        pos = self.settings_menu.mapToGlobal(QPoint(0, self.height()))
-        self.settings_menu_popup.popup(pos)
+        # Get horizontal position from the button but vertical from menu bar bottom
+        x_pos = self.settings_menu.mapToGlobal(QPoint(0, 0)).x()
+        y_pos = self.mapToGlobal(QPoint(0, self.height())).y()
+        self.settings_menu_popup.popup(QPoint(x_pos, y_pos))
     
     def show_console_menu(self):
         """Show the Console menu popup."""
-        pos = self.console_menu.mapToGlobal(QPoint(0, self.height()))
-        self.console_menu_popup.popup(pos)
+        # Get horizontal position from the button but vertical from menu bar bottom
+        x_pos = self.console_menu.mapToGlobal(QPoint(0, 0)).x()
+        y_pos = self.mapToGlobal(QPoint(0, self.height())).y()
+        self.console_menu_popup.popup(QPoint(x_pos, y_pos))
     
     def show_notifications(self):
         """Show the notifications popup menu."""
-        # Calculate position for the popup menu
-        pos = self.clock_button.mapToGlobal(QPoint(0, self.height()))
-        
-        # Get the notification menu width to calculate proper positioning
+        # Get the menu width to calculate proper positioning
         menu_width = self.notifications_popup.sizeHint().width()
         
         # Get the global position of the right edge of the window
         window = self.window()
         window_right_edge = window.mapToGlobal(QPoint(window.width(), 0)).x()
         
+        # Get y position from menu bar bottom
+        y_pos = self.mapToGlobal(QPoint(0, self.height())).y()
+        
         # Position the menu so its right edge aligns with the window right edge
-        # but not extending beyond the right edge of the window
         x_position = window_right_edge - menu_width
         
         # Create final position
-        adjusted_pos = QPoint(x_position, pos.y())
+        adjusted_pos = QPoint(x_position, y_pos)
         
         # Show the popup at the calculated position
         self.notifications_popup.popup(adjusted_pos)
