@@ -2832,12 +2832,6 @@ class PunchCardDisplay(QMainWindow):
         self.splash_step = 0
         self.splash_progress = 0
         
-        # Fill the entire card with holes to prepare for the animation
-        # This ensures our animation of clearing holes is visible
-        for row in range(NUM_ROWS):
-            for col in range(NUM_COLS):
-                self.punch_card.set_led(row, col, True)
-        
         # Load the punch card sounds if not already loaded
         self.load_punch_card_sounds()
         
@@ -2847,7 +2841,7 @@ class PunchCardDisplay(QMainWindow):
         self.splash_timer.start(100)  # Update every 100ms
         
         # Console log for debugging only
-        self.console.log("Splash screen started - filling card with holes first", "INFO")
+        self.console.log("Splash screen started - simple version", "INFO")
     
     def update_countdown(self):
         """Update the countdown timer during hardware detection."""
@@ -2964,11 +2958,11 @@ class PunchCardDisplay(QMainWindow):
             )
     
     def update_splash(self):
-        """Startup animation that punches all holes first, then clears them diagonally."""
+        """Simple splash animation that gradually clears the punch card."""
         if not self.showing_splash:
             return
         
-        # Calculate progress percentage (0-100)
+        # Calculate progress percentage
         self.splash_progress += 5
         progress_percent = self.splash_progress / 100
         
@@ -2992,52 +2986,26 @@ class PunchCardDisplay(QMainWindow):
             self.complete_splash_screen()
             return
         
-        # Phase 1 (0-30%): Punch all holes in the card
-        if self.splash_progress <= 30:
-            # Calculate how many holes to punch based on progress
-            total_cells = NUM_ROWS * NUM_COLS
-            cells_to_punch = int(total_cells * (self.splash_progress / 30))
-            
-            # Play card insert sound at the beginning
-            if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
-                self.card_insert_sound.play()
-            
-            # Play punch sound every few frames
-            if hasattr(self, 'punch_sound') and self.splash_progress % 10 == 0:
-                self.play_punch_sound()
-                
-            # Punch holes in order (row by row)
-            cells_punched = 0
-            for row in range(NUM_ROWS):
-                for col in range(NUM_COLS):
-                    if cells_punched < cells_to_punch and not self.punch_card.grid[row][col]:
-                        self.punch_card.set_led(row, col, True)
-                        cells_punched += 1
-                        if cells_punched >= cells_to_punch:
-                            break
-                if cells_punched >= cells_to_punch:
-                    break
+        # Clear a percentage of the punch card based on progress
+        total_cells = NUM_ROWS * NUM_COLS
+        cells_to_clear = int(total_cells * progress_percent)
         
-        # Phase 2 (31-100%): Clear holes diagonally with 12-hole width
-        else:
-            # Calculate total steps needed for diagonal pattern
-            total_steps = NUM_ROWS + NUM_COLS - 1
+        # Play punch sound every few frames
+        if hasattr(self, 'punch_sound') and self.splash_progress % 10 == 0:
+            self.punch_sound.play()
             
-            # Map 31-100% progress to 0-total_steps
-            clear_progress = ((self.splash_progress - 30) / 70) * total_steps
-            current_step = int(clear_progress)
-            
-            # Play eject sound periodically
-            if self.splash_progress % 15 == 0 and hasattr(self, 'card_eject_sound'):
-                self.card_eject_sound.play()
-            
-            # We'll clear diagonals from top-left to bottom-right
-            # Each diagonal passes through cells where row+col = constant
+        # Play card insert sound at the beginning
+        if self.splash_progress == 5 and hasattr(self, 'card_insert_sound'):
+            self.card_insert_sound.play()
+        
+        # Only clear cards that haven't been cleared yet
+        if cells_to_clear > 0:
+            cells_cleared = 0
             for row in range(NUM_ROWS):
                 for col in range(NUM_COLS):
-                    if row + col <= current_step:
-                        # Clear this diagonal and all previous ones
+                    if cells_cleared < cells_to_clear and self.punch_card.grid[row][col]:
                         self.punch_card.set_led(row, col, False)
+                        cells_cleared += 1
         
         # Force a repaint
         self.punch_card.update()
@@ -3378,7 +3346,7 @@ class PunchCardDisplay(QMainWindow):
         # Log animation progress
         self.console.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
         
-        # Phase 1: Starting punch pattern (reverse of startup clear phase)
+        # Phase 1: Starting punch pattern from bottom-right to top-left
         if self.sleep_step < total_steps:
             # Make sure the bottom-right corner is explicitly set as the first step
             if self.sleep_step == 0:
@@ -3394,7 +3362,6 @@ class PunchCardDisplay(QMainWindow):
             led_changed = False
             for row in range(NUM_ROWS):
                 # Calculate column from bottom-right (NUM_COLS-1) working back
-                # Instead of working from 0 forward in startup animation
                 col = (NUM_COLS - 1) - (self.sleep_step - ((NUM_ROWS-1) - row))
                 if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
                     # Skip bottom-right corner as we already set it
@@ -3406,8 +3373,22 @@ class PunchCardDisplay(QMainWindow):
             # Play punch sound if any LEDs changed
             if led_changed and self.sleep_step % 3 == 0:  # Play every 3rd step
                 self.play_punch_sound()
+                
+            # Critical change: Start turning off LEDs after 12 columns
+            if self.sleep_step >= 12:
+                trailing_step = self.sleep_step - 12
+                for row in range(NUM_ROWS):
+                    # Calculate column for trailing clearing (12 steps behind)
+                    clear_col = (NUM_COLS - 1) - (trailing_step - ((NUM_ROWS-1) - row))
+                    if 0 <= clear_col < NUM_COLS and 0 <= row < NUM_ROWS:
+                        self.console.log(f"LED: Clearing row {row}, col {clear_col} (Sleep Phase 1 trailing)", "LED")
+                        self.punch_card.set_led(row, clear_col, False)
+                
+                # Play eject sound for clearing every 5th step
+                if self.sleep_step % 5 == 0 and hasattr(self, 'card_eject_sound'):
+                    self.card_eject_sound.play()
         
-        # Phase 2: Rolling diagonal with 12-column width (reverse of startup phase 2)
+        # Phase 2: Continue turning on LEDs while turning off trailing ones
         elif self.sleep_step < total_steps * 2:
             current_step = self.sleep_step - total_steps
             
@@ -3439,7 +3420,7 @@ class PunchCardDisplay(QMainWindow):
                 if hasattr(self, 'card_eject_sound'):
                     self.card_eject_sound.play()
         
-        # Phase 3: Clear the final pattern (reverse of startup phase 3)
+        # Phase 3: Clear the final pattern
         elif self.sleep_step < total_steps * 2 + 12:
             current_clear_step = self.sleep_step - (total_steps * 2)
             
@@ -3526,11 +3507,6 @@ class PunchCardDisplay(QMainWindow):
         self.splash_step = 0
         self.splash_progress = 0
         self.animation_started = False  # Reset this flag to ensure animation plays
-        
-        # Fill the entire card with holes to prepare for the animation
-        for row in range(NUM_ROWS):
-            for col in range(NUM_COLS):
-                self.punch_card.set_led(row, col, True)
         
         # Run the startup animation - this will automatically be followed by messages
         self.start_animation()
