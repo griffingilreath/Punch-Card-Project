@@ -3336,7 +3336,7 @@ class PunchCardDisplay(QMainWindow):
             self.punch_sound.play()
     
     def update_sleep_animation(self):
-        """Update the sleep animation (same pattern as startup animation)."""
+        """Update the sleep animation (reverse of startup animation)."""
         if not hasattr(self, 'is_sleeping') or not self.is_sleeping:
             return
             
@@ -3346,83 +3346,85 @@ class PunchCardDisplay(QMainWindow):
         # Log animation progress
         self.console.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
         
-        # Phase 1: Initial clearing (empty card)
+        # Phase 1: Starting punch pattern (reverse of startup clear phase)
         if self.sleep_step < total_steps:
-            # Make sure the top-left corner (0,0) is explicitly cleared first
+            # Make sure the bottom-right corner is explicitly set as the first step
             if self.sleep_step == 0:
-                self.console.log(f"LED: Explicitly clearing top-left corner (0,0)", "LED")
-                self.punch_card.set_led(0, 0, False)
+                # Play card insert sound at the beginning of animation
+                if hasattr(self, 'card_insert_sound'):
+                    self.card_insert_sound.play()
+                    
+                # Start animation from bottom-right (reverse of top-left in startup)
+                self.console.log(f"LED: Starting from bottom-right corner", "LED")
+                self.punch_card.set_led(NUM_ROWS-1, NUM_COLS-1, True)
             
-            # Clear the current diagonal
+            # Set the LEDs in the current diagonal (working backward)
+            led_changed = False
             for row in range(NUM_ROWS):
-                col = self.sleep_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Clearing row {row}, col {col} (Sleep Phase 1)", "LED")
-                        self.punch_card.set_led(row, col, False)
+                # Calculate column from bottom-right (NUM_COLS-1) working back
+                # Instead of working from 0 forward in startup animation
+                col = (NUM_COLS - 1) - (self.sleep_step - ((NUM_ROWS-1) - row))
+                if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
+                    # Skip bottom-right corner as we already set it
+                    if not (row == NUM_ROWS-1 and col == NUM_COLS-1):
+                        self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 1)", "LED")
+                        self.punch_card.set_led(row, col, True)
+                        led_changed = True
             
-            # Play eject sound if holes changed
-            if self.sleep_step % 5 == 0 and hasattr(self, 'card_eject_sound'):
-                self.card_eject_sound.play()
+            # Play punch sound if any LEDs changed
+            if led_changed and self.sleep_step % 3 == 0:  # Play every 3rd step
+                self.play_punch_sound()
         
-        # Phase 2: Punching holes with a 12-hole width
+        # Phase 2: Rolling diagonal with 12-column width (reverse of startup phase 2)
         elif self.sleep_step < total_steps * 2:
             current_step = self.sleep_step - total_steps
             
-            # At the beginning of Phase 2, explicitly turn on the top-left corner
-            if current_step == 0:
-                self.console.log(f"LED: Explicitly turning ON top-left corner (0,0)", "LED")
-                self.punch_card.set_led(0, 0, True)
-            
-            # Punch new holes at the current diagonal
+            # Set new LEDs ON in the current diagonal (moving from bottom-right to top-left)
+            on_changed = False
             for row in range(NUM_ROWS):
-                col = current_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 2)", "LED")
-                        self.punch_card.set_led(row, col, True)
+                # Reverse column calculation from startup animation
+                col = (NUM_COLS - 1) - (current_step - ((NUM_ROWS-1) - row))
+                if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
+                    self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 2)", "LED")
+                    self.punch_card.set_led(row, col, True)
+                    on_changed = True
             
-            # Clear old holes (trailing diagonal pattern - 12 columns wide)
+            # Clear trailing LEDs that are 12 columns behind (opposite of startup)
+            off_changed = False
             trailing_step = max(0, current_step - 12)
             for row in range(NUM_ROWS):
-                col = trailing_step - row
-                if 0 <= col < NUM_COLS:
-                    # Only clear top-left corner when it's definitely time to clear it
-                    if row == 0 and col == 0 and current_step >= 12:
-                        self.console.log(f"LED: Explicitly turning OFF top-left corner (0,0)", "LED")
-                        self.punch_card.set_led(0, 0, False)
-                    elif not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 2 trailing)", "LED")
-                        self.punch_card.set_led(row, col, False)
+                # Reverse column calculation for trailing clear
+                col = (NUM_COLS - 1) - (trailing_step - ((NUM_ROWS-1) - row))
+                if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
+                    self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 2 trailing)", "LED")
+                    self.punch_card.set_led(row, col, False)
+                    off_changed = True
             
-            # Play sounds for punching and clearing
-            if current_step % 3 == 0:  # Every 3rd step for punching
+            # Play sounds
+            if on_changed and self.sleep_step % 3 == 0:  # Every 3rd step for new holes
                 self.play_punch_sound()
-            elif current_step % 5 == 0 and hasattr(self, 'card_eject_sound'):  # Every 5th step for clearing
-                self.card_eject_sound.play()
+            elif off_changed and self.sleep_step % 5 == 0:  # Every 5th step for clearing holes
+                if hasattr(self, 'card_eject_sound'):
+                    self.card_eject_sound.play()
         
-        # Phase 3: Clear the remaining 12 columns in a diagonal pattern
+        # Phase 3: Clear the final pattern (reverse of startup phase 3)
         elif self.sleep_step < total_steps * 2 + 12:
-            current_clear_step = self.sleep_step - (total_steps * 2) + (total_steps - 12)
+            current_clear_step = self.sleep_step - (total_steps * 2)
             
-            # Make sure top-left corner is OFF by this phase
-            if self.sleep_step == total_steps * 2:
-                self.console.log(f"LED: Final check - ensuring top-left corner (0,0) is OFF", "LED")
-                self.punch_card.set_led(0, 0, False)
-            
+            # Calculate which LEDs to clear next (moving toward top-left)
+            led_changed = False
             for row in range(NUM_ROWS):
-                col = current_clear_step - row
-                if 0 <= col < NUM_COLS:
-                    # Skip the top-left corner as we've already handled it
-                    if not (row == 0 and col == 0):
-                        self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 3)", "LED")
-                        self.punch_card.set_led(row, col, False)
+                # Reverse column calculation
+                col = (NUM_COLS - 1) - (current_clear_step - ((NUM_ROWS-1) - row)) - (total_steps - 12)
+                if 0 <= col < NUM_COLS and 0 <= row < NUM_ROWS:
+                    self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 3)", "LED")
+                    self.punch_card.set_led(row, col, False)
+                    led_changed = True
             
-            # Play eject sound for clearing
-            if self.sleep_step % 4 == 0 and hasattr(self, 'card_eject_sound'):
-                self.card_eject_sound.play()
+            # Play eject sound if any LEDs changed
+            if led_changed and self.sleep_step % 4 == 0:  # Play every 4th step
+                if hasattr(self, 'card_eject_sound'):
+                    self.card_eject_sound.play()
         
         # Animation completed
         else:
@@ -3501,6 +3503,17 @@ class PunchCardDisplay(QMainWindow):
     def post_wake_setup(self):
         """Actions to perform after wake sequence completes."""
         self.update_status("READY")
+        
+        # Update the message label to only display "SYSTEM READY"
+        self.message_label.setText("SYSTEM READY")
+        self.message_label.setStyleSheet(f"""
+            {get_font_css(bold=False, size=FONT_SIZE+2)}
+            color: {COLORS['text'].name()};
+            padding: 10px 0px;
+        """)
+        
+        # Ensure message label aligns with the left edge of the punch card
+        QTimer.singleShot(10, self.align_message_with_card)
         
         # Restart auto message timer
         QTimer.singleShot(2000, lambda: self.auto_timer.start(5000))
