@@ -1989,7 +1989,7 @@ class WiFiStatusWidget(QWidget):
         
         # Calculate position centered in widget
         center_x = self.width() // 2
-        y_base = self.height() - 4  # Position from bottom (moved up slightly)
+        y_base = self.height() - 7  # Add more space at the bottom (was 6)
         
         # Calculate total width of all bars
         bar_width = 3
@@ -2000,7 +2000,7 @@ class WiFiStatusWidget(QWidget):
         # Draw all three bars (filled or empty based on status)
         for i in range(3):
             x = start_x + (i * (bar_width + spacing))
-            bar_height = 5 + (i * 3)  # Slightly taller bars
+            bar_height = 4 + (i * 2)  # Slightly shorter bars (was i*3)
             y = y_base - bar_height
             
             # If this bar should be filled based on status
@@ -2009,7 +2009,7 @@ class WiFiStatusWidget(QWidget):
             else:
                 # Draw outline for inactive bars
                 painter.setBrush(Qt.BrushStyle.NoBrush)
-                painter.setPen(QPen(color, 0.8))  # Slightly thicker outline
+                painter.setPen(QPen(color, 0.8))
             
             painter.drawRect(x, y, bar_width, bar_height)
             painter.setPen(Qt.PenStyle.NoPen)  # Reset pen for next iteration
@@ -2049,7 +2049,7 @@ class InAppMenuBar(QWidget):
                 background-color: transparent;
                 color: white;
                 border: none;
-                padding: 0px 4px 0px 8px;  /* Reduced right padding */
+                padding: 0px 7px 0px 7px;  /* Even padding on left and right */
                 text-align: center;
                 font-size: 18px;
                 font-weight: normal;
