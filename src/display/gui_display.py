@@ -2008,7 +2008,7 @@ class InAppMenuBar(QWidget):
         super().__init__(parent)
         self.setFixedHeight(22)
         
-        # Set background color to match the punch card theme
+        # Set background color to match the punch card theme - no CSS border, we'll draw it ourselves
         self.setStyleSheet(f"""
             background-color: black;
             color: white;
@@ -2017,14 +2017,14 @@ class InAppMenuBar(QWidget):
         # Create main layout
         self.layout = QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)  # Zero margins to ensure full width
-        self.layout.setSpacing(2)  # Slightly increased spacing for better readability
+        self.layout.setSpacing(1)  # Reduced spacing between menu items
         
         # Left side - Menu items
         # Create left container to hold all menu buttons
         self.left_container = QWidget()
         self.left_layout = QHBoxLayout(self.left_container)
         self.left_layout.setContentsMargins(0, 0, 0, 0)
-        self.left_layout.setSpacing(2)
+        self.left_layout.setSpacing(1)  # Reduced spacing
         
         # Apple menu button
         self.apple_menu = QPushButton("▭")  # Rectangle symbol for a punch card
@@ -2034,14 +2034,14 @@ class InAppMenuBar(QWidget):
                 background-color: transparent;
                 color: white;
                 border: none;
-                padding: 0px 10px;
+                padding: 0px 4px 0px 8px;  /* Reduced right padding */
                 text-align: center;
-                font-size: 18px;  /* Increased size */
+                font-size: 18px;
                 font-weight: normal;
-                min-width: 24px;
+                min-width: 22px;
                 min-height: 22px;
                 margin: 0px;
-                line-height: 22px;  /* Align vertically */
+                line-height: 22px;
             }}
             QPushButton:hover {{
                 background-color: white;
@@ -2308,7 +2308,8 @@ class InAppMenuBar(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
         # Draw bottom border line manually to ensure it spans the entire width
-        painter.setPen(QPen(QColor(255, 255, 255), 1))  # White pen, 1px width
+        # Use a slightly thicker line (1.2px) with full opacity for better visibility
+        painter.setPen(QPen(QColor(255, 255, 255), 1.2))
         painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
 
 
