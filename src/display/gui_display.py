@@ -2240,7 +2240,7 @@ class InAppMenuBar(QWidget):
         inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
         
         # Connect Settings menu signals
-        display_settings_action.triggered.connect(main_window.show_card_settings)  # Use card settings for display settings too
+        display_settings_action.triggered.connect(main_window.show_card_settings)  # Use card settings instead
         api_settings_action.triggered.connect(main_window.show_api_settings)
         inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
         
@@ -3017,8 +3017,11 @@ class PunchCardDisplay(QMainWindow):
         self.showing_splash = False
         
         # Make sure countdown timer is stopped
-        if self.countdown_timer.isActive():
-            self.countdown_timer.stop()
+        try:
+            if hasattr(self, 'countdown_timer') and self.countdown_timer.isActive():
+                self.countdown_timer.stop()
+        except Exception as e:
+            self.console.log(f"Non-critical error stopping countdown timer: {str(e)}", "WARNING")
         
         # First update the status text while other elements are hidden
         self.status_label.setText("READY")
@@ -3040,17 +3043,25 @@ class PunchCardDisplay(QMainWindow):
         
         # Hide hardware-specific status indicators by making them transparent
         # but keep their space in the layout
-        self.hardware_status_label.setStyleSheet(f"""
-            {get_font_css(bold=False, size=FONT_SIZE-2)}
-            color: {COLORS['background'].name()};
-            padding: 5px;
-        """)
+        try:
+            if hasattr(self, 'hardware_status_label'):
+                self.hardware_status_label.setStyleSheet(f"""
+                    {get_font_css(bold=False, size=FONT_SIZE-2)}
+                    color: {COLORS['background'].name()};
+                    padding: 5px;
+                """)
+        except Exception as e:
+            self.console.log(f"Non-critical error hiding hardware status: {str(e)}", "WARNING")
         
-        self.keyboard_hint_label.setStyleSheet(f"""
-            {get_font_css(italic=True, size=FONT_SIZE-2)}
-            color: {COLORS['background'].name()};
-            padding: 5px;
-        """)
+        try: 
+            if hasattr(self, 'keyboard_hint_label'):
+                self.keyboard_hint_label.setStyleSheet(f"""
+                    {get_font_css(italic=True, size=FONT_SIZE-2)}
+                    color: {COLORS['background'].name()};
+                    padding: 5px;
+                """)
+        except Exception as e:
+            self.console.log(f"Non-critical error hiding keyboard hint: {str(e)}", "WARNING")
         
         # Restore button styles
         for button in [self.start_button, self.clear_button, self.exit_button]:
@@ -3072,7 +3083,7 @@ class PunchCardDisplay(QMainWindow):
         # Wait a significant time before starting auto messages
         # This gives the user time to see the initial state
         QTimer.singleShot(5000, lambda: self.auto_timer.start(5000))
-        
+    
     def resizeEvent(self, event):
         """Handle resize events to ensure message label aligns with punch card."""
         super().resizeEvent(event)
