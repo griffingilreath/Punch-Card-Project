@@ -27,6 +27,8 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt6.QtCore import Qt, QTimer, QSize, QRect, QRectF, pyqtSignal, QDir, QObject, QEvent, QPoint, QDateTime
 from PyQt6.QtGui import QPainter, QColor, QPen, QFont, QPalette, QBrush, QPainterPath, QKeyEvent
 
+from src.display.settings_dialog import SettingsDialog
+
 # Color scheme
 COLORS = {
     'background': QColor(0, 0, 0),        # Black background
@@ -3314,7 +3316,9 @@ class PunchCardDisplay(QMainWindow):
     def show_settings_dialog(self):
         """Show the settings dialog."""
         self.update_status("Opening Settings...")
-        if self.settings.exec() == QDialog.DialogCode.Accepted:
+        # Create and show the settings dialog
+        settings_dialog = SettingsDialog(self)
+        if settings_dialog.exec() == QDialog.DialogCode.Accepted:
             self.refresh_ui_from_settings()
 
 
