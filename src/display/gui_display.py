@@ -2810,7 +2810,7 @@ class PunchCardDisplay(QMainWindow):
         self.status_label.setText("INITIALIZING SYSTEM...")
         
         # Disable buttons during splash
-        for button in [self.start_button, self.clear_button, self.settings_button, self.exit_button]:
+        for button in [self.start_button, self.clear_button, self.exit_button]:
             button.setEnabled(False)
             button.setStyleSheet(f"""
                 QPushButton {{
