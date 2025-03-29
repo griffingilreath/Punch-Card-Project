@@ -366,7 +366,6 @@ Running the program with <code>--vintage-mode</code> activates a special display
   6 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   7 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
   8 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
-  9 │□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□│
     └────────────────────────────────────────────────────────────────────────────────┘
      012345678901234567890123456789012345678901234567890123456789012345678901234567890
      1         2         3         4         5         6         7         8
@@ -613,7 +612,15 @@ A summary of version changes is provided below. For more detailed information, s
 - [CHANGELOG.md](docs/versions/CHANGELOG.md) - Technical changelog with detailed changes
 - [Release Notes](docs/versions/release_notes.md) - User-focused update notes
 
-### v0.6.6 (March 2025) - Secure Settings Management & Keychain Integration
+### v0.6.7 (March 29, 2025) - Settings System Overhaul and Animation Manager Beta
+- **Implemented comprehensive Settings Manager** for centralized configuration
+- **Introduced Animation Manager (Beta)** for coordinated animation control
+- **Enhanced Menu Bar integration** for better feature access
+- **Started work on text positioning (Alpha)** with early layout-based experiments
+- **Added documentation** for Settings Manager and Animation Manager features
+- **Known issues**: Text positioning remains unstable with significant glitches
+
+### v0.6.6 (March 27, 2025) - Secure Settings Management & Keychain Integration
 - **Added keychain integration** for secure API key storage
 - **Centralized settings management** with new SettingsManager class
 - **Improved settings dialog** with tabbed interface and better organization
@@ -696,92 +703,4 @@ A summary of version changes is provided below. For more detailed information, s
 - **Message Display Enhancement**: Improved message display timing functionality
 - **Visual Bug Fix**: Fixed issue with punch card holes display - holes now properly clear after display
 - **Code Structure Improvements**: Enhanced code organization and readability
-- **Switched to `repaint()`**: Changed from `update()` to `repaint()` for complete widget refresh
-
-### v0.5.7 (March 2024) - Non-Functional Save Point
-- **Replaced Complex Implementation**: Simplified the main display module with a functional standalone version
-- **Working Punch Card Visualization**: Successfully displays IBM 026 punch card patterns 
-- **Command-Line Interface**: Preserved all command-line options from the original implementation
-- **Preserved Original Functionality**: Maintains the core functionality of displaying text on punch cards
-- **Fixed IBM 026 Encoding**: Properly encodes text into IBM 026 punch card format
-- **Fixed LED Grid**: Proper visualization of the punch card's LED matrix
-- **Streamlined Implementation**: Removed problematic code sections that caused syntax errors
-- **Minimized Dependencies**: Reduced to essential PyQt6 components
-- **Command Line Options**: Support for various display modes and test functions
-- **Testing Functions**: Built-in tests for validating encoding accuracy
-- **Character Encoding Display**: Visual representation of character-to-punch mapping 
-- [IBM Documentation: "IBM Punched Card Stock Specification"](https://www.ibm.com/ibm/history/ibm100/us/en/icons/punchcard/) 
-### v0.5.3 (March 2024) - The Branching Update
-- **Complete restructuring** of the project for optimal organization
-- **Properly separated** core, display, and utility modules
-- **Enhanced test organization** with specialized test directories
-- **Consolidated and archived** all display-related modules
-- **Created proper configuration and data directories** 
-- **Reduced root directory** to only essential files
-- **Moved database and JSON files** to dedicated data directory
-- **Archived all legacy and duplicate test files** 
-- **Comprehensive documentation** in VERSION_CONTROL.md
-- **Enhanced GitHub Wiki** with improved organization and navigation
-
-### v0.5.2 (March 2024) - Project Structure Improvements
-- **Reorganized code architecture**:
-  - Properly separated core, display, and utility modules
-  - Consolidated similar functionality
-  - Enhanced import structure with proper module organization
-- **Improved testing organization** with dedicated unit and integration test directories
-- **Better configuration management** with centralized config directory
-- **Streamlined data handling** with consolidated data storage
-- **Standardized logging** with dedicated logs directory
-- **Cleaner version archiving** with proper structure for previous versions
-- **Fixed duplicate files** by archiving older versions
-
-### v0.5.1 (March 2024) - Documentation Enhancements
-- **Comprehensive Interface Design History** document covering early computing design languages
-- **Early Apple UI Design Language** research (1970s-1980s) including text-based origins and GUI evolution
-- **EPA's 1977 Unified Visual Design System** case study for consistent design systems
-- **Cultural and Societal Design Trends** analysis examining ASCII art, hardware design, and HCI evolution
-- **Design Language summary document** acting as an index to design research resources
-- **Updated references in README** with links to all research documentation
-
-### v0.5.0 (March 2024) - Visual Interface Overhaul
-- **Enhanced GUI with black-background theme** for better visibility and authentic punch card aesthetic
-- **Space Mono font** for consistent terminal-like appearance throughout the interface
-- **Classic Mac-style menu bar** (where supported) or enhanced button toolbar with properly sized buttons
-- **Fixed button layout issues** to prevent UI elements from being cut off
-- **Improved widget visibility** with enhanced contrast for all UI elements
-- **OpenAI integration** with model selection and prompt customization
-- **Service status monitoring** for both OpenAI and fly.io connectivity
-- **API console** with detailed connection information (toggle with 'C' key)
-- **Keyboard shortcuts** for common functions including console visibility
-- **Improved error handling** for service connectivity issues
-- **API key management** with secure handling and environment variable support
-- **Dedicated secrets directory** excluded from Git via .gitignore
-- **Enhanced settings file structure** to prevent accidental API key exposure
-- **Updated documentation** with security best practices
-- [Columbia University Computing History Archive](https://www.columbia.edu/cu/computinghistory/)
-- [Two-Bit History: The Punched Card Tabulator](https://twobithistory.org)
-- [The Craft of Coding: Understanding Historical Computing](https://craftofcoding.wordpress.com/)
-- [University of Iowa Punch Card Collection (D. Jones)](https://www.lib.uiowa.edu/sc/resources/punched-card-collections/)
-- [ANSI X3.26-1970: Hollerith Punched Card Code](https://webstore.ansi.org/Standards/INCITS/ANSIINCITSAssociates1970) 
-
-### Internal Documentation
-
-- [Interface Design History](/docs/research/INTERFACE_DESIGN_HISTORY.md) - Comprehensive research on early computer interface design, including:
-  - Early Apple UI Design Language (1970s-1980s)
-  - The EPA's 1977 Unified Visual Design System
-  - Cultural and Societal Design Trends in Early Computing
-- [Punch Card Encoding](/docs/research/PUNCH_CARD_ENCODING.md) - Technical details on punch card character encoding
-- [LED Implementation](/docs/research/LED_IMPLEMENTATION.md) - Guide to LED matrix implementation
-- [Sociological Aspects](/docs/research/SOCIOLOGICAL_ASPECTS.md) - The cultural impact of punch cards
-
----
-
-<div align="center">
-
-```
-D O   N O T   F O L D   S P I N D L E   O R   M U T I L A T E
-```
-
-*Made with ❤️ by Griffin Gilreath*
-
-</div> 
+- **Switched to `repaint()`**: Changed from `

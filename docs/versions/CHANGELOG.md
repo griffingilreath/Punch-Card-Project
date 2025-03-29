@@ -71,4 +71,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial project structure
 - Basic punch card encoding functionality
-- Command-line interface 
+- Command-line interface
+
+## [0.6.7] - 2025-03-29
+
+### Added
+- Comprehensive Settings Manager with centralized configuration
+- Animation Manager (Beta) for coordinated animation control
+- Menu Bar enhancements for better feature access
+- Initial prototype of layout-based text positioning (Alpha)
+- Documentation for Settings Manager and Animation Manager
+
+### Changed
+- Moved from scattered settings to centralized management
+- Improved configuration persistence and error handling
+- Enhanced menu organization and structure
+- Started transition from direct animation code to Animation Manager
+- Began experiments with layout-based positioning for text elements
+
+### Known Issues
+- Text positioning is still in early alpha with significant glitches
+- Animation Manager may experience timing issues with complex sequences
+- Some settings aren't properly preserved between sessions
+- Layout calculations can cause application crashes in certain scenarios
+- Window resizing causes visual glitches with text elements
+
+## [0.6.6] - 2025-03-27
+
+### Added
+- Keychain integration for secure API key storage
+- Centralized settings management with SettingsManager class
+- Improved settings dialog with tabbed interface
+- Enhanced API integration with better error handling
+- Usage statistics for tracking API usage
+
+### Changed
+- Updated settings organization and structure
+- Improved API error handling and feedback
+- Enhanced user interface for settings dialog
+- Better organization of configuration options
+
+### Fixed
+- API key storage security issues
+- Settings persistence problems
+- UI layout issues in settings dialog
+- Error handling for network timeouts
+
+## [Earlier Versions]
+
+See the [Version History Wiki](https://github.com/griffingilreath/Punch-Card-Project/wiki/Version-History) for details on earlier versions. 

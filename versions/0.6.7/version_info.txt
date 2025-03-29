@@ -1,0 +1,37 @@
+Version: 0.6.7
+Date: 2025-03-29
+Description: Settings System Overhaul and Animation Manager Beta
+Key Features:
+- Comprehensive Settings Manager with centralized configuration
+- Enhanced Menu Bar integration for better access to features
+- Animation Manager Beta for coordinated animation control
+- Initial work on text positioning (Alpha stage)
+
+Technical Changes:
+- Implemented Settings Manager with type-safe access and validation
+- Created Animation Manager with consistent API and synchronization
+- Started experimenting with layout-based text positioning
+- Improved configuration persistence and error handling
+- Enhanced menu organization and structure
+
+Known Issues:
+- Text positioning is still in early alpha with significant glitches
+- Animation Manager may experience timing issues with complex sequences
+- Some settings aren't properly preserved between sessions
+- Layout calculations can cause crashes in certain scenarios
+- Window resizing causes visual glitches with text elements
+
+Documentation:
+- Added technical documentation for Settings Manager in docs/technical/SETTINGS_MANAGER.md
+- Added Animation Manager documentation in docs/technical/ANIMATION_MANAGER.md
+- Initial documentation for text positioning work in docs/technical/GUI_TEXT_POSITIONING.md
+- Updated CHANGELOG.md with version 0.6.7 details
+- Added release notes in docs/versions/release_notes_0.6.7.md
+
+Contributors:
+- Griffin Gilreath (lead developer)
+
+To run:
+1. Ensure Python 3.8+ is installed
+2. Install dependencies: pip install -r requirements.txt
+3. Run with: python launch_animation_panel.py 
