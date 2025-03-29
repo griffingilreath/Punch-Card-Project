@@ -2217,7 +2217,7 @@ class InAppMenuBar(QWidget):
         
         # Connect Apple menu signals
         about_action.triggered.connect(main_window.show_about_dialog)
-        sleep_action.triggered.connect(main_window.showMinimized)
+        sleep_action.triggered.connect(main_window.start_sleep_mode)
         restart_action.triggered.connect(main_window.restart_app)
         shutdown_action.triggered.connect(main_window.safe_shutdown)  # Use safe shutdown
         
@@ -3370,6 +3370,148 @@ class PunchCardDisplay(QMainWindow):
         settings_dialog = SettingsDialog(self)
         if settings_dialog.exec() == QDialog.DialogCode.Accepted:
             self.refresh_ui_from_settings()
+
+    def start_sleep_mode(self):
+        """Start sleep mode for the punch card.
+        
+        This will play the startup animation in reverse and mirrored horizontally,
+        moving from top right to bottom left, then pause all visible processes.
+        """
+        # Don't start sleep if we're already sleeping
+        if hasattr(self, 'is_sleeping') and self.is_sleeping:
+            return
+            
+        # Set sleep state
+        self.is_sleeping = True
+        self.update_status("GOING TO SLEEP...")
+        self.console.log("Entering sleep mode", "INFO")
+        
+        # Clear any current message or animation
+        if hasattr(self, 'display_timer') and self.display_timer.isActive():
+            self.display_timer.stop()
+        
+        # Clear the card first
+        self.punch_card.clear_grid()
+        
+        # Start the sleep animation
+        self.sleep_step = 0
+        self.sleep_timer = QTimer(self)
+        self.sleep_timer.timeout.connect(self.update_sleep_animation)
+        self.sleep_timer.start(100)  # Same interval as startup animation
+    
+    def update_sleep_animation(self):
+        """Update the sleep animation (reverse and mirrored startup animation)."""
+        if not hasattr(self, 'is_sleeping') or not self.is_sleeping:
+            return
+            
+        # Calculate total steps needed to cover the entire card
+        total_steps = NUM_COLS + NUM_ROWS - 1
+        
+        # Log animation progress
+        self.console.log(f"Sleep animation step: {self.sleep_step} of {total_steps*2 + 12}", "INFO")
+        
+        # Phase 1: Initial diagonal line from top right to middle (mirroring startup phase 3)
+        if self.sleep_step < total_steps:
+            # Start from top right instead of top left (mirrored)
+            for row in range(NUM_ROWS):
+                # Column calculation is mirrored from startup animation
+                col = (NUM_COLS - 1) - (self.sleep_step - row)
+                if 0 <= col < NUM_COLS:
+                    self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 1)", "LED")
+                    self.punch_card.set_led(row, col, True)
+        
+        # Phase 2: Rolling diagonal with 12-column width (mirroring startup phase 2)
+        elif self.sleep_step < total_steps * 2:
+            current_step = self.sleep_step - total_steps
+            
+            # Set new LEDs ON in the current diagonal (from right to left)
+            for row in range(NUM_ROWS):
+                # Column calculation is mirrored
+                col = (NUM_COLS - 1) - (current_step - row)
+                if 0 <= col < NUM_COLS:
+                    self.console.log(f"LED: Setting row {row}, col {col} ON (Sleep Phase 2)", "LED")
+                    self.punch_card.set_led(row, col, True)
+            
+            # Clear old LEDs (trailing diagonal pattern - 12 columns wide)
+            trailing_step = max(0, current_step - 12)
+            for row in range(NUM_ROWS):
+                # Column calculation is mirrored
+                col = (NUM_COLS - 1) - (trailing_step - row)
+                if 0 <= col < NUM_COLS:
+                    self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 2 trailing)", "LED")
+                    self.punch_card.set_led(row, col, False)
+        
+        # Phase 3: Clear the remaining LEDs (mirroring startup phase 1)
+        elif self.sleep_step < total_steps * 2 + 12:
+            current_clear_step = self.sleep_step - (total_steps * 2) + (total_steps - 12)
+            
+            for row in range(NUM_ROWS):
+                # Column calculation is mirrored
+                col = (NUM_COLS - 1) - (current_clear_step - row)
+                if 0 <= col < NUM_COLS:
+                    self.console.log(f"LED: Setting row {row}, col {col} OFF (Sleep Phase 3)", "LED")
+                    self.punch_card.set_led(row, col, False)
+        
+        # Animation completed
+        else:
+            # Stop the timer
+            self.sleep_timer.stop()
+            self.console.log("Sleep animation completed, system is now sleeping", "INFO")
+            
+            # Clear all LEDs
+            self.punch_card.clear_grid()
+            
+            # Update status
+            self.update_status("SLEEPING")
+            
+            # Create wake button if it doesn't exist
+            if not hasattr(self, 'wake_button'):
+                self.wake_button = RetroButton("WAKE", self)
+                self.wake_button.setStyleSheet("""
+                    background-color: rgba(50, 50, 50, 0.7);
+                    color: white;
+                    border: 1px solid white;
+                    border-radius: 5px;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                """)
+                self.wake_button.clicked.connect(self.wake_from_sleep)
+                
+                # Calculate center position
+                button_width = 120
+                button_height = 40
+                center_x = (self.width() - button_width) // 2
+                center_y = (self.height() - button_height) // 2
+                
+                self.wake_button.setGeometry(center_x, center_y, button_width, button_height)
+                self.wake_button.show()
+                
+            return
+        
+        # Force a repaint
+        self.punch_card.update()
+        self.sleep_step += 1
+    
+    def wake_from_sleep(self):
+        """Wake up from sleep mode."""
+        if not hasattr(self, 'is_sleeping') or not self.is_sleeping:
+            return
+        
+        # Remove the wake button
+        if hasattr(self, 'wake_button'):
+            self.wake_button.deleteLater()
+            delattr(self, 'wake_button')
+        
+        # Update state
+        self.is_sleeping = False
+        self.update_status("WAKING UP...")
+        self.console.log("Waking from sleep mode", "INFO")
+        
+        # Run the startup animation
+        self.start_animation()
+        
+        # After animation delay, set to ready
+        QTimer.singleShot(2000, lambda: self.update_status("READY"))
 
 
 def run_gui_app():
