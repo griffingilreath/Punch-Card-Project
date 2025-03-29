@@ -52,14 +52,13 @@ COLORS = {
 }
 
 # Font configuration
-# Use a fallback approach for fonts - try Space Mono first, then fall back to system fonts
-FONT_FAMILY = "Space Mono, Courier New, monospace"
+# Use system fonts that are guaranteed to be available on macOS
+FONT_FAMILY = "Courier New"
 FONT_SIZE = 12  # Use consistent font size throughout the application
 
 def get_font(bold=False, italic=False, size=FONT_SIZE) -> QFont:
     """Get a font with the specified style."""
     font = QFont()
-    # Use a more widely available monospace font first, and fall back to Space Mono if available
     font.setFamily("Courier New")
     font.setPointSize(size)
     font.setBold(bold)
@@ -71,8 +70,7 @@ def get_font_css(bold=False, italic=False, size=FONT_SIZE) -> str:
     """Get CSS font styling with the specified style."""
     weight = "bold" if bold else "normal"
     style = "italic" if italic else "normal"
-    # Update font family to put more common fonts first
-    return f"font-family: Courier New, monospace; font-size: {size}px; font-weight: {weight}; font-style: {style};"
+    return f"font-family: {FONT_FAMILY}; font-size: {size}px; font-weight: {weight}; font-style: {style};"
 
 # Real IBM punch card dimensions (scaled up for display)
 SCALE_FACTOR = 3  # Scaled for comfortable monitor viewing
@@ -3027,11 +3025,8 @@ class PunchCardDisplay(QMainWindow):
         self.status_label.setText("READY")
         self.console.log("Splash screen completed, ready for operation", "INFO")
         
-        # Determine the operation mode based on hardware detection
-        mode_type = "HARDWARE" if not self.hardware_detector.using_virtual_mode else "VIRTUAL"
-        
-        # Pre-set the message label content before showing it
-        self.message_label.setText(f"SYSTEM READY - {mode_type} MODE")
+        # Remove the mode type variable and display only "SYSTEM READY"
+        self.message_label.setText("SYSTEM READY")
         self.message_label.setStyleSheet(f"""
             {get_font_css(bold=False, size=FONT_SIZE+2)}
             color: {COLORS['text'].name()};
