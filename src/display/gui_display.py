@@ -23,8 +23,8 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QSizePolicy, QFrame, QDialog, QTextEdit, QSpinBox,
                             QCheckBox, QFormLayout, QGroupBox, QTabWidget, 
                             QLineEdit, QComboBox, QSlider, QDoubleSpinBox,
-                            QDialogButtonBox, QMessageBox)
-from PyQt6.QtCore import Qt, QTimer, QSize, QRect, QRectF, pyqtSignal, QDir, QObject, QEvent
+                            QDialogButtonBox, QMessageBox, QMenu, QSpacerItem)
+from PyQt6.QtCore import Qt, QTimer, QSize, QRect, QRectF, pyqtSignal, QDir, QObject, QEvent, QPoint, QDateTime
 from PyQt6.QtGui import QPainter, QColor, QPen, QFont, QPalette, QBrush, QPainterPath, QKeyEvent
 
 # Color scheme
@@ -57,7 +57,8 @@ FONT_SIZE = 12  # Use consistent font size throughout the application
 def get_font(bold=False, italic=False, size=FONT_SIZE) -> QFont:
     """Get a font with the specified style."""
     font = QFont()
-    font.setFamily("Space Mono")
+    # Use a more widely available monospace font first, and fall back to Space Mono if available
+    font.setFamily("Courier New")
     font.setPointSize(size)
     font.setBold(bold)
     font.setItalic(italic)
@@ -68,7 +69,8 @@ def get_font_css(bold=False, italic=False, size=FONT_SIZE) -> str:
     """Get CSS font styling with the specified style."""
     weight = "bold" if bold else "normal"
     style = "italic" if italic else "normal"
-    return f"font-family: {FONT_FAMILY}; font-size: {size}px; font-weight: {weight}; font-style: {style};"
+    # Update font family to put more common fonts first
+    return f"font-family: Courier New, monospace; font-size: {size}px; font-weight: {weight}; font-style: {style};"
 
 # Real IBM punch card dimensions (scaled up for display)
 SCALE_FACTOR = 3  # Scaled for comfortable monitor viewing
@@ -1868,6 +1870,424 @@ class APIConsoleWindow(QDialog):
             self.log_error("Failed to connect to API", e)
             self.update_status("Unavailable")
 
+class WiFiStatusWidget(QWidget):
+    """Custom widget for displaying WiFi status with rectangular bars."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedWidth(30)
+        self.setFixedHeight(22)
+        self.setProperty("status", "connected")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)  # Show pointer cursor on hover
+        
+        # Create popup menu for WiFi settings
+        self.wifi_menu = QMenu(self)
+        self.wifi_menu.setStyleSheet("""
+            QMenu {
+                background-color: black;
+                color: white;
+                border: 1px solid white;
+                font-family: Courier New, monospace;
+                font-size: 12px;
+            }
+            QMenu::item {
+                padding: 4px 25px;
+            }
+            QMenu::item:selected {
+                background-color: white;
+                color: black;
+            }
+            QMenu::separator {
+                height: 1px;
+                background-color: #444444;
+                margin: 4px 2px;
+            }
+        """)
+        
+        # Add menu items
+        self.connected_action = self.wifi_menu.addAction("Connected")
+        self.connected_action.setCheckable(True)
+        self.connected_action.setChecked(True)
+        self.connected_action.triggered.connect(lambda: self.set_wifi_status("connected"))
+        
+        self.weak_action = self.wifi_menu.addAction("Weak Signal")
+        self.weak_action.setCheckable(True)
+        self.weak_action.triggered.connect(lambda: self.set_wifi_status("weak"))
+        
+        self.disconnected_action = self.wifi_menu.addAction("Disconnected")
+        self.disconnected_action.setCheckable(True)
+        self.disconnected_action.triggered.connect(lambda: self.set_wifi_status("disconnected"))
+        
+        self.wifi_menu.addSeparator()
+        self.wifi_menu.addAction("WiFi Settings...").triggered.connect(self.show_wifi_settings)
+    
+    def set_wifi_status(self, status):
+        """Set the WiFi status and update checked actions."""
+        self.setProperty("status", status)
+        
+        # Update checked states
+        self.connected_action.setChecked(status == "connected")
+        self.weak_action.setChecked(status == "weak")
+        self.disconnected_action.setChecked(status == "disconnected")
+        
+        # Repaint the widget
+        self.update()
+    
+    def show_wifi_settings(self):
+        """Show more detailed WiFi settings dialog."""
+        QMessageBox.information(self, "WiFi Settings", 
+                               "This would show a detailed WiFi configuration dialog.\n"
+                               "Currently in simulation mode only.")
+    
+    def mousePressEvent(self, event):
+        """Handle mouse press to show the popup menu."""
+        if event.button() == Qt.MouseButton.LeftButton:
+            # Show popup menu below the widget
+            self.wifi_menu.popup(self.mapToGlobal(QPoint(0, self.height())))
+    
+    def paintEvent(self, event):
+        """Paint the WiFi status icon with rectangular bars."""
+        super().paintEvent(event)
+        
+        # Get WiFi connection status
+        status = self.property("status") or "disconnected"
+        
+        # Create painter for this widget
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Use white color for WiFi bars in all states
+        color = QColor(255, 255, 255)
+        
+        # Determine number of bars based on connection status
+        if status == "connected":
+            bars = 3
+        elif status == "weak":
+            bars = 2
+        else:  # Disconnected
+            bars = 1
+        
+        # Configure painter
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QBrush(color))
+        
+        # Calculate position centered in widget
+        center_x = self.width() // 2
+        y_base = self.height() - 6  # Position from bottom
+        
+        # Calculate total width of all bars
+        bar_width = 3
+        spacing = 2
+        total_width = (3 * bar_width) + (2 * spacing)  # Always show 3 bars (some empty)
+        start_x = center_x - (total_width // 2)
+        
+        # Draw all three bars (filled or empty based on status)
+        for i in range(3):
+            x = start_x + (i * (bar_width + spacing))
+            bar_height = 4 + (i * 3)  # Increasing heights
+            y = y_base - bar_height
+            
+            # If this bar should be filled based on status
+            if i < bars:
+                painter.setBrush(QBrush(color))
+            else:
+                # Draw outline for inactive bars
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.setPen(QPen(color, 0.5))
+            
+            painter.drawRect(x, y, bar_width, bar_height)
+            painter.setPen(Qt.PenStyle.NoPen)  # Reset pen for next iteration
+
+
+class InAppMenuBar(QWidget):
+    """Custom in-app menu bar that simulates classic Mac menu bar appearance."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedHeight(22)
+        
+        # Set background color to match the punch card theme
+        self.setStyleSheet(f"""
+            background-color: black;
+            color: white;
+            border-bottom: 1.5px solid white; /* Direct styling for the bottom border */
+        """)
+        
+        # Create main layout
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)  # Zero margins to ensure full width
+        self.layout.setSpacing(2)  # Slightly increased spacing for better readability
+        
+        # Left side - Menu items
+        # Create left container to hold all menu buttons
+        self.left_container = QWidget()
+        self.left_layout = QHBoxLayout(self.left_container)
+        self.left_layout.setContentsMargins(0, 0, 0, 0)
+        self.left_layout.setSpacing(2)
+        
+        # Apple menu button
+        self.apple_menu = QPushButton("▭")  # More proportional rectangle symbol
+        self.apple_menu.setFlat(True)
+        self.apple_menu.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: white;
+                border: none;
+                padding: 2px 8px;
+                text-align: center;
+                font-size: 16px;  /* Larger font size for the apple icon */
+            }}
+            QPushButton:hover {{
+                background-color: white;
+                color: black;
+            }}
+            QPushButton:pressed {{
+                background-color: #444444;
+                color: white;
+            }}
+        """)
+        self.left_layout.addWidget(self.apple_menu)
+        
+        # Other menu buttons
+        self.card_menu = self.create_menu_button("Punch Card")
+        self.settings_menu = self.create_menu_button("Settings")
+        self.console_menu = self.create_menu_button("Console")
+        
+        # Right side - Status indicators
+        # Create right container to hold all status indicators
+        self.right_container = QWidget()
+        self.right_layout = QHBoxLayout(self.right_container)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_layout.setSpacing(5)  # Spacing between WiFi and clock
+        
+        # Add a small spacer to push WiFi icon to the right
+        right_spacer = QSpacerItem(10, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.right_layout.addItem(right_spacer)
+        
+        # Create WiFi indicator using our custom widget
+        self.wifi_status = WiFiStatusWidget(self)
+        
+        # Create clock button instead of label
+        self.clock_button = QPushButton()
+        self.clock_button.setFlat(True)
+        self.clock_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: white;
+                border: none;
+                padding: 2px 8px;
+                text-align: center;
+                {get_font_css(size=11, bold=False)}
+            }}
+            QPushButton:hover {{
+                background-color: white;
+                color: black;
+            }}
+            QPushButton:pressed {{
+                background-color: #444444;
+                color: white;
+            }}
+        """)
+        self.clock_button.setMinimumWidth(140)  # Ensure enough space for the date format
+        
+        # Add status indicators to right container
+        self.right_layout.addWidget(self.wifi_status)
+        self.right_layout.addWidget(self.clock_button)
+        
+        # Add left and right containers to main layout
+        self.layout.addWidget(self.left_container)
+        self.layout.addStretch(1)  # Push items to the sides
+        self.layout.addWidget(self.right_container)
+        
+        # Create empty menus to be set up later
+        self.apple_menu_popup = QMenu(self)
+        self.card_menu_popup = QMenu(self)
+        self.settings_menu_popup = QMenu(self)
+        self.console_menu_popup = QMenu(self)
+        self.notifications_popup = QMenu(self)
+        
+        # Connect menu buttons to popup functions
+        self.apple_menu.clicked.connect(self.show_apple_menu)
+        self.card_menu.clicked.connect(self.show_card_menu)
+        self.settings_menu.clicked.connect(self.show_settings_menu)
+        self.console_menu.clicked.connect(self.show_console_menu)
+        self.clock_button.clicked.connect(self.show_notifications)
+        
+        # Setup clock timer
+        self.clock_timer = QTimer(self)
+        self.clock_timer.timeout.connect(self.update_clock)
+        self.clock_timer.start(1000)  # Update every second
+        self.update_clock()
+        
+        # Update WiFi status periodically
+        self.wifi_timer = QTimer(self)
+        self.wifi_timer.timeout.connect(self.update_wifi_status)
+        self.wifi_timer.start(5000)  # Check every 5 seconds
+        self.update_wifi_status()
+
+    def create_menu_button(self, text):
+        """Create a button that looks like a menu item."""
+        button = QPushButton(text)
+        button.setFlat(True)
+        button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: white;
+                border: none;
+                padding: 2px 8px;
+                text-align: center;
+                {get_font_css(size=12)}
+            }}
+            QPushButton:hover {{
+                background-color: white;
+                color: black;
+            }}
+            QPushButton:pressed {{
+                background-color: #444444;
+                color: white;
+            }}
+        """)
+        self.left_layout.addWidget(button)
+        return button
+    
+    def setup_menu_actions(self, main_window):
+        """Set up menu actions after the main window is fully initialized."""
+        # Define common menu style
+        menu_style = f"""
+            QMenu {{
+                background-color: black;
+                color: white;
+                border: 1px solid white;
+                {get_font_css(size=12)}
+            }}
+            QMenu::item {{
+                padding: 4px 25px;
+            }}
+            QMenu::item:selected {{
+                background-color: white;
+                color: black;
+            }}
+            QMenu::separator {{
+                height: 1px;
+                background-color: #444444;
+                margin: 4px 2px;
+            }}
+        """
+        
+        # Apply styles to all menus
+        self.apple_menu_popup.setStyleSheet(menu_style)
+        self.card_menu_popup.setStyleSheet(menu_style)
+        self.settings_menu_popup.setStyleSheet(menu_style)
+        self.console_menu_popup.setStyleSheet(menu_style)
+        self.notifications_popup.setStyleSheet(menu_style)
+        
+        # ---- Apple menu items ----
+        about_action = self.apple_menu_popup.addAction("About This Punch Card")
+        self.apple_menu_popup.addSeparator()
+        sleep_action = self.apple_menu_popup.addAction("Sleep")
+        restart_action = self.apple_menu_popup.addAction("Restart")
+        shutdown_action = self.apple_menu_popup.addAction("Shut Down")
+        
+        # Connect Apple menu signals
+        about_action.triggered.connect(main_window.show_about_dialog)
+        sleep_action.triggered.connect(main_window.showMinimized)
+        restart_action.triggered.connect(main_window.restart_app)
+        shutdown_action.triggered.connect(main_window.safe_shutdown)  # Use safe shutdown
+        
+        # ---- Punch Card menu ----
+        display_message_action = self.card_menu_popup.addAction("Display Message")
+        clear_card_action = self.card_menu_popup.addAction("Clear Card")
+        self.card_menu_popup.addSeparator()
+        card_settings_action = self.card_menu_popup.addAction("Card Dimensions...")
+        
+        # Connect Punch Card menu signals
+        display_message_action.triggered.connect(main_window.start_display)
+        if hasattr(main_window, 'punch_card'):
+            clear_card_action.triggered.connect(main_window.punch_card.clear_grid)
+        card_settings_action.triggered.connect(main_window.show_card_settings)
+        
+        # ---- Settings menu ----
+        display_settings_action = self.settings_menu_popup.addAction("Display Settings...")
+        api_settings_action = self.settings_menu_popup.addAction("API Settings...")
+        self.settings_menu_popup.addSeparator()
+        inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
+        
+        # Connect Settings menu signals
+        display_settings_action.triggered.connect(main_window.show_settings_dialog)
+        api_settings_action.triggered.connect(main_window.show_api_settings)
+        inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
+        
+        # ---- Console menu ----
+        system_console_action = self.console_menu_popup.addAction("System Console")
+        api_console_action = self.console_menu_popup.addAction("API Console")
+        
+        # Connect Console menu signals
+        system_console_action.triggered.connect(lambda: main_window.console.show())
+        api_console_action.triggered.connect(lambda: main_window.api_console.show())
+        
+        # ---- Notifications menu (for future use) ----
+        self.notifications_popup.addAction("No New Notifications")
+        self.notifications_popup.addSeparator()
+        notification_settings = self.notifications_popup.addAction("Notification Settings...")
+        clear_all = self.notifications_popup.addAction("Clear All")
+        
+        # These actions don't need to do anything yet - placeholder for future functionality
+    
+    def show_apple_menu(self):
+        """Show the Apple menu popup."""
+        pos = self.apple_menu.mapToGlobal(QPoint(0, self.height()))
+        self.apple_menu_popup.popup(pos)
+    
+    def show_card_menu(self):
+        """Show the Punch Card menu popup."""
+        pos = self.card_menu.mapToGlobal(QPoint(0, self.height()))
+        self.card_menu_popup.popup(pos)
+    
+    def show_settings_menu(self):
+        """Show the Settings menu popup."""
+        pos = self.settings_menu.mapToGlobal(QPoint(0, self.height()))
+        self.settings_menu_popup.popup(pos)
+    
+    def show_console_menu(self):
+        """Show the Console menu popup."""
+        pos = self.console_menu.mapToGlobal(QPoint(0, self.height()))
+        self.console_menu_popup.popup(pos)
+    
+    def show_notifications(self):
+        """Show the notifications popup menu."""
+        # Calculate position for the popup menu
+        pos = self.clock_button.mapToGlobal(QPoint(0, self.height()))
+        
+        # Show the popup at the calculated position
+        self.notifications_popup.popup(pos)
+        
+    def update_clock(self):
+        """Update the clock display with date and time in macOS style."""
+        current_time = QDateTime.currentDateTime()
+        # Use macOS style format: "Thu Apr 4 2:15 PM" or abbreviated "Thu 2:15 PM"
+        day_name = current_time.toString("ddd")
+        date_str = current_time.toString("MMM d")
+        time_str = current_time.toString("h:mm AP")
+        self.clock_button.setText(f"{day_name} {date_str} {time_str}")
+    
+    def update_wifi_status(self):
+        """Update the WiFi status indicator."""
+        # Simulate WiFi status check - in a real app, this would check actual connectivity
+        import random
+        status = random.choice(["connected", "weak", "disconnected"])
+        
+        # Update the custom WiFi widget with the new status
+        self.wifi_status.set_wifi_status(status)
+    
+    def paintEvent(self, event):
+        """Custom paint event to draw the menu bar with classic Mac styling."""
+        super().paintEvent(event)
+        
+        # We use CSS border-bottom for the line, so we don't need to draw it manually
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+
 class PunchCardDisplay(QMainWindow):
     """Main window for the minimalist punch card display application."""
     
@@ -1892,8 +2312,26 @@ class PunchCardDisplay(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         self.main_layout = QVBoxLayout(central_widget)
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)  # No margins to allow full-width menu bar
         self.main_layout.setSpacing(0)  # Reduce spacing to minimize shifts
+        
+        # ================== MENU BAR SECTION ==================
+        # Add custom in-app menu bar
+        self.menu_bar = InAppMenuBar(self)
+        self.main_layout.addWidget(self.menu_bar)
+        
+        # Add spacer to separate menu bar from content
+        menu_spacer = QWidget()
+        menu_spacer.setFixedHeight(5)
+        self.main_layout.addWidget(menu_spacer)
+        
+        # ================== CONTENT CONTAINER ==================
+        # Create container for all content below menu bar (with proper margins)
+        content_container = QWidget()
+        content_layout = QVBoxLayout(content_container)
+        content_layout.setContentsMargins(20, 20, 20, 20)
+        content_layout.setSpacing(0)
+        self.main_layout.addWidget(content_container)
         
         # ================== TOP SECTION ==================
         # Create a container for the top section (message label) with fixed height
@@ -1923,8 +2361,8 @@ class PunchCardDisplay(QMainWindow):
         message_layout.addWidget(self.message_label, 1)  # 1 = stretch factor
         top_layout.addWidget(self.message_container)
         
-        # Add the top section to the main layout
-        self.main_layout.addWidget(top_section)
+        # Add the top section to the content layout
+        content_layout.addWidget(top_section)
         
         # ================== MIDDLE SECTION (PUNCH CARD) ==================
         # Create a fixed container for the punch card to ensure it stays in place
@@ -1937,8 +2375,8 @@ class PunchCardDisplay(QMainWindow):
         self.punch_card = PunchCardWidget()
         punch_card_layout.addWidget(self.punch_card)
         
-        # Add the punch card container to the main layout with stretch factor
-        self.main_layout.addWidget(punch_card_container, 1)  # 1 = stretch factor
+        # Add the punch card container to the content layout with stretch factor
+        content_layout.addWidget(punch_card_container, 1)  # 1 = stretch factor
         
         # ================== BOTTOM SECTION ==================
         # Create a container for the bottom section with fixed height
@@ -2029,8 +2467,8 @@ class PunchCardDisplay(QMainWindow):
         self.button_container.setFixedHeight(60)
         bottom_layout.addWidget(self.button_container)
         
-        # Add the bottom section to the main layout
-        self.main_layout.addWidget(bottom_section)
+        # Add the bottom section to the content layout
+        content_layout.addWidget(bottom_section)
         
         # Initialize variables
         self.showing_splash = True  # Start with splash screen
@@ -2060,6 +2498,14 @@ class PunchCardDisplay(QMainWindow):
         
         # Create API console window
         self.api_console = APIConsoleWindow(self)
+        
+        # Setup menu bar actions
+        self.menu_bar.setup_menu_actions(self)
+        
+        # Initialize clock timer to update clock in menu bar
+        self.clock_timer = QTimer()
+        self.clock_timer.timeout.connect(self.update_clock)
+        self.clock_timer.start(1000)  # Update every second
         
         # Show console automatically
         self.console.show()
@@ -2823,6 +3269,53 @@ class PunchCardDisplay(QMainWindow):
         
         except Exception as e:
             self.console.log(f"Error loading settings: {str(e)}", "ERROR")
+
+    def update_clock(self):
+        """Update the clock in the menu bar."""
+        if hasattr(self, 'menu_bar'):
+            self.menu_bar.update_clock()
+            
+    def restart_app(self):
+        """Restart the application."""
+        QMessageBox.information(self, "Restart", "The application will now restart.")
+        self.close()
+        
+    def safe_shutdown(self):
+        """Safely shut down the application."""
+        self.close()
+        
+    def show_card_settings(self):
+        """Show the card dimensions settings tab."""
+        self.update_status("Opening Card Settings...")
+        self.settings.setCurrentIndex(2)  # Assuming card settings is on tab index 2
+        self.settings.exec()
+        
+    def show_api_settings(self):
+        """Show the API settings tab."""
+        self.update_status("Opening API Settings...")
+        self.settings.setCurrentIndex(1)  # Assuming API settings is on tab index 1
+        self.settings.exec()
+        
+    def show_about_dialog(self):
+        """Show about dialog with application information."""
+        self.update_status("Showing About Information...")
+        QMessageBox.about(self, "About Punch Card Display",
+                         f"<h3>Punch Card Display v1.0</h3>"
+                         f"<p>A minimalist punch card display application.</p>"
+                         f"<p>© 2023 All Rights Reserved</p>")
+                         
+    def toggle_quick_settings(self):
+        """Toggle the quick settings panel."""
+        self.update_status("Quick Settings Panel (Not Yet Implemented)")
+        QMessageBox.information(self, "Quick Settings", 
+                               "This would show a quick settings panel.\n"
+                               "Feature not yet implemented.")
+                               
+    def show_settings_dialog(self):
+        """Show the settings dialog."""
+        self.update_status("Opening Settings...")
+        if self.settings.exec() == QDialog.DialogCode.Accepted:
+            self.refresh_ui_from_settings()
 
 
 def run_gui_app():
