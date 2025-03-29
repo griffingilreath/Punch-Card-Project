@@ -1956,7 +1956,7 @@ class WiFiStatusWidget(QWidget):
             
             # Get parent menu bar to determine its bottom edge
             parent_menubar = self.parent()
-            y_pos = parent_menubar.mapToGlobal(QPoint(0, parent_menubar.height() - 2)).y()  # Moved up 2 pixels
+            y_pos = parent_menubar.mapToGlobal(QPoint(0, parent_menubar.height() - 1)).y()  # Moved down 1 pixel
             
             # Make sure menu doesn't go off screen
             x_position = min(x_pos, window_right_edge - menu_width)
@@ -2059,8 +2059,9 @@ class InAppMenuBar(QWidget):
                 min-width: 24px;
                 min-height: 22px;
                 margin: 0px;
-                line-height: 20px;  /* Reduced from 22px to move symbol up */
-                vertical-align: top; /* Align to top */
+                line-height: 16px;  /* Reduced from 20px to move symbol up further */
+                vertical-align: top;
+                padding-top: 1px;  /* Add slight top padding to fine-tune position */
             }}
             QPushButton:hover {{
                 background-color: white;
@@ -2261,7 +2262,7 @@ class InAppMenuBar(QWidget):
     def show_apple_menu(self):
         """Show the Apple menu popup."""
         # Get the absolute position of the menu bar's bottom edge
-        pos = self.mapToGlobal(QPoint(0, self.height() - 2))  # Moved up 2 pixels
+        pos = self.mapToGlobal(QPoint(0, self.height() - 1))  # Moved down 1 pixel (was -2)
         # No vertical adjustment needed - this lines up with the bottom border
         self.apple_menu_popup.popup(pos)
     
@@ -2269,21 +2270,21 @@ class InAppMenuBar(QWidget):
         """Show the Punch Card menu popup."""
         # Get horizontal position from the button but vertical from menu bar bottom
         x_pos = self.card_menu.mapToGlobal(QPoint(0, 0)).x()
-        y_pos = self.mapToGlobal(QPoint(0, self.height() - 2)).y()  # Moved up 2 pixels
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()  # Moved down 1 pixel (was -2)
         self.card_menu_popup.popup(QPoint(x_pos, y_pos))
     
     def show_settings_menu(self):
         """Show the Settings menu popup."""
         # Get horizontal position from the button but vertical from menu bar bottom
         x_pos = self.settings_menu.mapToGlobal(QPoint(0, 0)).x()
-        y_pos = self.mapToGlobal(QPoint(0, self.height() - 2)).y()  # Moved up 2 pixels
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()  # Moved down 1 pixel (was -2)
         self.settings_menu_popup.popup(QPoint(x_pos, y_pos))
     
     def show_console_menu(self):
         """Show the Console menu popup."""
         # Get horizontal position from the button but vertical from menu bar bottom
         x_pos = self.console_menu.mapToGlobal(QPoint(0, 0)).x()
-        y_pos = self.mapToGlobal(QPoint(0, self.height() - 2)).y()  # Moved up 2 pixels
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()  # Moved down 1 pixel (was -2)
         self.console_menu_popup.popup(QPoint(x_pos, y_pos))
     
     def show_notifications(self):
@@ -2295,8 +2296,8 @@ class InAppMenuBar(QWidget):
         window = self.window()
         window_right_edge = window.mapToGlobal(QPoint(window.width(), 0)).x()
         
-        # Get y position from menu bar bottom (moved up 2 pixels)
-        y_pos = self.mapToGlobal(QPoint(0, self.height() - 2)).y()
+        # Get y position from menu bar bottom (moved down 1 pixel)
+        y_pos = self.mapToGlobal(QPoint(0, self.height() - 1)).y()
         
         # Position the menu so its right edge aligns with the window right edge
         x_position = window_right_edge - menu_width
