@@ -2027,17 +2027,21 @@ class InAppMenuBar(QWidget):
         self.left_layout.setSpacing(2)
         
         # Apple menu button
-        self.apple_menu = QPushButton("▭")  # Use rectangle symbol to represent punch card
+        self.apple_menu = QPushButton("▭")  # Rectangle symbol for a punch card
         self.apple_menu.setFlat(True)
         self.apple_menu.setStyleSheet(f"""
             QPushButton {{
                 background-color: transparent;
                 color: white;
                 border: none;
-                padding: 2px 8px;
+                padding: 0px 10px;
                 text-align: center;
-                font-size: 16px;  /* Restore original size */
-                font-weight: normal; /* Not bold */
+                font-size: 18px;  /* Increased size */
+                font-weight: normal;
+                min-width: 24px;
+                min-height: 22px;
+                margin: 0px;
+                line-height: 22px;  /* Align vertically */
             }}
             QPushButton:hover {{
                 background-color: white;
@@ -2260,9 +2264,23 @@ class InAppMenuBar(QWidget):
         # Calculate position for the popup menu
         pos = self.clock_button.mapToGlobal(QPoint(0, self.height()))
         
-        # Show the popup at the calculated position
-        self.notifications_popup.popup(pos)
+        # Get the notification menu width to calculate proper positioning
+        menu_width = self.notifications_popup.sizeHint().width()
         
+        # Get the global position of the right edge of the window
+        window = self.window()
+        window_right_edge = window.mapToGlobal(QPoint(window.width(), 0)).x()
+        
+        # Position the menu so its right edge aligns with the window right edge
+        # but not extending beyond the right edge of the window
+        x_position = window_right_edge - menu_width
+        
+        # Create final position
+        adjusted_pos = QPoint(x_position, pos.y())
+        
+        # Show the popup at the calculated position
+        self.notifications_popup.popup(adjusted_pos)
+    
     def update_clock(self):
         """Update the clock display with date and time in macOS style."""
         current_time = QDateTime.currentDateTime()
