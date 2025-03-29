@@ -2022,11 +2022,11 @@ class InAppMenuBar(QWidget):
         super().__init__(parent)
         self.setFixedHeight(22)
         
-        # Set background color to match the punch card theme - no border in CSS
-        self.setStyleSheet(f"""
-            background-color: black;
+        # Set NO background styling in CSS - we'll handle all drawing manually
+        self.setStyleSheet("""
+            background-color: transparent;
             color: white;
-            border: none;  /* Explicitly remove any border */
+            border: none;
         """)
         
         # Create main layout
@@ -2316,24 +2316,29 @@ class InAppMenuBar(QWidget):
     
     def paintEvent(self, event):
         """Custom paint event to draw the menu bar with classic Mac styling."""
-        # First let the base class draw the background
+        # Create painter for drawing
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)  # Turn off antialiasing for crisp lines
+        
+        # Step 1: Draw the black background over everything
+        painter.fillRect(self.rect(), QColor(0, 0, 0))
+        
+        # Step 2: Let the base class handle child widgets
+        painter.end()
         super().paintEvent(event)
         
-        # Create painter for drawing the bottom border
+        # Step 3: Create a new painter to draw on top of everything
         painter = QPainter(self)
         
-        # Ensure the line is drawn on top of all child widgets
-        # by doing it after the standard rendering
+        # Set up a pen for the white bottom border
+        pen = QPen(QColor(255, 255, 255))
+        pen.setWidth(1)
+        pen.setStyle(Qt.PenStyle.SolidLine)
+        painter.setPen(pen)
         
-        # Use a darker, more pronounced white line with proper thickness
-        painter.setPen(QPen(QColor(255, 255, 255), 1.5))
-        
-        # Draw the line at the very bottom of the menu bar
-        # This ensures it spans the full width regardless of layout
-        painter.drawLine(0, self.height() - 1, self.width(), self.height() - 1)
-        
-        # Explicitly update the line area to ensure it's visible
-        self.update(QRect(0, self.height() - 2, self.width(), 2))
+        # Draw the line precisely at the bottom of the widget
+        bottom_y = self.height() - 1
+        painter.drawLine(0, bottom_y, self.width(), bottom_y)
 
 
 class PunchCardDisplay(QMainWindow):
