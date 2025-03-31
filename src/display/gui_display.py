@@ -2656,27 +2656,68 @@ class PunchCardDisplay(QMainWindow):
         if hasattr(self, 'sound_manager'):
             volume = value / 100.0  # Convert percentage to float
             self.sound_manager.set_volume(volume)
+            
             # Update menu bar volume slider if it exists
             if hasattr(self.menu_bar, 'sound_control'):
                 self.menu_bar.sound_control.volume_slider.setValue(value)
                 self.menu_bar.sound_control.volume_value.setText(f"{value}%")
+            
+            # Save setting to file
+            self.save_sound_setting("volume", volume)
     
     def on_sound_mute_changed(self, muted):
         """Handle mute state changes from sound settings."""
         if hasattr(self, 'sound_manager'):
             self.sound_manager.set_muted(muted)
+            
             # Update menu bar mute state if it exists
             if hasattr(self.menu_bar, 'sound_control'):
                 self.menu_bar.sound_control.mute_action.setChecked(muted)
                 self.menu_bar.sound_control.setProperty("muted", muted)
                 self.menu_bar.sound_control.update()
+            
+            # Save setting to file
+            self.save_sound_setting("muted", muted)
     
     def on_sound_mappings_changed(self, mappings):
         """Handle sound mapping changes from sound settings."""
         if hasattr(self, 'sound_manager'):
             self.sound_manager.update_sound_mappings(mappings)
+            
             # Test the punch sound
             self.sound_manager.play_sound("punch")
+            
+            # Save setting to file
+            self.save_sound_setting("sound_mappings", mappings)
+    
+    def save_sound_setting(self, setting_name, value):
+        """Save a single sound setting to the settings file."""
+        try:
+            import json
+            import os
+            
+            settings_path = "punch_card_settings.json"
+            settings = {}
+            
+            # Load existing settings if available
+            if os.path.exists(settings_path):
+                try:
+                    with open(settings_path, "r") as f:
+                        settings = json.load(f)
+                except Exception as e:
+                    self.console.log(f"Error loading settings file: {str(e)}", "ERROR")
+            
+            # Update the setting
+            settings[setting_name] = value
+            
+            # Save settings
+            with open(settings_path, "w") as f:
+                json.dump(settings, f, indent=4)
+            
+            self.console.log(f"Saved sound setting: {setting_name}", "INFO")
+            
+        except Exception as e:
+            self.console.log(f"Error saving sound setting: {str(e)}", "ERROR")
     
     def position_overlay_labels(self):
         """This method is no longer needed as labels are now children of the punch card."""
@@ -2712,15 +2753,19 @@ class PunchCardDisplay(QMainWindow):
             
         self.current_message = message.upper()
         self.current_char_index = 0
+        
+        # Clear the grid and play clear sound
         self.punch_card.clear_grid()
+        self.play_sound("clear")
+        
         self.led_delay = delay
         self.timer.setInterval(delay)
         
         # Update message label
         self.message_label.setText(message)
         
-        # Update label margins to align with punch card
-        QTimer.singleShot(50, self.update_label_margins)
+        # Update label margins
+        self.update_label_margins()
         
         self.update_status(f"PROCESSING: {message}")
         self.start_display()
@@ -2756,7 +2801,7 @@ class PunchCardDisplay(QMainWindow):
             self.running = False
             
             # Play completion sound (non-blocking)
-            self.play_sound("eject")
+            self.play_sound("complete")
             
             # Update status
             self.update_status("DISPLAY COMPLETE")
@@ -3212,26 +3257,72 @@ class PunchCardDisplay(QMainWindow):
             if settings_data:
                 self.console.log(f"Loaded settings from {settings_path}", "INFO")
                 
-                # Load message display time
+                # Display settings
                 if 'message_display_time' in settings_data:
                     self.message_display_time = settings_data['message_display_time']
                     self.console.log(f"Message display time loaded: {self.message_display_time} seconds", "INFO")
                 
-                # Load other settings
-                if 'display_delay' in settings_data:
-                    self.led_delay = settings_data['display_delay']
+                if 'led_delay' in settings_data:
+                    self.led_delay = settings_data['led_delay']
                     self.timer.setInterval(self.led_delay)
                     self.console.log(f"LED delay loaded: {self.led_delay} ms", "INFO")
                 
-                # Update settings dialog values
+                # Sound settings
+                if hasattr(self, 'sound_manager'):
+                    # Volume
+                    if 'volume' in settings_data:
+                        volume = float(settings_data['volume'])
+                        self.sound_manager.set_volume(volume)
+                        self.console.log(f"Volume loaded: {int(volume * 100)}%", "INFO")
+                    
+                    # Mute state
+                    if 'muted' in settings_data:
+                        muted = bool(settings_data['muted'])
+                        self.sound_manager.set_muted(muted)
+                        self.console.log(f"Mute state loaded: {muted}", "INFO")
+                    
+                    # Sound mappings
+                    if 'sound_mappings' in settings_data:
+                        mappings = settings_data['sound_mappings']
+                        self.sound_manager.update_sound_mappings(mappings)
+                        self.console.log(f"Sound mappings loaded", "INFO")
+                
+                # Update settings dialog values if it exists
                 if hasattr(self, 'settings'):
                     self.settings.led_delay.setValue(self.led_delay)
                     self.settings.message_display_time.setValue(self.message_display_time)
             else:
                 self.console.log("No settings file found, using defaults", "WARNING")
+                
+                # Save default settings for future use
+                self.save_default_settings()
         
         except Exception as e:
             self.console.log(f"Error loading settings: {str(e)}", "ERROR")
+    
+    def save_default_settings(self):
+        """Save default settings to file."""
+        try:
+            settings = {
+                "led_delay": self.led_delay,
+                "message_display_time": self.message_display_time,
+                "volume": 1.0,
+                "muted": False,
+                "sound_mappings": {
+                    "punch": "Tink",
+                    "complete": "Glass", 
+                    "clear": "Pop",
+                    "startup": "Hero"
+                }
+            }
+            
+            settings_path = "punch_card_settings.json"
+            with open(settings_path, 'w') as f:
+                json.dump(settings, f, indent=4)
+                
+            self.console.log("Default settings saved", "INFO")
+        except Exception as e:
+            self.console.log(f"Error saving default settings: {str(e)}", "ERROR")
 
     def update_clock(self):
         """Update the clock in the menu bar."""
@@ -3598,7 +3689,11 @@ class PunchCardDisplay(QMainWindow):
             
         self.current_message = message.upper()
         self.current_char_index = 0
+        
+        # Clear the grid and play clear sound
         self.punch_card.clear_grid()
+        self.play_sound("clear")
+        
         self.led_delay = delay
         self.timer.setInterval(delay)
         
@@ -3954,6 +4049,35 @@ class SoundSettingsDialog(QDialog):
         self.volume_changed.emit(self.volume_slider.value())
         self.mute_changed.emit(self.mute_checkbox.isChecked())
         self.sound_mappings_changed.emit(mappings)
+        
+        # Save settings to file
+        try:
+            import json
+            import os
+            
+            settings_path = "punch_card_settings.json"
+            existing_settings = {}
+            
+            # Load existing settings if available
+            if os.path.exists(settings_path):
+                try:
+                    with open(settings_path, "r") as f:
+                        existing_settings = json.load(f)
+                except Exception:
+                    pass
+            
+            # Update sound settings
+            existing_settings["volume"] = self.volume_slider.value() / 100.0
+            existing_settings["muted"] = self.mute_checkbox.isChecked()
+            existing_settings["sound_mappings"] = mappings
+            
+            # Save settings
+            with open(settings_path, "w") as f:
+                json.dump(existing_settings, f, indent=4)
+            
+        except Exception as e:
+            if hasattr(self.parent(), 'console'):
+                self.parent().console.log(f"Error saving sound settings: {str(e)}", "ERROR")
         
         # Close dialog
         self.accept()

@@ -30,5 +30,13 @@
     },
     "message_interval": 14,
     "theme": "dark",
-    "font_size": 12
+    "font_size": 12,
+    "volume": 1.0,
+    "muted": false,
+    "sound_mappings": {
+        "punch": "Frog",
+        "complete": "Bottle",
+        "clear": "Submarine",
+        "startup": "Hero"
+    }
 }
