@@ -1,9 +1,9 @@
-# Punch Card Project v0.6.7 - Settings System Overhaul and Animation Manager Beta
+# Punch Card Project v0.6.8 - Sound Control and Menu Bar Improvements
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
 [![PyQt6](https://img.shields.io/badge/PyQt-6.4-green.svg)](https://www.riverbankcomputing.com/software/pyqt/)
-[![Version](https://img.shields.io/badge/version-0.6.7-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.7)
+[![Version](https://img.shields.io/badge/version-0.6.8-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.8)
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
 ```
@@ -20,7 +20,7 @@
 │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
 │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
 │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.7  │
+│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.8  │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -40,15 +40,15 @@
 
 **Status**: Beta - The Settings System Overhaul introduces significant architectural improvements with centralized settings management and animation coordination.
 
-**What's New in v0.6.7**
+**What's New in v0.6.8**
 
-- **Settings Manager (Stable)**: Comprehensive system for centralized configuration management
-- **Animation Manager (Beta)**: New system for coordinating animations across GUI and hardware
-- **Enhanced Menu Bar**: Improved menu organization and access to features
-- **Text Positioning (Alpha)**: Initial work on layout-based text positioning (experimental)
-- **Technical Documentation**: Added detailed documentation for new components
+- **Sound Control System**: Improved implementation with proper volume slider and mute functionality
+- **Menu Bar Enhancements**: Fixed duplication issues and improved organization
+- **UI Improvements**: Better text alignment, status label positioning, and window resizing
+- **Bug Fixes**: Resolved indentation issues and improved error handling
+- **Technical Improvements**: Enhanced sound manager integration and menu action handling
 
-[See full release notes](docs/versions/release_notes_0.6.7.md)
+[See full release notes](VERSION_0.6.8_SUMMARY.md)
 
 **Documentation**
 
@@ -58,6 +58,7 @@
 - [Settings Manager](docs/technical/SETTINGS_MANAGER.md) - How the settings system works
 - [Animation Manager](docs/technical/ANIMATION_MANAGER.md) - How the animation system works
 - [Version 0.6.7 Release Notes](docs/versions/release_notes_0.6.7.md) - Details about the latest release
+- [Version 0.6.8 Release Notes](VERSION_0.6.8_SUMMARY.md) - Details about the latest release
 
 **Organization**
 
