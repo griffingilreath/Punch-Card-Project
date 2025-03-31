@@ -1,0 +1,13 @@
+[23:47:24] [INFO] Card dimensions updated: {'scale_factor': 3, 'top_margin': 4, 'side_margin': 5, 'row_spacing': 2, 'column_spacing': 1, 'hole_width': 1, 'hole_height': 3}
+[23:47:24] [WARNING] Virtual mode enabled for testing
+[23:47:24] [INFO] Loading punch card sounds...
+[23:47:24] [INFO] Loaded punch sound from /Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/../../assets/sounds/punch.wav
+[23:47:24] [INFO] Loaded card insert sound from /Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/../../assets/sounds/card_insert.wav
+[23:47:24] [INFO] Loaded card eject sound from /Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/../../assets/sounds/card_eject.wav
+[23:47:24] [INFO] Splash screen started - simple version
+[23:47:24] [INFO] Loaded settings from punch_card_settings.json
+[23:47:24] [INFO] Message display time loaded: 3 seconds
+[23:47:24] [ERROR] Error loading settings: 'SettingsDialog' object has no attribute 'message_display_time'
+[23:47:25] [INFO] Alignment: window=900, card=561, card_margin=169, main_margin=0, applied_margin=169
+[23:47:26] [INFO] Splash screen completed, ready for operation
+[23:47:26] [INFO] Alignment: window=900, card=561, card_margin=169, main_margin=0, applied_margin=169

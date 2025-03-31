@@ -1,0 +1,477 @@
+[17:31:40] [INFO] Card dimensions updated: {'scale_factor': 3, 'top_margin': 4, 'side_margin': 5, 'row_spacing': 2, 'column_spacing': 1, 'hole_width': 1, 'hole_height': 3}
+[17:31:40] [WARNING] Virtual mode enabled for testing
+[17:31:40] [INFO] Sound manager initialized
+[17:31:40] [INFO] Splash screen started using animation manager
+[17:31:40] [INFO] Playing animation: STARTUP
+[17:31:40] [INFO] Loaded settings from punch_card_settings.json
+[17:31:40] [INFO] Message display time loaded: 10 seconds
+[17:31:40] [ERROR] Error loading settings: 'SettingsDialog' object has no attribute 'message_display_time'
+[17:31:40] [INFO] Loaded settings from punch_card_settings.json
+[17:31:40] [INFO] Message display time loaded: 10 seconds
+[17:31:40] [ERROR] Error loading settings: 'SettingsDialog' object has no attribute 'message_display_time'
+[17:31:40] [INFO] Updated label margins to 159px
+[17:31:40] [INFO] Updated label margins to 159px
+[17:31:41] [INFO] Testing sound system...
+[17:31:41] [WARNING] Failed to play sound: punch
+[17:31:41] [WARNING] Sound system test failed - no sound played
+[17:31:44] [INFO] Splash screen completed, ready for operation
+[17:31:44] [INFO] Animation finished: AnimationType.STARTUP
+[17:31:44] [WARNING] Failed to play sound: eject
+[17:31:44] [INFO] Animation completed: STARTUP
+[17:31:54] [INFO] Updated label margins to 159px
+[17:31:54] [INFO] Status: PROCESSING: FROM MECHANICAL TO DIGITAL
+[17:31:54] [INFO] Status: TYPING
+[17:31:54] [LED] LED: Cleared row 0, col 0
+[17:31:54] [LED] LED: Cleared row 1, col 0
+[17:31:54] [LED] LED: Cleared row 2, col 0
+[17:31:54] [LED] LED: Cleared row 3, col 0
+[17:31:54] [LED] LED: Cleared row 4, col 0
+[17:31:54] [LED] LED: Cleared row 5, col 0
+[17:31:54] [LED] LED: Cleared row 6, col 0
+[17:31:54] [LED] LED: Cleared row 7, col 0
+[17:31:54] [LED] LED: Cleared row 8, col 0
+[17:31:54] [LED] LED: Cleared row 9, col 0
+[17:31:54] [LED] LED: Cleared row 10, col 0
+[17:31:54] [LED] LED: Cleared row 11, col 0
+[17:31:54] [INFO] Displaying character 'F' in column 0
+[17:31:54] [LED] LED: Row 12 + Row 8 for 'F'
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: F
+[17:31:54] [LED] LED: Cleared row 0, col 1
+[17:31:54] [LED] LED: Cleared row 1, col 1
+[17:31:54] [LED] LED: Cleared row 2, col 1
+[17:31:54] [LED] LED: Cleared row 3, col 1
+[17:31:54] [LED] LED: Cleared row 4, col 1
+[17:31:54] [LED] LED: Cleared row 5, col 1
+[17:31:54] [LED] LED: Cleared row 6, col 1
+[17:31:54] [LED] LED: Cleared row 7, col 1
+[17:31:54] [LED] LED: Cleared row 8, col 1
+[17:31:54] [LED] LED: Cleared row 9, col 1
+[17:31:54] [LED] LED: Cleared row 10, col 1
+[17:31:54] [LED] LED: Cleared row 11, col 1
+[17:31:54] [INFO] Displaying character 'R' in column 1
+[17:31:54] [LED] LED: Row 11 + Row 11 for 'R'
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: FR
+[17:31:54] [LED] LED: Cleared row 0, col 2
+[17:31:54] [LED] LED: Cleared row 1, col 2
+[17:31:54] [LED] LED: Cleared row 2, col 2
+[17:31:54] [LED] LED: Cleared row 3, col 2
+[17:31:54] [LED] LED: Cleared row 4, col 2
+[17:31:54] [LED] LED: Cleared row 5, col 2
+[17:31:54] [LED] LED: Cleared row 6, col 2
+[17:31:54] [LED] LED: Cleared row 7, col 2
+[17:31:54] [LED] LED: Cleared row 8, col 2
+[17:31:54] [LED] LED: Cleared row 9, col 2
+[17:31:54] [LED] LED: Cleared row 10, col 2
+[17:31:54] [LED] LED: Cleared row 11, col 2
+[17:31:54] [INFO] Displaying character 'O' in column 2
+[17:31:54] [LED] LED: Row 11 + Row 8 for 'O'
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: FRO
+[17:31:54] [LED] LED: Cleared row 0, col 3
+[17:31:54] [LED] LED: Cleared row 1, col 3
+[17:31:54] [LED] LED: Cleared row 2, col 3
+[17:31:54] [LED] LED: Cleared row 3, col 3
+[17:31:54] [LED] LED: Cleared row 4, col 3
+[17:31:54] [LED] LED: Cleared row 5, col 3
+[17:31:54] [LED] LED: Cleared row 6, col 3
+[17:31:54] [LED] LED: Cleared row 7, col 3
+[17:31:54] [LED] LED: Cleared row 8, col 3
+[17:31:54] [LED] LED: Cleared row 9, col 3
+[17:31:54] [LED] LED: Cleared row 10, col 3
+[17:31:54] [LED] LED: Cleared row 11, col 3
+[17:31:54] [INFO] Displaying character 'M' in column 3
+[17:31:54] [LED] LED: Row 11 + Row 6 for 'M'
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: FROM
+[17:31:54] [LED] LED: Cleared row 0, col 4
+[17:31:54] [LED] LED: Cleared row 1, col 4
+[17:31:54] [LED] LED: Cleared row 2, col 4
+[17:31:54] [LED] LED: Cleared row 3, col 4
+[17:31:54] [LED] LED: Cleared row 4, col 4
+[17:31:54] [LED] LED: Cleared row 5, col 4
+[17:31:54] [LED] LED: Cleared row 6, col 4
+[17:31:54] [LED] LED: Cleared row 7, col 4
+[17:31:54] [LED] LED: Cleared row 8, col 4
+[17:31:54] [LED] LED: Cleared row 9, col 4
+[17:31:54] [LED] LED: Cleared row 10, col 4
+[17:31:54] [LED] LED: Cleared row 11, col 4
+[17:31:54] [INFO] Displaying character ' ' in column 4
+[17:31:54] [LED] LED: Space character - no punches
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: FROM 
+[17:31:54] [LED] LED: Cleared row 0, col 5
+[17:31:54] [LED] LED: Cleared row 1, col 5
+[17:31:54] [LED] LED: Cleared row 2, col 5
+[17:31:54] [LED] LED: Cleared row 3, col 5
+[17:31:54] [LED] LED: Cleared row 4, col 5
+[17:31:54] [LED] LED: Cleared row 5, col 5
+[17:31:54] [LED] LED: Cleared row 6, col 5
+[17:31:54] [LED] LED: Cleared row 7, col 5
+[17:31:54] [LED] LED: Cleared row 8, col 5
+[17:31:54] [LED] LED: Cleared row 9, col 5
+[17:31:54] [LED] LED: Cleared row 10, col 5
+[17:31:54] [LED] LED: Cleared row 11, col 5
+[17:31:54] [INFO] Displaying character 'M' in column 5
+[17:31:54] [LED] LED: Row 11 + Row 6 for 'M'
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: FROM M
+[17:31:54] [LED] LED: Cleared row 0, col 6
+[17:31:54] [LED] LED: Cleared row 1, col 6
+[17:31:54] [LED] LED: Cleared row 2, col 6
+[17:31:54] [LED] LED: Cleared row 3, col 6
+[17:31:54] [LED] LED: Cleared row 4, col 6
+[17:31:54] [LED] LED: Cleared row 5, col 6
+[17:31:54] [LED] LED: Cleared row 6, col 6
+[17:31:54] [LED] LED: Cleared row 7, col 6
+[17:31:54] [LED] LED: Cleared row 8, col 6
+[17:31:54] [LED] LED: Cleared row 9, col 6
+[17:31:54] [LED] LED: Cleared row 10, col 6
+[17:31:54] [LED] LED: Cleared row 11, col 6
+[17:31:54] [INFO] Displaying character 'E' in column 6
+[17:31:54] [LED] LED: Row 12 + Row 7 for 'E'
+[17:31:54] [WARNING] Failed to play sound: punch
+[17:31:54] [INFO] Status: DISPLAYING: FROM ME
+[17:31:55] [LED] LED: Cleared row 0, col 7
+[17:31:55] [LED] LED: Cleared row 1, col 7
+[17:31:55] [LED] LED: Cleared row 2, col 7
+[17:31:55] [LED] LED: Cleared row 3, col 7
+[17:31:55] [LED] LED: Cleared row 4, col 7
+[17:31:55] [LED] LED: Cleared row 5, col 7
+[17:31:55] [LED] LED: Cleared row 6, col 7
+[17:31:55] [LED] LED: Cleared row 7, col 7
+[17:31:55] [LED] LED: Cleared row 8, col 7
+[17:31:55] [LED] LED: Cleared row 9, col 7
+[17:31:55] [LED] LED: Cleared row 10, col 7
+[17:31:55] [LED] LED: Cleared row 11, col 7
+[17:31:55] [INFO] Displaying character 'C' in column 7
+[17:31:55] [LED] LED: Row 12 + Row 5 for 'C'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MEC
+[17:31:55] [LED] LED: Cleared row 0, col 8
+[17:31:55] [LED] LED: Cleared row 1, col 8
+[17:31:55] [LED] LED: Cleared row 2, col 8
+[17:31:55] [LED] LED: Cleared row 3, col 8
+[17:31:55] [LED] LED: Cleared row 4, col 8
+[17:31:55] [LED] LED: Cleared row 5, col 8
+[17:31:55] [LED] LED: Cleared row 6, col 8
+[17:31:55] [LED] LED: Cleared row 7, col 8
+[17:31:55] [LED] LED: Cleared row 8, col 8
+[17:31:55] [LED] LED: Cleared row 9, col 8
+[17:31:55] [LED] LED: Cleared row 10, col 8
+[17:31:55] [LED] LED: Cleared row 11, col 8
+[17:31:55] [INFO] Displaying character 'H' in column 8
+[17:31:55] [LED] LED: Row 12 + Row 10 for 'H'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECH
+[17:31:55] [LED] LED: Cleared row 0, col 9
+[17:31:55] [LED] LED: Cleared row 1, col 9
+[17:31:55] [LED] LED: Cleared row 2, col 9
+[17:31:55] [LED] LED: Cleared row 3, col 9
+[17:31:55] [LED] LED: Cleared row 4, col 9
+[17:31:55] [LED] LED: Cleared row 5, col 9
+[17:31:55] [LED] LED: Cleared row 6, col 9
+[17:31:55] [LED] LED: Cleared row 7, col 9
+[17:31:55] [LED] LED: Cleared row 8, col 9
+[17:31:55] [LED] LED: Cleared row 9, col 9
+[17:31:55] [LED] LED: Cleared row 10, col 9
+[17:31:55] [LED] LED: Cleared row 11, col 9
+[17:31:55] [INFO] Displaying character 'A' in column 9
+[17:31:55] [LED] LED: Row 12 + Row 3 for 'A'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHA
+[17:31:55] [LED] LED: Cleared row 0, col 10
+[17:31:55] [LED] LED: Cleared row 1, col 10
+[17:31:55] [LED] LED: Cleared row 2, col 10
+[17:31:55] [LED] LED: Cleared row 3, col 10
+[17:31:55] [LED] LED: Cleared row 4, col 10
+[17:31:55] [LED] LED: Cleared row 5, col 10
+[17:31:55] [LED] LED: Cleared row 6, col 10
+[17:31:55] [LED] LED: Cleared row 7, col 10
+[17:31:55] [LED] LED: Cleared row 8, col 10
+[17:31:55] [LED] LED: Cleared row 9, col 10
+[17:31:55] [LED] LED: Cleared row 10, col 10
+[17:31:55] [LED] LED: Cleared row 11, col 10
+[17:31:55] [INFO] Displaying character 'N' in column 10
+[17:31:55] [LED] LED: Row 11 + Row 7 for 'N'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHAN
+[17:31:55] [LED] LED: Cleared row 0, col 11
+[17:31:55] [LED] LED: Cleared row 1, col 11
+[17:31:55] [LED] LED: Cleared row 2, col 11
+[17:31:55] [LED] LED: Cleared row 3, col 11
+[17:31:55] [LED] LED: Cleared row 4, col 11
+[17:31:55] [LED] LED: Cleared row 5, col 11
+[17:31:55] [LED] LED: Cleared row 6, col 11
+[17:31:55] [LED] LED: Cleared row 7, col 11
+[17:31:55] [LED] LED: Cleared row 8, col 11
+[17:31:55] [LED] LED: Cleared row 9, col 11
+[17:31:55] [LED] LED: Cleared row 10, col 11
+[17:31:55] [LED] LED: Cleared row 11, col 11
+[17:31:55] [INFO] Displaying character 'I' in column 11
+[17:31:55] [LED] LED: Row 12 + Row 11 for 'I'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHANI
+[17:31:55] [LED] LED: Cleared row 0, col 12
+[17:31:55] [LED] LED: Cleared row 1, col 12
+[17:31:55] [LED] LED: Cleared row 2, col 12
+[17:31:55] [LED] LED: Cleared row 3, col 12
+[17:31:55] [LED] LED: Cleared row 4, col 12
+[17:31:55] [LED] LED: Cleared row 5, col 12
+[17:31:55] [LED] LED: Cleared row 6, col 12
+[17:31:55] [LED] LED: Cleared row 7, col 12
+[17:31:55] [LED] LED: Cleared row 8, col 12
+[17:31:55] [LED] LED: Cleared row 9, col 12
+[17:31:55] [LED] LED: Cleared row 10, col 12
+[17:31:55] [LED] LED: Cleared row 11, col 12
+[17:31:55] [INFO] Displaying character 'C' in column 12
+[17:31:55] [LED] LED: Row 12 + Row 5 for 'C'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHANIC
+[17:31:55] [LED] LED: Cleared row 0, col 13
+[17:31:55] [LED] LED: Cleared row 1, col 13
+[17:31:55] [LED] LED: Cleared row 2, col 13
+[17:31:55] [LED] LED: Cleared row 3, col 13
+[17:31:55] [LED] LED: Cleared row 4, col 13
+[17:31:55] [LED] LED: Cleared row 5, col 13
+[17:31:55] [LED] LED: Cleared row 6, col 13
+[17:31:55] [LED] LED: Cleared row 7, col 13
+[17:31:55] [LED] LED: Cleared row 8, col 13
+[17:31:55] [LED] LED: Cleared row 9, col 13
+[17:31:55] [LED] LED: Cleared row 10, col 13
+[17:31:55] [LED] LED: Cleared row 11, col 13
+[17:31:55] [INFO] Displaying character 'A' in column 13
+[17:31:55] [LED] LED: Row 12 + Row 3 for 'A'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHANICA
+[17:31:55] [LED] LED: Cleared row 0, col 14
+[17:31:55] [LED] LED: Cleared row 1, col 14
+[17:31:55] [LED] LED: Cleared row 2, col 14
+[17:31:55] [LED] LED: Cleared row 3, col 14
+[17:31:55] [LED] LED: Cleared row 4, col 14
+[17:31:55] [LED] LED: Cleared row 5, col 14
+[17:31:55] [LED] LED: Cleared row 6, col 14
+[17:31:55] [LED] LED: Cleared row 7, col 14
+[17:31:55] [LED] LED: Cleared row 8, col 14
+[17:31:55] [LED] LED: Cleared row 9, col 14
+[17:31:55] [LED] LED: Cleared row 10, col 14
+[17:31:55] [LED] LED: Cleared row 11, col 14
+[17:31:55] [INFO] Displaying character 'L' in column 14
+[17:31:55] [LED] LED: Row 11 + Row 5 for 'L'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHANICAL
+[17:31:55] [LED] LED: Cleared row 0, col 15
+[17:31:55] [LED] LED: Cleared row 1, col 15
+[17:31:55] [LED] LED: Cleared row 2, col 15
+[17:31:55] [LED] LED: Cleared row 3, col 15
+[17:31:55] [LED] LED: Cleared row 4, col 15
+[17:31:55] [LED] LED: Cleared row 5, col 15
+[17:31:55] [LED] LED: Cleared row 6, col 15
+[17:31:55] [LED] LED: Cleared row 7, col 15
+[17:31:55] [LED] LED: Cleared row 8, col 15
+[17:31:55] [LED] LED: Cleared row 9, col 15
+[17:31:55] [LED] LED: Cleared row 10, col 15
+[17:31:55] [LED] LED: Cleared row 11, col 15
+[17:31:55] [INFO] Displaying character ' ' in column 15
+[17:31:55] [LED] LED: Space character - no punches
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHANICAL 
+[17:31:55] [LED] LED: Cleared row 0, col 16
+[17:31:55] [LED] LED: Cleared row 1, col 16
+[17:31:55] [LED] LED: Cleared row 2, col 16
+[17:31:55] [LED] LED: Cleared row 3, col 16
+[17:31:55] [LED] LED: Cleared row 4, col 16
+[17:31:55] [LED] LED: Cleared row 5, col 16
+[17:31:55] [LED] LED: Cleared row 6, col 16
+[17:31:55] [LED] LED: Cleared row 7, col 16
+[17:31:55] [LED] LED: Cleared row 8, col 16
+[17:31:55] [LED] LED: Cleared row 9, col 16
+[17:31:55] [LED] LED: Cleared row 10, col 16
+[17:31:55] [LED] LED: Cleared row 11, col 16
+[17:31:55] [INFO] Displaying character 'T' in column 16
+[17:31:55] [LED] LED: Row 0 + Row 5 for 'T'
+[17:31:55] [WARNING] Failed to play sound: punch
+[17:31:55] [INFO] Status: DISPLAYING: FROM MECHANICAL T
+[17:31:56] [LED] LED: Cleared row 0, col 17
+[17:31:56] [LED] LED: Cleared row 1, col 17
+[17:31:56] [LED] LED: Cleared row 2, col 17
+[17:31:56] [LED] LED: Cleared row 3, col 17
+[17:31:56] [LED] LED: Cleared row 4, col 17
+[17:31:56] [LED] LED: Cleared row 5, col 17
+[17:31:56] [LED] LED: Cleared row 6, col 17
+[17:31:56] [LED] LED: Cleared row 7, col 17
+[17:31:56] [LED] LED: Cleared row 8, col 17
+[17:31:56] [LED] LED: Cleared row 9, col 17
+[17:31:56] [LED] LED: Cleared row 10, col 17
+[17:31:56] [LED] LED: Cleared row 11, col 17
+[17:31:56] [INFO] Displaying character 'O' in column 17
+[17:31:56] [LED] LED: Row 11 + Row 8 for 'O'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO
+[17:31:56] [LED] LED: Cleared row 0, col 18
+[17:31:56] [LED] LED: Cleared row 1, col 18
+[17:31:56] [LED] LED: Cleared row 2, col 18
+[17:31:56] [LED] LED: Cleared row 3, col 18
+[17:31:56] [LED] LED: Cleared row 4, col 18
+[17:31:56] [LED] LED: Cleared row 5, col 18
+[17:31:56] [LED] LED: Cleared row 6, col 18
+[17:31:56] [LED] LED: Cleared row 7, col 18
+[17:31:56] [LED] LED: Cleared row 8, col 18
+[17:31:56] [LED] LED: Cleared row 9, col 18
+[17:31:56] [LED] LED: Cleared row 10, col 18
+[17:31:56] [LED] LED: Cleared row 11, col 18
+[17:31:56] [INFO] Displaying character ' ' in column 18
+[17:31:56] [LED] LED: Space character - no punches
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO 
+[17:31:56] [LED] LED: Cleared row 0, col 19
+[17:31:56] [LED] LED: Cleared row 1, col 19
+[17:31:56] [LED] LED: Cleared row 2, col 19
+[17:31:56] [LED] LED: Cleared row 3, col 19
+[17:31:56] [LED] LED: Cleared row 4, col 19
+[17:31:56] [LED] LED: Cleared row 5, col 19
+[17:31:56] [LED] LED: Cleared row 6, col 19
+[17:31:56] [LED] LED: Cleared row 7, col 19
+[17:31:56] [LED] LED: Cleared row 8, col 19
+[17:31:56] [LED] LED: Cleared row 9, col 19
+[17:31:56] [LED] LED: Cleared row 10, col 19
+[17:31:56] [LED] LED: Cleared row 11, col 19
+[17:31:56] [INFO] Displaying character 'D' in column 19
+[17:31:56] [LED] LED: Row 12 + Row 6 for 'D'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO D
+[17:31:56] [LED] LED: Cleared row 0, col 20
+[17:31:56] [LED] LED: Cleared row 1, col 20
+[17:31:56] [LED] LED: Cleared row 2, col 20
+[17:31:56] [LED] LED: Cleared row 3, col 20
+[17:31:56] [LED] LED: Cleared row 4, col 20
+[17:31:56] [LED] LED: Cleared row 5, col 20
+[17:31:56] [LED] LED: Cleared row 6, col 20
+[17:31:56] [LED] LED: Cleared row 7, col 20
+[17:31:56] [LED] LED: Cleared row 8, col 20
+[17:31:56] [LED] LED: Cleared row 9, col 20
+[17:31:56] [LED] LED: Cleared row 10, col 20
+[17:31:56] [LED] LED: Cleared row 11, col 20
+[17:31:56] [INFO] Displaying character 'I' in column 20
+[17:31:56] [LED] LED: Row 12 + Row 11 for 'I'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO DI
+[17:31:56] [LED] LED: Cleared row 0, col 21
+[17:31:56] [LED] LED: Cleared row 1, col 21
+[17:31:56] [LED] LED: Cleared row 2, col 21
+[17:31:56] [LED] LED: Cleared row 3, col 21
+[17:31:56] [LED] LED: Cleared row 4, col 21
+[17:31:56] [LED] LED: Cleared row 5, col 21
+[17:31:56] [LED] LED: Cleared row 6, col 21
+[17:31:56] [LED] LED: Cleared row 7, col 21
+[17:31:56] [LED] LED: Cleared row 8, col 21
+[17:31:56] [LED] LED: Cleared row 9, col 21
+[17:31:56] [LED] LED: Cleared row 10, col 21
+[17:31:56] [LED] LED: Cleared row 11, col 21
+[17:31:56] [INFO] Displaying character 'G' in column 21
+[17:31:56] [LED] LED: Row 12 + Row 9 for 'G'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO DIG
+[17:31:56] [LED] LED: Cleared row 0, col 22
+[17:31:56] [LED] LED: Cleared row 1, col 22
+[17:31:56] [LED] LED: Cleared row 2, col 22
+[17:31:56] [LED] LED: Cleared row 3, col 22
+[17:31:56] [LED] LED: Cleared row 4, col 22
+[17:31:56] [LED] LED: Cleared row 5, col 22
+[17:31:56] [LED] LED: Cleared row 6, col 22
+[17:31:56] [LED] LED: Cleared row 7, col 22
+[17:31:56] [LED] LED: Cleared row 8, col 22
+[17:31:56] [LED] LED: Cleared row 9, col 22
+[17:31:56] [LED] LED: Cleared row 10, col 22
+[17:31:56] [LED] LED: Cleared row 11, col 22
+[17:31:56] [INFO] Displaying character 'I' in column 22
+[17:31:56] [LED] LED: Row 12 + Row 11 for 'I'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO DIGI
+[17:31:56] [LED] LED: Cleared row 0, col 23
+[17:31:56] [LED] LED: Cleared row 1, col 23
+[17:31:56] [LED] LED: Cleared row 2, col 23
+[17:31:56] [LED] LED: Cleared row 3, col 23
+[17:31:56] [LED] LED: Cleared row 4, col 23
+[17:31:56] [LED] LED: Cleared row 5, col 23
+[17:31:56] [LED] LED: Cleared row 6, col 23
+[17:31:56] [LED] LED: Cleared row 7, col 23
+[17:31:56] [LED] LED: Cleared row 8, col 23
+[17:31:56] [LED] LED: Cleared row 9, col 23
+[17:31:56] [LED] LED: Cleared row 10, col 23
+[17:31:56] [LED] LED: Cleared row 11, col 23
+[17:31:56] [INFO] Displaying character 'T' in column 23
+[17:31:56] [LED] LED: Row 0 + Row 5 for 'T'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO DIGIT
+[17:31:56] [LED] LED: Cleared row 0, col 24
+[17:31:56] [LED] LED: Cleared row 1, col 24
+[17:31:56] [LED] LED: Cleared row 2, col 24
+[17:31:56] [LED] LED: Cleared row 3, col 24
+[17:31:56] [LED] LED: Cleared row 4, col 24
+[17:31:56] [LED] LED: Cleared row 5, col 24
+[17:31:56] [LED] LED: Cleared row 6, col 24
+[17:31:56] [LED] LED: Cleared row 7, col 24
+[17:31:56] [LED] LED: Cleared row 8, col 24
+[17:31:56] [LED] LED: Cleared row 9, col 24
+[17:31:56] [LED] LED: Cleared row 10, col 24
+[17:31:56] [LED] LED: Cleared row 11, col 24
+[17:31:56] [INFO] Displaying character 'A' in column 24
+[17:31:56] [LED] LED: Row 12 + Row 3 for 'A'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO DIGITA
+[17:31:56] [LED] LED: Cleared row 0, col 25
+[17:31:56] [LED] LED: Cleared row 1, col 25
+[17:31:56] [LED] LED: Cleared row 2, col 25
+[17:31:56] [LED] LED: Cleared row 3, col 25
+[17:31:56] [LED] LED: Cleared row 4, col 25
+[17:31:56] [LED] LED: Cleared row 5, col 25
+[17:31:56] [LED] LED: Cleared row 6, col 25
+[17:31:56] [LED] LED: Cleared row 7, col 25
+[17:31:56] [LED] LED: Cleared row 8, col 25
+[17:31:56] [LED] LED: Cleared row 9, col 25
+[17:31:56] [LED] LED: Cleared row 10, col 25
+[17:31:56] [LED] LED: Cleared row 11, col 25
+[17:31:56] [INFO] Displaying character 'L' in column 25
+[17:31:56] [LED] LED: Row 11 + Row 5 for 'L'
+[17:31:56] [WARNING] Failed to play sound: punch
+[17:31:56] [INFO] Status: DISPLAYING: FROM MECHANICAL TO DIGITAL
+[17:31:56] [WARNING] Failed to play sound: eject
+[17:31:56] [INFO] Status: DISPLAY COMPLETE
+[17:31:56] [INFO] Message will be displayed for 10 seconds
+[17:31:59] [INFO] Updated label margins to 159px
+[17:31:59] [INFO] Status: PROCESSING: BINARY DREAMS
+[17:31:59] [INFO] Status: TYPING
+[17:31:59] [LED] LED: Cleared row 0, col 0
+[17:31:59] [LED] LED: Cleared row 1, col 0
+[17:31:59] [LED] LED: Cleared row 2, col 0
+[17:31:59] [LED] LED: Cleared row 3, col 0
+[17:31:59] [LED] LED: Cleared row 4, col 0
+[17:31:59] [LED] LED: Cleared row 5, col 0
+[17:31:59] [LED] LED: Cleared row 6, col 0
+[17:31:59] [LED] LED: Cleared row 7, col 0
+[17:31:59] [LED] LED: Cleared row 8, col 0
+[17:31:59] [LED] LED: Cleared row 9, col 0
+[17:31:59] [LED] LED: Cleared row 10, col 0
+[17:31:59] [LED] LED: Cleared row 11, col 0
+[17:31:59] [INFO] Displaying character 'B' in column 0
+[17:31:59] [LED] LED: Row 12 + Row 4 for 'B'
+[17:31:59] [WARNING] Failed to play sound: punch
+[17:31:59] [INFO] Status: DISPLAYING: B
+[17:31:59] [LED] LED: Cleared row 0, col 1
+[17:31:59] [LED] LED: Cleared row 1, col 1
+[17:31:59] [LED] LED: Cleared row 2, col 1
+[17:31:59] [LED] LED: Cleared row 3, col 1
+[17:31:59] [LED] LED: Cleared row 4, col 1
+[17:31:59] [LED] LED: Cleared row 5, col 1
+[17:31:59] [LED] LED: Cleared row 6, col 1
+[17:31:59] [LED] LED: Cleared row 7, col 1
+[17:31:59] [LED] LED: Cleared row 8, col 1
+[17:31:59] [LED] LED: Cleared row 9, col 1
+[17:31:59] [LED] LED: Cleared row 10, col 1
+[17:31:59] [LED] LED: Cleared row 11, col 1
+[17:31:59] [INFO] Displaying character 'I' in column 1
+[17:31:59] [LED] LED: Row 12 + Row 11 for 'I'
+[17:31:59] [WARNING] Failed to play sound: punch
+[17:31:59] [INFO] Status: DISPLAYING: BI

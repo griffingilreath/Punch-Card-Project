@@ -1,0 +1,2033 @@
+[13:19:35] [INFO] Card dimensions updated: {'scale_factor': 3, 'top_margin': 4, 'side_margin': 5, 'row_spacing': 2, 'column_spacing': 1, 'hole_width': 1, 'hole_height': 3}
+[13:19:35] [WARNING] Virtual mode enabled for testing
+[13:19:35] [INFO] Loading punch card sounds...
+[13:19:35] [INFO] Splash screen started using animation manager
+[13:19:35] [INFO] Playing animation: STARTUP
+[13:19:35] [INFO] Loaded settings from punch_card_settings.json
+[13:19:35] [INFO] Message display time loaded: 10 seconds
+[13:19:35] [ERROR] Error loading settings: 'SettingsDialog' object has no attribute 'message_display_time'
+[13:19:35] [INFO] === Text Alignment Debug ===
+[13:19:35] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:35] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:35] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:35] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:35] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:35] [ERROR] Error checking sound status: 'NoneType' object has no attribute 'status'
+[13:19:39] [INFO] Splash screen completed, ready for operation
+[13:19:39] [INFO] Animation finished: AnimationType.STARTUP
+[13:19:39] [INFO] Splash screen completed, ready for operation
+[13:19:39] [INFO] Animation completed: STARTUP
+[13:19:39] [INFO] === Text Alignment Debug ===
+[13:19:39] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:39] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:39] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:39] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:39] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:39] [INFO] === Text Alignment Debug ===
+[13:19:39] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:39] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:39] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:39] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:39] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [INFO] Status: PROCESSING: IBM PUNCH CARD SYSTEM
+[13:19:50] [INFO] Status: TYPING
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 0
+[13:19:50] [LED] LED: Cleared row 1, col 0
+[13:19:50] [LED] LED: Cleared row 2, col 0
+[13:19:50] [LED] LED: Cleared row 3, col 0
+[13:19:50] [LED] LED: Cleared row 4, col 0
+[13:19:50] [LED] LED: Cleared row 5, col 0
+[13:19:50] [LED] LED: Cleared row 6, col 0
+[13:19:50] [LED] LED: Cleared row 7, col 0
+[13:19:50] [LED] LED: Cleared row 8, col 0
+[13:19:50] [LED] LED: Cleared row 9, col 0
+[13:19:50] [LED] LED: Cleared row 10, col 0
+[13:19:50] [LED] LED: Cleared row 11, col 0
+[13:19:50] [INFO] Displaying character 'I' in column 0
+[13:19:50] [LED] LED: Row 12 + Row 11 for 'I'
+[13:19:50] [INFO] Status: DISPLAYING: I
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 1
+[13:19:50] [LED] LED: Cleared row 1, col 1
+[13:19:50] [LED] LED: Cleared row 2, col 1
+[13:19:50] [LED] LED: Cleared row 3, col 1
+[13:19:50] [LED] LED: Cleared row 4, col 1
+[13:19:50] [LED] LED: Cleared row 5, col 1
+[13:19:50] [LED] LED: Cleared row 6, col 1
+[13:19:50] [LED] LED: Cleared row 7, col 1
+[13:19:50] [LED] LED: Cleared row 8, col 1
+[13:19:50] [LED] LED: Cleared row 9, col 1
+[13:19:50] [LED] LED: Cleared row 10, col 1
+[13:19:50] [LED] LED: Cleared row 11, col 1
+[13:19:50] [INFO] Displaying character 'B' in column 1
+[13:19:50] [LED] LED: Row 12 + Row 4 for 'B'
+[13:19:50] [INFO] Status: DISPLAYING: IB
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 2
+[13:19:50] [LED] LED: Cleared row 1, col 2
+[13:19:50] [LED] LED: Cleared row 2, col 2
+[13:19:50] [LED] LED: Cleared row 3, col 2
+[13:19:50] [LED] LED: Cleared row 4, col 2
+[13:19:50] [LED] LED: Cleared row 5, col 2
+[13:19:50] [LED] LED: Cleared row 6, col 2
+[13:19:50] [LED] LED: Cleared row 7, col 2
+[13:19:50] [LED] LED: Cleared row 8, col 2
+[13:19:50] [LED] LED: Cleared row 9, col 2
+[13:19:50] [LED] LED: Cleared row 10, col 2
+[13:19:50] [LED] LED: Cleared row 11, col 2
+[13:19:50] [INFO] Displaying character 'M' in column 2
+[13:19:50] [LED] LED: Row 11 + Row 6 for 'M'
+[13:19:50] [INFO] Status: DISPLAYING: IBM
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 3
+[13:19:50] [LED] LED: Cleared row 1, col 3
+[13:19:50] [LED] LED: Cleared row 2, col 3
+[13:19:50] [LED] LED: Cleared row 3, col 3
+[13:19:50] [LED] LED: Cleared row 4, col 3
+[13:19:50] [LED] LED: Cleared row 5, col 3
+[13:19:50] [LED] LED: Cleared row 6, col 3
+[13:19:50] [LED] LED: Cleared row 7, col 3
+[13:19:50] [LED] LED: Cleared row 8, col 3
+[13:19:50] [LED] LED: Cleared row 9, col 3
+[13:19:50] [LED] LED: Cleared row 10, col 3
+[13:19:50] [LED] LED: Cleared row 11, col 3
+[13:19:50] [INFO] Displaying character ' ' in column 3
+[13:19:50] [LED] LED: Space character - no punches
+[13:19:50] [INFO] Status: DISPLAYING: IBM 
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 4
+[13:19:50] [LED] LED: Cleared row 1, col 4
+[13:19:50] [LED] LED: Cleared row 2, col 4
+[13:19:50] [LED] LED: Cleared row 3, col 4
+[13:19:50] [LED] LED: Cleared row 4, col 4
+[13:19:50] [LED] LED: Cleared row 5, col 4
+[13:19:50] [LED] LED: Cleared row 6, col 4
+[13:19:50] [LED] LED: Cleared row 7, col 4
+[13:19:50] [LED] LED: Cleared row 8, col 4
+[13:19:50] [LED] LED: Cleared row 9, col 4
+[13:19:50] [LED] LED: Cleared row 10, col 4
+[13:19:50] [LED] LED: Cleared row 11, col 4
+[13:19:50] [INFO] Displaying character 'P' in column 4
+[13:19:50] [LED] LED: Row 11 + Row 9 for 'P'
+[13:19:50] [INFO] Status: DISPLAYING: IBM P
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 5
+[13:19:50] [LED] LED: Cleared row 1, col 5
+[13:19:50] [LED] LED: Cleared row 2, col 5
+[13:19:50] [LED] LED: Cleared row 3, col 5
+[13:19:50] [LED] LED: Cleared row 4, col 5
+[13:19:50] [LED] LED: Cleared row 5, col 5
+[13:19:50] [LED] LED: Cleared row 6, col 5
+[13:19:50] [LED] LED: Cleared row 7, col 5
+[13:19:50] [LED] LED: Cleared row 8, col 5
+[13:19:50] [LED] LED: Cleared row 9, col 5
+[13:19:50] [LED] LED: Cleared row 10, col 5
+[13:19:50] [LED] LED: Cleared row 11, col 5
+[13:19:50] [INFO] Displaying character 'U' in column 5
+[13:19:50] [LED] LED: Row 0 + Row 6 for 'U'
+[13:19:50] [INFO] Status: DISPLAYING: IBM PU
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:50] [LED] LED: Cleared row 0, col 6
+[13:19:50] [LED] LED: Cleared row 1, col 6
+[13:19:50] [LED] LED: Cleared row 2, col 6
+[13:19:50] [LED] LED: Cleared row 3, col 6
+[13:19:50] [LED] LED: Cleared row 4, col 6
+[13:19:50] [LED] LED: Cleared row 5, col 6
+[13:19:50] [LED] LED: Cleared row 6, col 6
+[13:19:50] [LED] LED: Cleared row 7, col 6
+[13:19:50] [LED] LED: Cleared row 8, col 6
+[13:19:50] [LED] LED: Cleared row 9, col 6
+[13:19:50] [LED] LED: Cleared row 10, col 6
+[13:19:50] [LED] LED: Cleared row 11, col 6
+[13:19:50] [INFO] Displaying character 'N' in column 6
+[13:19:50] [LED] LED: Row 11 + Row 7 for 'N'
+[13:19:50] [INFO] Status: DISPLAYING: IBM PUN
+[13:19:50] [INFO] === Text Alignment Debug ===
+[13:19:50] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:50] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:50] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:50] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:50] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 7
+[13:19:51] [LED] LED: Cleared row 1, col 7
+[13:19:51] [LED] LED: Cleared row 2, col 7
+[13:19:51] [LED] LED: Cleared row 3, col 7
+[13:19:51] [LED] LED: Cleared row 4, col 7
+[13:19:51] [LED] LED: Cleared row 5, col 7
+[13:19:51] [LED] LED: Cleared row 6, col 7
+[13:19:51] [LED] LED: Cleared row 7, col 7
+[13:19:51] [LED] LED: Cleared row 8, col 7
+[13:19:51] [LED] LED: Cleared row 9, col 7
+[13:19:51] [LED] LED: Cleared row 10, col 7
+[13:19:51] [LED] LED: Cleared row 11, col 7
+[13:19:51] [INFO] Displaying character 'C' in column 7
+[13:19:51] [LED] LED: Row 12 + Row 5 for 'C'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNC
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 8
+[13:19:51] [LED] LED: Cleared row 1, col 8
+[13:19:51] [LED] LED: Cleared row 2, col 8
+[13:19:51] [LED] LED: Cleared row 3, col 8
+[13:19:51] [LED] LED: Cleared row 4, col 8
+[13:19:51] [LED] LED: Cleared row 5, col 8
+[13:19:51] [LED] LED: Cleared row 6, col 8
+[13:19:51] [LED] LED: Cleared row 7, col 8
+[13:19:51] [LED] LED: Cleared row 8, col 8
+[13:19:51] [LED] LED: Cleared row 9, col 8
+[13:19:51] [LED] LED: Cleared row 10, col 8
+[13:19:51] [LED] LED: Cleared row 11, col 8
+[13:19:51] [INFO] Displaying character 'H' in column 8
+[13:19:51] [LED] LED: Row 12 + Row 10 for 'H'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 9
+[13:19:51] [LED] LED: Cleared row 1, col 9
+[13:19:51] [LED] LED: Cleared row 2, col 9
+[13:19:51] [LED] LED: Cleared row 3, col 9
+[13:19:51] [LED] LED: Cleared row 4, col 9
+[13:19:51] [LED] LED: Cleared row 5, col 9
+[13:19:51] [LED] LED: Cleared row 6, col 9
+[13:19:51] [LED] LED: Cleared row 7, col 9
+[13:19:51] [LED] LED: Cleared row 8, col 9
+[13:19:51] [LED] LED: Cleared row 9, col 9
+[13:19:51] [LED] LED: Cleared row 10, col 9
+[13:19:51] [LED] LED: Cleared row 11, col 9
+[13:19:51] [INFO] Displaying character ' ' in column 9
+[13:19:51] [LED] LED: Space character - no punches
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH 
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 10
+[13:19:51] [LED] LED: Cleared row 1, col 10
+[13:19:51] [LED] LED: Cleared row 2, col 10
+[13:19:51] [LED] LED: Cleared row 3, col 10
+[13:19:51] [LED] LED: Cleared row 4, col 10
+[13:19:51] [LED] LED: Cleared row 5, col 10
+[13:19:51] [LED] LED: Cleared row 6, col 10
+[13:19:51] [LED] LED: Cleared row 7, col 10
+[13:19:51] [LED] LED: Cleared row 8, col 10
+[13:19:51] [LED] LED: Cleared row 9, col 10
+[13:19:51] [LED] LED: Cleared row 10, col 10
+[13:19:51] [LED] LED: Cleared row 11, col 10
+[13:19:51] [INFO] Displaying character 'C' in column 10
+[13:19:51] [LED] LED: Row 12 + Row 5 for 'C'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH C
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 11
+[13:19:51] [LED] LED: Cleared row 1, col 11
+[13:19:51] [LED] LED: Cleared row 2, col 11
+[13:19:51] [LED] LED: Cleared row 3, col 11
+[13:19:51] [LED] LED: Cleared row 4, col 11
+[13:19:51] [LED] LED: Cleared row 5, col 11
+[13:19:51] [LED] LED: Cleared row 6, col 11
+[13:19:51] [LED] LED: Cleared row 7, col 11
+[13:19:51] [LED] LED: Cleared row 8, col 11
+[13:19:51] [LED] LED: Cleared row 9, col 11
+[13:19:51] [LED] LED: Cleared row 10, col 11
+[13:19:51] [LED] LED: Cleared row 11, col 11
+[13:19:51] [INFO] Displaying character 'A' in column 11
+[13:19:51] [LED] LED: Row 12 + Row 3 for 'A'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH CA
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 12
+[13:19:51] [LED] LED: Cleared row 1, col 12
+[13:19:51] [LED] LED: Cleared row 2, col 12
+[13:19:51] [LED] LED: Cleared row 3, col 12
+[13:19:51] [LED] LED: Cleared row 4, col 12
+[13:19:51] [LED] LED: Cleared row 5, col 12
+[13:19:51] [LED] LED: Cleared row 6, col 12
+[13:19:51] [LED] LED: Cleared row 7, col 12
+[13:19:51] [LED] LED: Cleared row 8, col 12
+[13:19:51] [LED] LED: Cleared row 9, col 12
+[13:19:51] [LED] LED: Cleared row 10, col 12
+[13:19:51] [LED] LED: Cleared row 11, col 12
+[13:19:51] [INFO] Displaying character 'R' in column 12
+[13:19:51] [LED] LED: Row 11 + Row 11 for 'R'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH CAR
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 13
+[13:19:51] [LED] LED: Cleared row 1, col 13
+[13:19:51] [LED] LED: Cleared row 2, col 13
+[13:19:51] [LED] LED: Cleared row 3, col 13
+[13:19:51] [LED] LED: Cleared row 4, col 13
+[13:19:51] [LED] LED: Cleared row 5, col 13
+[13:19:51] [LED] LED: Cleared row 6, col 13
+[13:19:51] [LED] LED: Cleared row 7, col 13
+[13:19:51] [LED] LED: Cleared row 8, col 13
+[13:19:51] [LED] LED: Cleared row 9, col 13
+[13:19:51] [LED] LED: Cleared row 10, col 13
+[13:19:51] [LED] LED: Cleared row 11, col 13
+[13:19:51] [INFO] Displaying character 'D' in column 13
+[13:19:51] [LED] LED: Row 12 + Row 6 for 'D'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH CARD
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 14
+[13:19:51] [LED] LED: Cleared row 1, col 14
+[13:19:51] [LED] LED: Cleared row 2, col 14
+[13:19:51] [LED] LED: Cleared row 3, col 14
+[13:19:51] [LED] LED: Cleared row 4, col 14
+[13:19:51] [LED] LED: Cleared row 5, col 14
+[13:19:51] [LED] LED: Cleared row 6, col 14
+[13:19:51] [LED] LED: Cleared row 7, col 14
+[13:19:51] [LED] LED: Cleared row 8, col 14
+[13:19:51] [LED] LED: Cleared row 9, col 14
+[13:19:51] [LED] LED: Cleared row 10, col 14
+[13:19:51] [LED] LED: Cleared row 11, col 14
+[13:19:51] [INFO] Displaying character ' ' in column 14
+[13:19:51] [LED] LED: Space character - no punches
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH CARD 
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 15
+[13:19:51] [LED] LED: Cleared row 1, col 15
+[13:19:51] [LED] LED: Cleared row 2, col 15
+[13:19:51] [LED] LED: Cleared row 3, col 15
+[13:19:51] [LED] LED: Cleared row 4, col 15
+[13:19:51] [LED] LED: Cleared row 5, col 15
+[13:19:51] [LED] LED: Cleared row 6, col 15
+[13:19:51] [LED] LED: Cleared row 7, col 15
+[13:19:51] [LED] LED: Cleared row 8, col 15
+[13:19:51] [LED] LED: Cleared row 9, col 15
+[13:19:51] [LED] LED: Cleared row 10, col 15
+[13:19:51] [LED] LED: Cleared row 11, col 15
+[13:19:51] [INFO] Displaying character 'S' in column 15
+[13:19:51] [LED] LED: Row 0 + Row 4 for 'S'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH CARD S
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:51] [LED] LED: Cleared row 0, col 16
+[13:19:51] [LED] LED: Cleared row 1, col 16
+[13:19:51] [LED] LED: Cleared row 2, col 16
+[13:19:51] [LED] LED: Cleared row 3, col 16
+[13:19:51] [LED] LED: Cleared row 4, col 16
+[13:19:51] [LED] LED: Cleared row 5, col 16
+[13:19:51] [LED] LED: Cleared row 6, col 16
+[13:19:51] [LED] LED: Cleared row 7, col 16
+[13:19:51] [LED] LED: Cleared row 8, col 16
+[13:19:51] [LED] LED: Cleared row 9, col 16
+[13:19:51] [LED] LED: Cleared row 10, col 16
+[13:19:51] [LED] LED: Cleared row 11, col 16
+[13:19:51] [INFO] Displaying character 'Y' in column 16
+[13:19:51] [LED] LED: Row 0 + Row 10 for 'Y'
+[13:19:51] [INFO] Status: DISPLAYING: IBM PUNCH CARD SY
+[13:19:51] [INFO] === Text Alignment Debug ===
+[13:19:51] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:51] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:51] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:51] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:51] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:52] [LED] LED: Cleared row 0, col 17
+[13:19:52] [LED] LED: Cleared row 1, col 17
+[13:19:52] [LED] LED: Cleared row 2, col 17
+[13:19:52] [LED] LED: Cleared row 3, col 17
+[13:19:52] [LED] LED: Cleared row 4, col 17
+[13:19:52] [LED] LED: Cleared row 5, col 17
+[13:19:52] [LED] LED: Cleared row 6, col 17
+[13:19:52] [LED] LED: Cleared row 7, col 17
+[13:19:52] [LED] LED: Cleared row 8, col 17
+[13:19:52] [LED] LED: Cleared row 9, col 17
+[13:19:52] [LED] LED: Cleared row 10, col 17
+[13:19:52] [LED] LED: Cleared row 11, col 17
+[13:19:52] [INFO] Displaying character 'S' in column 17
+[13:19:52] [LED] LED: Row 0 + Row 4 for 'S'
+[13:19:52] [INFO] Status: DISPLAYING: IBM PUNCH CARD SYS
+[13:19:52] [INFO] === Text Alignment Debug ===
+[13:19:52] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:52] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:52] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:52] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:52] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:52] [LED] LED: Cleared row 0, col 18
+[13:19:52] [LED] LED: Cleared row 1, col 18
+[13:19:52] [LED] LED: Cleared row 2, col 18
+[13:19:52] [LED] LED: Cleared row 3, col 18
+[13:19:52] [LED] LED: Cleared row 4, col 18
+[13:19:52] [LED] LED: Cleared row 5, col 18
+[13:19:52] [LED] LED: Cleared row 6, col 18
+[13:19:52] [LED] LED: Cleared row 7, col 18
+[13:19:52] [LED] LED: Cleared row 8, col 18
+[13:19:52] [LED] LED: Cleared row 9, col 18
+[13:19:52] [LED] LED: Cleared row 10, col 18
+[13:19:52] [LED] LED: Cleared row 11, col 18
+[13:19:52] [INFO] Displaying character 'T' in column 18
+[13:19:52] [LED] LED: Row 0 + Row 5 for 'T'
+[13:19:52] [INFO] Status: DISPLAYING: IBM PUNCH CARD SYST
+[13:19:52] [INFO] === Text Alignment Debug ===
+[13:19:52] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:52] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:52] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:52] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:52] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:52] [LED] LED: Cleared row 0, col 19
+[13:19:52] [LED] LED: Cleared row 1, col 19
+[13:19:52] [LED] LED: Cleared row 2, col 19
+[13:19:52] [LED] LED: Cleared row 3, col 19
+[13:19:52] [LED] LED: Cleared row 4, col 19
+[13:19:52] [LED] LED: Cleared row 5, col 19
+[13:19:52] [LED] LED: Cleared row 6, col 19
+[13:19:52] [LED] LED: Cleared row 7, col 19
+[13:19:52] [LED] LED: Cleared row 8, col 19
+[13:19:52] [LED] LED: Cleared row 9, col 19
+[13:19:52] [LED] LED: Cleared row 10, col 19
+[13:19:52] [LED] LED: Cleared row 11, col 19
+[13:19:52] [INFO] Displaying character 'E' in column 19
+[13:19:52] [LED] LED: Row 12 + Row 7 for 'E'
+[13:19:52] [INFO] Status: DISPLAYING: IBM PUNCH CARD SYSTE
+[13:19:52] [INFO] === Text Alignment Debug ===
+[13:19:52] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:52] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:52] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:52] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:52] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:52] [LED] LED: Cleared row 0, col 20
+[13:19:52] [LED] LED: Cleared row 1, col 20
+[13:19:52] [LED] LED: Cleared row 2, col 20
+[13:19:52] [LED] LED: Cleared row 3, col 20
+[13:19:52] [LED] LED: Cleared row 4, col 20
+[13:19:52] [LED] LED: Cleared row 5, col 20
+[13:19:52] [LED] LED: Cleared row 6, col 20
+[13:19:52] [LED] LED: Cleared row 7, col 20
+[13:19:52] [LED] LED: Cleared row 8, col 20
+[13:19:52] [LED] LED: Cleared row 9, col 20
+[13:19:52] [LED] LED: Cleared row 10, col 20
+[13:19:52] [LED] LED: Cleared row 11, col 20
+[13:19:52] [INFO] Displaying character 'M' in column 20
+[13:19:52] [LED] LED: Row 11 + Row 6 for 'M'
+[13:19:52] [INFO] Status: DISPLAYING: IBM PUNCH CARD SYSTEM
+[13:19:52] [INFO] === Text Alignment Debug ===
+[13:19:52] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:52] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:52] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:52] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:52] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:52] [INFO] Status: DISPLAY COMPLETE
+[13:19:52] [INFO] Message will be displayed for 10 seconds
+[13:19:52] [INFO] === Text Alignment Debug ===
+[13:19:52] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:52] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:52] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:52] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:52] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [INFO] Status: PROCESSING: COMPUTING THE FUTURE
+[13:19:55] [INFO] Status: TYPING
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 0
+[13:19:55] [LED] LED: Cleared row 1, col 0
+[13:19:55] [LED] LED: Cleared row 2, col 0
+[13:19:55] [LED] LED: Cleared row 3, col 0
+[13:19:55] [LED] LED: Cleared row 4, col 0
+[13:19:55] [LED] LED: Cleared row 5, col 0
+[13:19:55] [LED] LED: Cleared row 6, col 0
+[13:19:55] [LED] LED: Cleared row 7, col 0
+[13:19:55] [LED] LED: Cleared row 8, col 0
+[13:19:55] [LED] LED: Cleared row 9, col 0
+[13:19:55] [LED] LED: Cleared row 10, col 0
+[13:19:55] [LED] LED: Cleared row 11, col 0
+[13:19:55] [INFO] Displaying character 'C' in column 0
+[13:19:55] [LED] LED: Row 12 + Row 5 for 'C'
+[13:19:55] [INFO] Status: DISPLAYING: C
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 1
+[13:19:55] [LED] LED: Cleared row 1, col 1
+[13:19:55] [LED] LED: Cleared row 2, col 1
+[13:19:55] [LED] LED: Cleared row 3, col 1
+[13:19:55] [LED] LED: Cleared row 4, col 1
+[13:19:55] [LED] LED: Cleared row 5, col 1
+[13:19:55] [LED] LED: Cleared row 6, col 1
+[13:19:55] [LED] LED: Cleared row 7, col 1
+[13:19:55] [LED] LED: Cleared row 8, col 1
+[13:19:55] [LED] LED: Cleared row 9, col 1
+[13:19:55] [LED] LED: Cleared row 10, col 1
+[13:19:55] [LED] LED: Cleared row 11, col 1
+[13:19:55] [INFO] Displaying character 'O' in column 1
+[13:19:55] [LED] LED: Row 11 + Row 8 for 'O'
+[13:19:55] [INFO] Status: DISPLAYING: CO
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 2
+[13:19:55] [LED] LED: Cleared row 1, col 2
+[13:19:55] [LED] LED: Cleared row 2, col 2
+[13:19:55] [LED] LED: Cleared row 3, col 2
+[13:19:55] [LED] LED: Cleared row 4, col 2
+[13:19:55] [LED] LED: Cleared row 5, col 2
+[13:19:55] [LED] LED: Cleared row 6, col 2
+[13:19:55] [LED] LED: Cleared row 7, col 2
+[13:19:55] [LED] LED: Cleared row 8, col 2
+[13:19:55] [LED] LED: Cleared row 9, col 2
+[13:19:55] [LED] LED: Cleared row 10, col 2
+[13:19:55] [LED] LED: Cleared row 11, col 2
+[13:19:55] [INFO] Displaying character 'M' in column 2
+[13:19:55] [LED] LED: Row 11 + Row 6 for 'M'
+[13:19:55] [INFO] Status: DISPLAYING: COM
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 3
+[13:19:55] [LED] LED: Cleared row 1, col 3
+[13:19:55] [LED] LED: Cleared row 2, col 3
+[13:19:55] [LED] LED: Cleared row 3, col 3
+[13:19:55] [LED] LED: Cleared row 4, col 3
+[13:19:55] [LED] LED: Cleared row 5, col 3
+[13:19:55] [LED] LED: Cleared row 6, col 3
+[13:19:55] [LED] LED: Cleared row 7, col 3
+[13:19:55] [LED] LED: Cleared row 8, col 3
+[13:19:55] [LED] LED: Cleared row 9, col 3
+[13:19:55] [LED] LED: Cleared row 10, col 3
+[13:19:55] [LED] LED: Cleared row 11, col 3
+[13:19:55] [INFO] Displaying character 'P' in column 3
+[13:19:55] [LED] LED: Row 11 + Row 9 for 'P'
+[13:19:55] [INFO] Status: DISPLAYING: COMP
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 4
+[13:19:55] [LED] LED: Cleared row 1, col 4
+[13:19:55] [LED] LED: Cleared row 2, col 4
+[13:19:55] [LED] LED: Cleared row 3, col 4
+[13:19:55] [LED] LED: Cleared row 4, col 4
+[13:19:55] [LED] LED: Cleared row 5, col 4
+[13:19:55] [LED] LED: Cleared row 6, col 4
+[13:19:55] [LED] LED: Cleared row 7, col 4
+[13:19:55] [LED] LED: Cleared row 8, col 4
+[13:19:55] [LED] LED: Cleared row 9, col 4
+[13:19:55] [LED] LED: Cleared row 10, col 4
+[13:19:55] [LED] LED: Cleared row 11, col 4
+[13:19:55] [INFO] Displaying character 'U' in column 4
+[13:19:55] [LED] LED: Row 0 + Row 6 for 'U'
+[13:19:55] [INFO] Status: DISPLAYING: COMPU
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 5
+[13:19:55] [LED] LED: Cleared row 1, col 5
+[13:19:55] [LED] LED: Cleared row 2, col 5
+[13:19:55] [LED] LED: Cleared row 3, col 5
+[13:19:55] [LED] LED: Cleared row 4, col 5
+[13:19:55] [LED] LED: Cleared row 5, col 5
+[13:19:55] [LED] LED: Cleared row 6, col 5
+[13:19:55] [LED] LED: Cleared row 7, col 5
+[13:19:55] [LED] LED: Cleared row 8, col 5
+[13:19:55] [LED] LED: Cleared row 9, col 5
+[13:19:55] [LED] LED: Cleared row 10, col 5
+[13:19:55] [LED] LED: Cleared row 11, col 5
+[13:19:55] [INFO] Displaying character 'T' in column 5
+[13:19:55] [LED] LED: Row 0 + Row 5 for 'T'
+[13:19:55] [INFO] Status: DISPLAYING: COMPUT
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:55] [LED] LED: Cleared row 0, col 6
+[13:19:55] [LED] LED: Cleared row 1, col 6
+[13:19:55] [LED] LED: Cleared row 2, col 6
+[13:19:55] [LED] LED: Cleared row 3, col 6
+[13:19:55] [LED] LED: Cleared row 4, col 6
+[13:19:55] [LED] LED: Cleared row 5, col 6
+[13:19:55] [LED] LED: Cleared row 6, col 6
+[13:19:55] [LED] LED: Cleared row 7, col 6
+[13:19:55] [LED] LED: Cleared row 8, col 6
+[13:19:55] [LED] LED: Cleared row 9, col 6
+[13:19:55] [LED] LED: Cleared row 10, col 6
+[13:19:55] [LED] LED: Cleared row 11, col 6
+[13:19:55] [INFO] Displaying character 'I' in column 6
+[13:19:55] [LED] LED: Row 12 + Row 11 for 'I'
+[13:19:55] [INFO] Status: DISPLAYING: COMPUTI
+[13:19:55] [INFO] === Text Alignment Debug ===
+[13:19:55] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:55] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:55] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:55] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:55] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 7
+[13:19:56] [LED] LED: Cleared row 1, col 7
+[13:19:56] [LED] LED: Cleared row 2, col 7
+[13:19:56] [LED] LED: Cleared row 3, col 7
+[13:19:56] [LED] LED: Cleared row 4, col 7
+[13:19:56] [LED] LED: Cleared row 5, col 7
+[13:19:56] [LED] LED: Cleared row 6, col 7
+[13:19:56] [LED] LED: Cleared row 7, col 7
+[13:19:56] [LED] LED: Cleared row 8, col 7
+[13:19:56] [LED] LED: Cleared row 9, col 7
+[13:19:56] [LED] LED: Cleared row 10, col 7
+[13:19:56] [LED] LED: Cleared row 11, col 7
+[13:19:56] [INFO] Displaying character 'N' in column 7
+[13:19:56] [LED] LED: Row 11 + Row 7 for 'N'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTIN
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 8
+[13:19:56] [LED] LED: Cleared row 1, col 8
+[13:19:56] [LED] LED: Cleared row 2, col 8
+[13:19:56] [LED] LED: Cleared row 3, col 8
+[13:19:56] [LED] LED: Cleared row 4, col 8
+[13:19:56] [LED] LED: Cleared row 5, col 8
+[13:19:56] [LED] LED: Cleared row 6, col 8
+[13:19:56] [LED] LED: Cleared row 7, col 8
+[13:19:56] [LED] LED: Cleared row 8, col 8
+[13:19:56] [LED] LED: Cleared row 9, col 8
+[13:19:56] [LED] LED: Cleared row 10, col 8
+[13:19:56] [LED] LED: Cleared row 11, col 8
+[13:19:56] [INFO] Displaying character 'G' in column 8
+[13:19:56] [LED] LED: Row 12 + Row 9 for 'G'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 9
+[13:19:56] [LED] LED: Cleared row 1, col 9
+[13:19:56] [LED] LED: Cleared row 2, col 9
+[13:19:56] [LED] LED: Cleared row 3, col 9
+[13:19:56] [LED] LED: Cleared row 4, col 9
+[13:19:56] [LED] LED: Cleared row 5, col 9
+[13:19:56] [LED] LED: Cleared row 6, col 9
+[13:19:56] [LED] LED: Cleared row 7, col 9
+[13:19:56] [LED] LED: Cleared row 8, col 9
+[13:19:56] [LED] LED: Cleared row 9, col 9
+[13:19:56] [LED] LED: Cleared row 10, col 9
+[13:19:56] [LED] LED: Cleared row 11, col 9
+[13:19:56] [INFO] Displaying character ' ' in column 9
+[13:19:56] [LED] LED: Space character - no punches
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING 
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 10
+[13:19:56] [LED] LED: Cleared row 1, col 10
+[13:19:56] [LED] LED: Cleared row 2, col 10
+[13:19:56] [LED] LED: Cleared row 3, col 10
+[13:19:56] [LED] LED: Cleared row 4, col 10
+[13:19:56] [LED] LED: Cleared row 5, col 10
+[13:19:56] [LED] LED: Cleared row 6, col 10
+[13:19:56] [LED] LED: Cleared row 7, col 10
+[13:19:56] [LED] LED: Cleared row 8, col 10
+[13:19:56] [LED] LED: Cleared row 9, col 10
+[13:19:56] [LED] LED: Cleared row 10, col 10
+[13:19:56] [LED] LED: Cleared row 11, col 10
+[13:19:56] [INFO] Displaying character 'T' in column 10
+[13:19:56] [LED] LED: Row 0 + Row 5 for 'T'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING T
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 11
+[13:19:56] [LED] LED: Cleared row 1, col 11
+[13:19:56] [LED] LED: Cleared row 2, col 11
+[13:19:56] [LED] LED: Cleared row 3, col 11
+[13:19:56] [LED] LED: Cleared row 4, col 11
+[13:19:56] [LED] LED: Cleared row 5, col 11
+[13:19:56] [LED] LED: Cleared row 6, col 11
+[13:19:56] [LED] LED: Cleared row 7, col 11
+[13:19:56] [LED] LED: Cleared row 8, col 11
+[13:19:56] [LED] LED: Cleared row 9, col 11
+[13:19:56] [LED] LED: Cleared row 10, col 11
+[13:19:56] [LED] LED: Cleared row 11, col 11
+[13:19:56] [INFO] Displaying character 'H' in column 11
+[13:19:56] [LED] LED: Row 12 + Row 10 for 'H'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING TH
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 12
+[13:19:56] [LED] LED: Cleared row 1, col 12
+[13:19:56] [LED] LED: Cleared row 2, col 12
+[13:19:56] [LED] LED: Cleared row 3, col 12
+[13:19:56] [LED] LED: Cleared row 4, col 12
+[13:19:56] [LED] LED: Cleared row 5, col 12
+[13:19:56] [LED] LED: Cleared row 6, col 12
+[13:19:56] [LED] LED: Cleared row 7, col 12
+[13:19:56] [LED] LED: Cleared row 8, col 12
+[13:19:56] [LED] LED: Cleared row 9, col 12
+[13:19:56] [LED] LED: Cleared row 10, col 12
+[13:19:56] [LED] LED: Cleared row 11, col 12
+[13:19:56] [INFO] Displaying character 'E' in column 12
+[13:19:56] [LED] LED: Row 12 + Row 7 for 'E'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING THE
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 13
+[13:19:56] [LED] LED: Cleared row 1, col 13
+[13:19:56] [LED] LED: Cleared row 2, col 13
+[13:19:56] [LED] LED: Cleared row 3, col 13
+[13:19:56] [LED] LED: Cleared row 4, col 13
+[13:19:56] [LED] LED: Cleared row 5, col 13
+[13:19:56] [LED] LED: Cleared row 6, col 13
+[13:19:56] [LED] LED: Cleared row 7, col 13
+[13:19:56] [LED] LED: Cleared row 8, col 13
+[13:19:56] [LED] LED: Cleared row 9, col 13
+[13:19:56] [LED] LED: Cleared row 10, col 13
+[13:19:56] [LED] LED: Cleared row 11, col 13
+[13:19:56] [INFO] Displaying character ' ' in column 13
+[13:19:56] [LED] LED: Space character - no punches
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING THE 
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 14
+[13:19:56] [LED] LED: Cleared row 1, col 14
+[13:19:56] [LED] LED: Cleared row 2, col 14
+[13:19:56] [LED] LED: Cleared row 3, col 14
+[13:19:56] [LED] LED: Cleared row 4, col 14
+[13:19:56] [LED] LED: Cleared row 5, col 14
+[13:19:56] [LED] LED: Cleared row 6, col 14
+[13:19:56] [LED] LED: Cleared row 7, col 14
+[13:19:56] [LED] LED: Cleared row 8, col 14
+[13:19:56] [LED] LED: Cleared row 9, col 14
+[13:19:56] [LED] LED: Cleared row 10, col 14
+[13:19:56] [LED] LED: Cleared row 11, col 14
+[13:19:56] [INFO] Displaying character 'F' in column 14
+[13:19:56] [LED] LED: Row 12 + Row 8 for 'F'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING THE F
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 15
+[13:19:56] [LED] LED: Cleared row 1, col 15
+[13:19:56] [LED] LED: Cleared row 2, col 15
+[13:19:56] [LED] LED: Cleared row 3, col 15
+[13:19:56] [LED] LED: Cleared row 4, col 15
+[13:19:56] [LED] LED: Cleared row 5, col 15
+[13:19:56] [LED] LED: Cleared row 6, col 15
+[13:19:56] [LED] LED: Cleared row 7, col 15
+[13:19:56] [LED] LED: Cleared row 8, col 15
+[13:19:56] [LED] LED: Cleared row 9, col 15
+[13:19:56] [LED] LED: Cleared row 10, col 15
+[13:19:56] [LED] LED: Cleared row 11, col 15
+[13:19:56] [INFO] Displaying character 'U' in column 15
+[13:19:56] [LED] LED: Row 0 + Row 6 for 'U'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING THE FU
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:56] [LED] LED: Cleared row 0, col 16
+[13:19:56] [LED] LED: Cleared row 1, col 16
+[13:19:56] [LED] LED: Cleared row 2, col 16
+[13:19:56] [LED] LED: Cleared row 3, col 16
+[13:19:56] [LED] LED: Cleared row 4, col 16
+[13:19:56] [LED] LED: Cleared row 5, col 16
+[13:19:56] [LED] LED: Cleared row 6, col 16
+[13:19:56] [LED] LED: Cleared row 7, col 16
+[13:19:56] [LED] LED: Cleared row 8, col 16
+[13:19:56] [LED] LED: Cleared row 9, col 16
+[13:19:56] [LED] LED: Cleared row 10, col 16
+[13:19:56] [LED] LED: Cleared row 11, col 16
+[13:19:56] [INFO] Displaying character 'T' in column 16
+[13:19:56] [LED] LED: Row 0 + Row 5 for 'T'
+[13:19:56] [INFO] Status: DISPLAYING: COMPUTING THE FUT
+[13:19:56] [INFO] === Text Alignment Debug ===
+[13:19:56] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:56] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:56] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:56] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:56] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:57] [LED] LED: Cleared row 0, col 17
+[13:19:57] [LED] LED: Cleared row 1, col 17
+[13:19:57] [LED] LED: Cleared row 2, col 17
+[13:19:57] [LED] LED: Cleared row 3, col 17
+[13:19:57] [LED] LED: Cleared row 4, col 17
+[13:19:57] [LED] LED: Cleared row 5, col 17
+[13:19:57] [LED] LED: Cleared row 6, col 17
+[13:19:57] [LED] LED: Cleared row 7, col 17
+[13:19:57] [LED] LED: Cleared row 8, col 17
+[13:19:57] [LED] LED: Cleared row 9, col 17
+[13:19:57] [LED] LED: Cleared row 10, col 17
+[13:19:57] [LED] LED: Cleared row 11, col 17
+[13:19:57] [INFO] Displaying character 'U' in column 17
+[13:19:57] [LED] LED: Row 0 + Row 6 for 'U'
+[13:19:57] [INFO] Status: DISPLAYING: COMPUTING THE FUTU
+[13:19:57] [INFO] === Text Alignment Debug ===
+[13:19:57] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:57] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:57] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:57] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:57] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:57] [LED] LED: Cleared row 0, col 18
+[13:19:57] [LED] LED: Cleared row 1, col 18
+[13:19:57] [LED] LED: Cleared row 2, col 18
+[13:19:57] [LED] LED: Cleared row 3, col 18
+[13:19:57] [LED] LED: Cleared row 4, col 18
+[13:19:57] [LED] LED: Cleared row 5, col 18
+[13:19:57] [LED] LED: Cleared row 6, col 18
+[13:19:57] [LED] LED: Cleared row 7, col 18
+[13:19:57] [LED] LED: Cleared row 8, col 18
+[13:19:57] [LED] LED: Cleared row 9, col 18
+[13:19:57] [LED] LED: Cleared row 10, col 18
+[13:19:57] [LED] LED: Cleared row 11, col 18
+[13:19:57] [INFO] Displaying character 'R' in column 18
+[13:19:57] [LED] LED: Row 11 + Row 11 for 'R'
+[13:19:57] [INFO] Status: DISPLAYING: COMPUTING THE FUTUR
+[13:19:57] [INFO] === Text Alignment Debug ===
+[13:19:57] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:57] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:57] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:57] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:57] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:57] [LED] LED: Cleared row 0, col 19
+[13:19:57] [LED] LED: Cleared row 1, col 19
+[13:19:57] [LED] LED: Cleared row 2, col 19
+[13:19:57] [LED] LED: Cleared row 3, col 19
+[13:19:57] [LED] LED: Cleared row 4, col 19
+[13:19:57] [LED] LED: Cleared row 5, col 19
+[13:19:57] [LED] LED: Cleared row 6, col 19
+[13:19:57] [LED] LED: Cleared row 7, col 19
+[13:19:57] [LED] LED: Cleared row 8, col 19
+[13:19:57] [LED] LED: Cleared row 9, col 19
+[13:19:57] [LED] LED: Cleared row 10, col 19
+[13:19:57] [LED] LED: Cleared row 11, col 19
+[13:19:57] [INFO] Displaying character 'E' in column 19
+[13:19:57] [LED] LED: Row 12 + Row 7 for 'E'
+[13:19:57] [INFO] Status: DISPLAYING: COMPUTING THE FUTURE
+[13:19:57] [INFO] === Text Alignment Debug ===
+[13:19:57] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:57] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:57] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:57] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:57] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:19:57] [INFO] Status: DISPLAY COMPLETE
+[13:19:57] [INFO] Message will be displayed for 10 seconds
+[13:19:57] [INFO] === Text Alignment Debug ===
+[13:19:57] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:19:57] [INFO] Punch Card Global Position: x=550, y=360
+[13:19:57] [INFO] Punch Card Local Position: x=20, y=107
+[13:19:57] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:19:57] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [INFO] Status: PROCESSING: WELCOME TO THE PUNCH CARD DISPLAY
+[13:20:00] [INFO] Status: TYPING
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 0
+[13:20:00] [LED] LED: Cleared row 1, col 0
+[13:20:00] [LED] LED: Cleared row 2, col 0
+[13:20:00] [LED] LED: Cleared row 3, col 0
+[13:20:00] [LED] LED: Cleared row 4, col 0
+[13:20:00] [LED] LED: Cleared row 5, col 0
+[13:20:00] [LED] LED: Cleared row 6, col 0
+[13:20:00] [LED] LED: Cleared row 7, col 0
+[13:20:00] [LED] LED: Cleared row 8, col 0
+[13:20:00] [LED] LED: Cleared row 9, col 0
+[13:20:00] [LED] LED: Cleared row 10, col 0
+[13:20:00] [LED] LED: Cleared row 11, col 0
+[13:20:00] [INFO] Displaying character 'W' in column 0
+[13:20:00] [LED] LED: Row 0 + Row 8 for 'W'
+[13:20:00] [INFO] Status: DISPLAYING: W
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 1
+[13:20:00] [LED] LED: Cleared row 1, col 1
+[13:20:00] [LED] LED: Cleared row 2, col 1
+[13:20:00] [LED] LED: Cleared row 3, col 1
+[13:20:00] [LED] LED: Cleared row 4, col 1
+[13:20:00] [LED] LED: Cleared row 5, col 1
+[13:20:00] [LED] LED: Cleared row 6, col 1
+[13:20:00] [LED] LED: Cleared row 7, col 1
+[13:20:00] [LED] LED: Cleared row 8, col 1
+[13:20:00] [LED] LED: Cleared row 9, col 1
+[13:20:00] [LED] LED: Cleared row 10, col 1
+[13:20:00] [LED] LED: Cleared row 11, col 1
+[13:20:00] [INFO] Displaying character 'E' in column 1
+[13:20:00] [LED] LED: Row 12 + Row 7 for 'E'
+[13:20:00] [INFO] Status: DISPLAYING: WE
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 2
+[13:20:00] [LED] LED: Cleared row 1, col 2
+[13:20:00] [LED] LED: Cleared row 2, col 2
+[13:20:00] [LED] LED: Cleared row 3, col 2
+[13:20:00] [LED] LED: Cleared row 4, col 2
+[13:20:00] [LED] LED: Cleared row 5, col 2
+[13:20:00] [LED] LED: Cleared row 6, col 2
+[13:20:00] [LED] LED: Cleared row 7, col 2
+[13:20:00] [LED] LED: Cleared row 8, col 2
+[13:20:00] [LED] LED: Cleared row 9, col 2
+[13:20:00] [LED] LED: Cleared row 10, col 2
+[13:20:00] [LED] LED: Cleared row 11, col 2
+[13:20:00] [INFO] Displaying character 'L' in column 2
+[13:20:00] [LED] LED: Row 11 + Row 5 for 'L'
+[13:20:00] [INFO] Status: DISPLAYING: WEL
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 3
+[13:20:00] [LED] LED: Cleared row 1, col 3
+[13:20:00] [LED] LED: Cleared row 2, col 3
+[13:20:00] [LED] LED: Cleared row 3, col 3
+[13:20:00] [LED] LED: Cleared row 4, col 3
+[13:20:00] [LED] LED: Cleared row 5, col 3
+[13:20:00] [LED] LED: Cleared row 6, col 3
+[13:20:00] [LED] LED: Cleared row 7, col 3
+[13:20:00] [LED] LED: Cleared row 8, col 3
+[13:20:00] [LED] LED: Cleared row 9, col 3
+[13:20:00] [LED] LED: Cleared row 10, col 3
+[13:20:00] [LED] LED: Cleared row 11, col 3
+[13:20:00] [INFO] Displaying character 'C' in column 3
+[13:20:00] [LED] LED: Row 12 + Row 5 for 'C'
+[13:20:00] [INFO] Status: DISPLAYING: WELC
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 4
+[13:20:00] [LED] LED: Cleared row 1, col 4
+[13:20:00] [LED] LED: Cleared row 2, col 4
+[13:20:00] [LED] LED: Cleared row 3, col 4
+[13:20:00] [LED] LED: Cleared row 4, col 4
+[13:20:00] [LED] LED: Cleared row 5, col 4
+[13:20:00] [LED] LED: Cleared row 6, col 4
+[13:20:00] [LED] LED: Cleared row 7, col 4
+[13:20:00] [LED] LED: Cleared row 8, col 4
+[13:20:00] [LED] LED: Cleared row 9, col 4
+[13:20:00] [LED] LED: Cleared row 10, col 4
+[13:20:00] [LED] LED: Cleared row 11, col 4
+[13:20:00] [INFO] Displaying character 'O' in column 4
+[13:20:00] [LED] LED: Row 11 + Row 8 for 'O'
+[13:20:00] [INFO] Status: DISPLAYING: WELCO
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 5
+[13:20:00] [LED] LED: Cleared row 1, col 5
+[13:20:00] [LED] LED: Cleared row 2, col 5
+[13:20:00] [LED] LED: Cleared row 3, col 5
+[13:20:00] [LED] LED: Cleared row 4, col 5
+[13:20:00] [LED] LED: Cleared row 5, col 5
+[13:20:00] [LED] LED: Cleared row 6, col 5
+[13:20:00] [LED] LED: Cleared row 7, col 5
+[13:20:00] [LED] LED: Cleared row 8, col 5
+[13:20:00] [LED] LED: Cleared row 9, col 5
+[13:20:00] [LED] LED: Cleared row 10, col 5
+[13:20:00] [LED] LED: Cleared row 11, col 5
+[13:20:00] [INFO] Displaying character 'M' in column 5
+[13:20:00] [LED] LED: Row 11 + Row 6 for 'M'
+[13:20:00] [INFO] Status: DISPLAYING: WELCOM
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:00] [LED] LED: Cleared row 0, col 6
+[13:20:00] [LED] LED: Cleared row 1, col 6
+[13:20:00] [LED] LED: Cleared row 2, col 6
+[13:20:00] [LED] LED: Cleared row 3, col 6
+[13:20:00] [LED] LED: Cleared row 4, col 6
+[13:20:00] [LED] LED: Cleared row 5, col 6
+[13:20:00] [LED] LED: Cleared row 6, col 6
+[13:20:00] [LED] LED: Cleared row 7, col 6
+[13:20:00] [LED] LED: Cleared row 8, col 6
+[13:20:00] [LED] LED: Cleared row 9, col 6
+[13:20:00] [LED] LED: Cleared row 10, col 6
+[13:20:00] [LED] LED: Cleared row 11, col 6
+[13:20:00] [INFO] Displaying character 'E' in column 6
+[13:20:00] [LED] LED: Row 12 + Row 7 for 'E'
+[13:20:00] [INFO] Status: DISPLAYING: WELCOME
+[13:20:00] [INFO] === Text Alignment Debug ===
+[13:20:00] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:00] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:00] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:00] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:00] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 7
+[13:20:01] [LED] LED: Cleared row 1, col 7
+[13:20:01] [LED] LED: Cleared row 2, col 7
+[13:20:01] [LED] LED: Cleared row 3, col 7
+[13:20:01] [LED] LED: Cleared row 4, col 7
+[13:20:01] [LED] LED: Cleared row 5, col 7
+[13:20:01] [LED] LED: Cleared row 6, col 7
+[13:20:01] [LED] LED: Cleared row 7, col 7
+[13:20:01] [LED] LED: Cleared row 8, col 7
+[13:20:01] [LED] LED: Cleared row 9, col 7
+[13:20:01] [LED] LED: Cleared row 10, col 7
+[13:20:01] [LED] LED: Cleared row 11, col 7
+[13:20:01] [INFO] Displaying character ' ' in column 7
+[13:20:01] [LED] LED: Space character - no punches
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME 
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 8
+[13:20:01] [LED] LED: Cleared row 1, col 8
+[13:20:01] [LED] LED: Cleared row 2, col 8
+[13:20:01] [LED] LED: Cleared row 3, col 8
+[13:20:01] [LED] LED: Cleared row 4, col 8
+[13:20:01] [LED] LED: Cleared row 5, col 8
+[13:20:01] [LED] LED: Cleared row 6, col 8
+[13:20:01] [LED] LED: Cleared row 7, col 8
+[13:20:01] [LED] LED: Cleared row 8, col 8
+[13:20:01] [LED] LED: Cleared row 9, col 8
+[13:20:01] [LED] LED: Cleared row 10, col 8
+[13:20:01] [LED] LED: Cleared row 11, col 8
+[13:20:01] [INFO] Displaying character 'T' in column 8
+[13:20:01] [LED] LED: Row 0 + Row 5 for 'T'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME T
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 9
+[13:20:01] [LED] LED: Cleared row 1, col 9
+[13:20:01] [LED] LED: Cleared row 2, col 9
+[13:20:01] [LED] LED: Cleared row 3, col 9
+[13:20:01] [LED] LED: Cleared row 4, col 9
+[13:20:01] [LED] LED: Cleared row 5, col 9
+[13:20:01] [LED] LED: Cleared row 6, col 9
+[13:20:01] [LED] LED: Cleared row 7, col 9
+[13:20:01] [LED] LED: Cleared row 8, col 9
+[13:20:01] [LED] LED: Cleared row 9, col 9
+[13:20:01] [LED] LED: Cleared row 10, col 9
+[13:20:01] [LED] LED: Cleared row 11, col 9
+[13:20:01] [INFO] Displaying character 'O' in column 9
+[13:20:01] [LED] LED: Row 11 + Row 8 for 'O'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 10
+[13:20:01] [LED] LED: Cleared row 1, col 10
+[13:20:01] [LED] LED: Cleared row 2, col 10
+[13:20:01] [LED] LED: Cleared row 3, col 10
+[13:20:01] [LED] LED: Cleared row 4, col 10
+[13:20:01] [LED] LED: Cleared row 5, col 10
+[13:20:01] [LED] LED: Cleared row 6, col 10
+[13:20:01] [LED] LED: Cleared row 7, col 10
+[13:20:01] [LED] LED: Cleared row 8, col 10
+[13:20:01] [LED] LED: Cleared row 9, col 10
+[13:20:01] [LED] LED: Cleared row 10, col 10
+[13:20:01] [LED] LED: Cleared row 11, col 10
+[13:20:01] [INFO] Displaying character ' ' in column 10
+[13:20:01] [LED] LED: Space character - no punches
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO 
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 11
+[13:20:01] [LED] LED: Cleared row 1, col 11
+[13:20:01] [LED] LED: Cleared row 2, col 11
+[13:20:01] [LED] LED: Cleared row 3, col 11
+[13:20:01] [LED] LED: Cleared row 4, col 11
+[13:20:01] [LED] LED: Cleared row 5, col 11
+[13:20:01] [LED] LED: Cleared row 6, col 11
+[13:20:01] [LED] LED: Cleared row 7, col 11
+[13:20:01] [LED] LED: Cleared row 8, col 11
+[13:20:01] [LED] LED: Cleared row 9, col 11
+[13:20:01] [LED] LED: Cleared row 10, col 11
+[13:20:01] [LED] LED: Cleared row 11, col 11
+[13:20:01] [INFO] Displaying character 'T' in column 11
+[13:20:01] [LED] LED: Row 0 + Row 5 for 'T'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO T
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 12
+[13:20:01] [LED] LED: Cleared row 1, col 12
+[13:20:01] [LED] LED: Cleared row 2, col 12
+[13:20:01] [LED] LED: Cleared row 3, col 12
+[13:20:01] [LED] LED: Cleared row 4, col 12
+[13:20:01] [LED] LED: Cleared row 5, col 12
+[13:20:01] [LED] LED: Cleared row 6, col 12
+[13:20:01] [LED] LED: Cleared row 7, col 12
+[13:20:01] [LED] LED: Cleared row 8, col 12
+[13:20:01] [LED] LED: Cleared row 9, col 12
+[13:20:01] [LED] LED: Cleared row 10, col 12
+[13:20:01] [LED] LED: Cleared row 11, col 12
+[13:20:01] [INFO] Displaying character 'H' in column 12
+[13:20:01] [LED] LED: Row 12 + Row 10 for 'H'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO TH
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 13
+[13:20:01] [LED] LED: Cleared row 1, col 13
+[13:20:01] [LED] LED: Cleared row 2, col 13
+[13:20:01] [LED] LED: Cleared row 3, col 13
+[13:20:01] [LED] LED: Cleared row 4, col 13
+[13:20:01] [LED] LED: Cleared row 5, col 13
+[13:20:01] [LED] LED: Cleared row 6, col 13
+[13:20:01] [LED] LED: Cleared row 7, col 13
+[13:20:01] [LED] LED: Cleared row 8, col 13
+[13:20:01] [LED] LED: Cleared row 9, col 13
+[13:20:01] [LED] LED: Cleared row 10, col 13
+[13:20:01] [LED] LED: Cleared row 11, col 13
+[13:20:01] [INFO] Displaying character 'E' in column 13
+[13:20:01] [LED] LED: Row 12 + Row 7 for 'E'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO THE
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 14
+[13:20:01] [LED] LED: Cleared row 1, col 14
+[13:20:01] [LED] LED: Cleared row 2, col 14
+[13:20:01] [LED] LED: Cleared row 3, col 14
+[13:20:01] [LED] LED: Cleared row 4, col 14
+[13:20:01] [LED] LED: Cleared row 5, col 14
+[13:20:01] [LED] LED: Cleared row 6, col 14
+[13:20:01] [LED] LED: Cleared row 7, col 14
+[13:20:01] [LED] LED: Cleared row 8, col 14
+[13:20:01] [LED] LED: Cleared row 9, col 14
+[13:20:01] [LED] LED: Cleared row 10, col 14
+[13:20:01] [LED] LED: Cleared row 11, col 14
+[13:20:01] [INFO] Displaying character ' ' in column 14
+[13:20:01] [LED] LED: Space character - no punches
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO THE 
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 15
+[13:20:01] [LED] LED: Cleared row 1, col 15
+[13:20:01] [LED] LED: Cleared row 2, col 15
+[13:20:01] [LED] LED: Cleared row 3, col 15
+[13:20:01] [LED] LED: Cleared row 4, col 15
+[13:20:01] [LED] LED: Cleared row 5, col 15
+[13:20:01] [LED] LED: Cleared row 6, col 15
+[13:20:01] [LED] LED: Cleared row 7, col 15
+[13:20:01] [LED] LED: Cleared row 8, col 15
+[13:20:01] [LED] LED: Cleared row 9, col 15
+[13:20:01] [LED] LED: Cleared row 10, col 15
+[13:20:01] [LED] LED: Cleared row 11, col 15
+[13:20:01] [INFO] Displaying character 'P' in column 15
+[13:20:01] [LED] LED: Row 11 + Row 9 for 'P'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO THE P
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:01] [LED] LED: Cleared row 0, col 16
+[13:20:01] [LED] LED: Cleared row 1, col 16
+[13:20:01] [LED] LED: Cleared row 2, col 16
+[13:20:01] [LED] LED: Cleared row 3, col 16
+[13:20:01] [LED] LED: Cleared row 4, col 16
+[13:20:01] [LED] LED: Cleared row 5, col 16
+[13:20:01] [LED] LED: Cleared row 6, col 16
+[13:20:01] [LED] LED: Cleared row 7, col 16
+[13:20:01] [LED] LED: Cleared row 8, col 16
+[13:20:01] [LED] LED: Cleared row 9, col 16
+[13:20:01] [LED] LED: Cleared row 10, col 16
+[13:20:01] [LED] LED: Cleared row 11, col 16
+[13:20:01] [INFO] Displaying character 'U' in column 16
+[13:20:01] [LED] LED: Row 0 + Row 6 for 'U'
+[13:20:01] [INFO] Status: DISPLAYING: WELCOME TO THE PU
+[13:20:01] [INFO] === Text Alignment Debug ===
+[13:20:01] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:01] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:01] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:01] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:01] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 17
+[13:20:02] [LED] LED: Cleared row 1, col 17
+[13:20:02] [LED] LED: Cleared row 2, col 17
+[13:20:02] [LED] LED: Cleared row 3, col 17
+[13:20:02] [LED] LED: Cleared row 4, col 17
+[13:20:02] [LED] LED: Cleared row 5, col 17
+[13:20:02] [LED] LED: Cleared row 6, col 17
+[13:20:02] [LED] LED: Cleared row 7, col 17
+[13:20:02] [LED] LED: Cleared row 8, col 17
+[13:20:02] [LED] LED: Cleared row 9, col 17
+[13:20:02] [LED] LED: Cleared row 10, col 17
+[13:20:02] [LED] LED: Cleared row 11, col 17
+[13:20:02] [INFO] Displaying character 'N' in column 17
+[13:20:02] [LED] LED: Row 11 + Row 7 for 'N'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUN
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 18
+[13:20:02] [LED] LED: Cleared row 1, col 18
+[13:20:02] [LED] LED: Cleared row 2, col 18
+[13:20:02] [LED] LED: Cleared row 3, col 18
+[13:20:02] [LED] LED: Cleared row 4, col 18
+[13:20:02] [LED] LED: Cleared row 5, col 18
+[13:20:02] [LED] LED: Cleared row 6, col 18
+[13:20:02] [LED] LED: Cleared row 7, col 18
+[13:20:02] [LED] LED: Cleared row 8, col 18
+[13:20:02] [LED] LED: Cleared row 9, col 18
+[13:20:02] [LED] LED: Cleared row 10, col 18
+[13:20:02] [LED] LED: Cleared row 11, col 18
+[13:20:02] [INFO] Displaying character 'C' in column 18
+[13:20:02] [LED] LED: Row 12 + Row 5 for 'C'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNC
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 19
+[13:20:02] [LED] LED: Cleared row 1, col 19
+[13:20:02] [LED] LED: Cleared row 2, col 19
+[13:20:02] [LED] LED: Cleared row 3, col 19
+[13:20:02] [LED] LED: Cleared row 4, col 19
+[13:20:02] [LED] LED: Cleared row 5, col 19
+[13:20:02] [LED] LED: Cleared row 6, col 19
+[13:20:02] [LED] LED: Cleared row 7, col 19
+[13:20:02] [LED] LED: Cleared row 8, col 19
+[13:20:02] [LED] LED: Cleared row 9, col 19
+[13:20:02] [LED] LED: Cleared row 10, col 19
+[13:20:02] [LED] LED: Cleared row 11, col 19
+[13:20:02] [INFO] Displaying character 'H' in column 19
+[13:20:02] [LED] LED: Row 12 + Row 10 for 'H'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 20
+[13:20:02] [LED] LED: Cleared row 1, col 20
+[13:20:02] [LED] LED: Cleared row 2, col 20
+[13:20:02] [LED] LED: Cleared row 3, col 20
+[13:20:02] [LED] LED: Cleared row 4, col 20
+[13:20:02] [LED] LED: Cleared row 5, col 20
+[13:20:02] [LED] LED: Cleared row 6, col 20
+[13:20:02] [LED] LED: Cleared row 7, col 20
+[13:20:02] [LED] LED: Cleared row 8, col 20
+[13:20:02] [LED] LED: Cleared row 9, col 20
+[13:20:02] [LED] LED: Cleared row 10, col 20
+[13:20:02] [LED] LED: Cleared row 11, col 20
+[13:20:02] [INFO] Displaying character ' ' in column 20
+[13:20:02] [LED] LED: Space character - no punches
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH 
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 21
+[13:20:02] [LED] LED: Cleared row 1, col 21
+[13:20:02] [LED] LED: Cleared row 2, col 21
+[13:20:02] [LED] LED: Cleared row 3, col 21
+[13:20:02] [LED] LED: Cleared row 4, col 21
+[13:20:02] [LED] LED: Cleared row 5, col 21
+[13:20:02] [LED] LED: Cleared row 6, col 21
+[13:20:02] [LED] LED: Cleared row 7, col 21
+[13:20:02] [LED] LED: Cleared row 8, col 21
+[13:20:02] [LED] LED: Cleared row 9, col 21
+[13:20:02] [LED] LED: Cleared row 10, col 21
+[13:20:02] [LED] LED: Cleared row 11, col 21
+[13:20:02] [INFO] Displaying character 'C' in column 21
+[13:20:02] [LED] LED: Row 12 + Row 5 for 'C'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH C
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 22
+[13:20:02] [LED] LED: Cleared row 1, col 22
+[13:20:02] [LED] LED: Cleared row 2, col 22
+[13:20:02] [LED] LED: Cleared row 3, col 22
+[13:20:02] [LED] LED: Cleared row 4, col 22
+[13:20:02] [LED] LED: Cleared row 5, col 22
+[13:20:02] [LED] LED: Cleared row 6, col 22
+[13:20:02] [LED] LED: Cleared row 7, col 22
+[13:20:02] [LED] LED: Cleared row 8, col 22
+[13:20:02] [LED] LED: Cleared row 9, col 22
+[13:20:02] [LED] LED: Cleared row 10, col 22
+[13:20:02] [LED] LED: Cleared row 11, col 22
+[13:20:02] [INFO] Displaying character 'A' in column 22
+[13:20:02] [LED] LED: Row 12 + Row 3 for 'A'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CA
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 23
+[13:20:02] [LED] LED: Cleared row 1, col 23
+[13:20:02] [LED] LED: Cleared row 2, col 23
+[13:20:02] [LED] LED: Cleared row 3, col 23
+[13:20:02] [LED] LED: Cleared row 4, col 23
+[13:20:02] [LED] LED: Cleared row 5, col 23
+[13:20:02] [LED] LED: Cleared row 6, col 23
+[13:20:02] [LED] LED: Cleared row 7, col 23
+[13:20:02] [LED] LED: Cleared row 8, col 23
+[13:20:02] [LED] LED: Cleared row 9, col 23
+[13:20:02] [LED] LED: Cleared row 10, col 23
+[13:20:02] [LED] LED: Cleared row 11, col 23
+[13:20:02] [INFO] Displaying character 'R' in column 23
+[13:20:02] [LED] LED: Row 11 + Row 11 for 'R'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CAR
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 24
+[13:20:02] [LED] LED: Cleared row 1, col 24
+[13:20:02] [LED] LED: Cleared row 2, col 24
+[13:20:02] [LED] LED: Cleared row 3, col 24
+[13:20:02] [LED] LED: Cleared row 4, col 24
+[13:20:02] [LED] LED: Cleared row 5, col 24
+[13:20:02] [LED] LED: Cleared row 6, col 24
+[13:20:02] [LED] LED: Cleared row 7, col 24
+[13:20:02] [LED] LED: Cleared row 8, col 24
+[13:20:02] [LED] LED: Cleared row 9, col 24
+[13:20:02] [LED] LED: Cleared row 10, col 24
+[13:20:02] [LED] LED: Cleared row 11, col 24
+[13:20:02] [INFO] Displaying character 'D' in column 24
+[13:20:02] [LED] LED: Row 12 + Row 6 for 'D'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 25
+[13:20:02] [LED] LED: Cleared row 1, col 25
+[13:20:02] [LED] LED: Cleared row 2, col 25
+[13:20:02] [LED] LED: Cleared row 3, col 25
+[13:20:02] [LED] LED: Cleared row 4, col 25
+[13:20:02] [LED] LED: Cleared row 5, col 25
+[13:20:02] [LED] LED: Cleared row 6, col 25
+[13:20:02] [LED] LED: Cleared row 7, col 25
+[13:20:02] [LED] LED: Cleared row 8, col 25
+[13:20:02] [LED] LED: Cleared row 9, col 25
+[13:20:02] [LED] LED: Cleared row 10, col 25
+[13:20:02] [LED] LED: Cleared row 11, col 25
+[13:20:02] [INFO] Displaying character ' ' in column 25
+[13:20:02] [LED] LED: Space character - no punches
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD 
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:02] [LED] LED: Cleared row 0, col 26
+[13:20:02] [LED] LED: Cleared row 1, col 26
+[13:20:02] [LED] LED: Cleared row 2, col 26
+[13:20:02] [LED] LED: Cleared row 3, col 26
+[13:20:02] [LED] LED: Cleared row 4, col 26
+[13:20:02] [LED] LED: Cleared row 5, col 26
+[13:20:02] [LED] LED: Cleared row 6, col 26
+[13:20:02] [LED] LED: Cleared row 7, col 26
+[13:20:02] [LED] LED: Cleared row 8, col 26
+[13:20:02] [LED] LED: Cleared row 9, col 26
+[13:20:02] [LED] LED: Cleared row 10, col 26
+[13:20:02] [LED] LED: Cleared row 11, col 26
+[13:20:02] [INFO] Displaying character 'D' in column 26
+[13:20:02] [LED] LED: Row 12 + Row 6 for 'D'
+[13:20:02] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD D
+[13:20:02] [INFO] === Text Alignment Debug ===
+[13:20:02] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:02] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:02] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:02] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:02] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [LED] LED: Cleared row 0, col 27
+[13:20:03] [LED] LED: Cleared row 1, col 27
+[13:20:03] [LED] LED: Cleared row 2, col 27
+[13:20:03] [LED] LED: Cleared row 3, col 27
+[13:20:03] [LED] LED: Cleared row 4, col 27
+[13:20:03] [LED] LED: Cleared row 5, col 27
+[13:20:03] [LED] LED: Cleared row 6, col 27
+[13:20:03] [LED] LED: Cleared row 7, col 27
+[13:20:03] [LED] LED: Cleared row 8, col 27
+[13:20:03] [LED] LED: Cleared row 9, col 27
+[13:20:03] [LED] LED: Cleared row 10, col 27
+[13:20:03] [LED] LED: Cleared row 11, col 27
+[13:20:03] [INFO] Displaying character 'I' in column 27
+[13:20:03] [LED] LED: Row 12 + Row 11 for 'I'
+[13:20:03] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD DI
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [LED] LED: Cleared row 0, col 28
+[13:20:03] [LED] LED: Cleared row 1, col 28
+[13:20:03] [LED] LED: Cleared row 2, col 28
+[13:20:03] [LED] LED: Cleared row 3, col 28
+[13:20:03] [LED] LED: Cleared row 4, col 28
+[13:20:03] [LED] LED: Cleared row 5, col 28
+[13:20:03] [LED] LED: Cleared row 6, col 28
+[13:20:03] [LED] LED: Cleared row 7, col 28
+[13:20:03] [LED] LED: Cleared row 8, col 28
+[13:20:03] [LED] LED: Cleared row 9, col 28
+[13:20:03] [LED] LED: Cleared row 10, col 28
+[13:20:03] [LED] LED: Cleared row 11, col 28
+[13:20:03] [INFO] Displaying character 'S' in column 28
+[13:20:03] [LED] LED: Row 0 + Row 4 for 'S'
+[13:20:03] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD DIS
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [LED] LED: Cleared row 0, col 29
+[13:20:03] [LED] LED: Cleared row 1, col 29
+[13:20:03] [LED] LED: Cleared row 2, col 29
+[13:20:03] [LED] LED: Cleared row 3, col 29
+[13:20:03] [LED] LED: Cleared row 4, col 29
+[13:20:03] [LED] LED: Cleared row 5, col 29
+[13:20:03] [LED] LED: Cleared row 6, col 29
+[13:20:03] [LED] LED: Cleared row 7, col 29
+[13:20:03] [LED] LED: Cleared row 8, col 29
+[13:20:03] [LED] LED: Cleared row 9, col 29
+[13:20:03] [LED] LED: Cleared row 10, col 29
+[13:20:03] [LED] LED: Cleared row 11, col 29
+[13:20:03] [INFO] Displaying character 'P' in column 29
+[13:20:03] [LED] LED: Row 11 + Row 9 for 'P'
+[13:20:03] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD DISP
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [LED] LED: Cleared row 0, col 30
+[13:20:03] [LED] LED: Cleared row 1, col 30
+[13:20:03] [LED] LED: Cleared row 2, col 30
+[13:20:03] [LED] LED: Cleared row 3, col 30
+[13:20:03] [LED] LED: Cleared row 4, col 30
+[13:20:03] [LED] LED: Cleared row 5, col 30
+[13:20:03] [LED] LED: Cleared row 6, col 30
+[13:20:03] [LED] LED: Cleared row 7, col 30
+[13:20:03] [LED] LED: Cleared row 8, col 30
+[13:20:03] [LED] LED: Cleared row 9, col 30
+[13:20:03] [LED] LED: Cleared row 10, col 30
+[13:20:03] [LED] LED: Cleared row 11, col 30
+[13:20:03] [INFO] Displaying character 'L' in column 30
+[13:20:03] [LED] LED: Row 11 + Row 5 for 'L'
+[13:20:03] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD DISPL
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [LED] LED: Cleared row 0, col 31
+[13:20:03] [LED] LED: Cleared row 1, col 31
+[13:20:03] [LED] LED: Cleared row 2, col 31
+[13:20:03] [LED] LED: Cleared row 3, col 31
+[13:20:03] [LED] LED: Cleared row 4, col 31
+[13:20:03] [LED] LED: Cleared row 5, col 31
+[13:20:03] [LED] LED: Cleared row 6, col 31
+[13:20:03] [LED] LED: Cleared row 7, col 31
+[13:20:03] [LED] LED: Cleared row 8, col 31
+[13:20:03] [LED] LED: Cleared row 9, col 31
+[13:20:03] [LED] LED: Cleared row 10, col 31
+[13:20:03] [LED] LED: Cleared row 11, col 31
+[13:20:03] [INFO] Displaying character 'A' in column 31
+[13:20:03] [LED] LED: Row 12 + Row 3 for 'A'
+[13:20:03] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD DISPLA
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [LED] LED: Cleared row 0, col 32
+[13:20:03] [LED] LED: Cleared row 1, col 32
+[13:20:03] [LED] LED: Cleared row 2, col 32
+[13:20:03] [LED] LED: Cleared row 3, col 32
+[13:20:03] [LED] LED: Cleared row 4, col 32
+[13:20:03] [LED] LED: Cleared row 5, col 32
+[13:20:03] [LED] LED: Cleared row 6, col 32
+[13:20:03] [LED] LED: Cleared row 7, col 32
+[13:20:03] [LED] LED: Cleared row 8, col 32
+[13:20:03] [LED] LED: Cleared row 9, col 32
+[13:20:03] [LED] LED: Cleared row 10, col 32
+[13:20:03] [LED] LED: Cleared row 11, col 32
+[13:20:03] [INFO] Displaying character 'Y' in column 32
+[13:20:03] [LED] LED: Row 0 + Row 10 for 'Y'
+[13:20:03] [INFO] Status: DISPLAYING: WELCOME TO THE PUNCH CARD DISPLAY
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:03] [INFO] Status: DISPLAY COMPLETE
+[13:20:03] [INFO] Message will be displayed for 10 seconds
+[13:20:03] [INFO] === Text Alignment Debug ===
+[13:20:03] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:03] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:03] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:03] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:03] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [INFO] Status: PROCESSING: HISTORY IN HOLES
+[13:20:05] [INFO] Status: TYPING
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 0
+[13:20:05] [LED] LED: Cleared row 1, col 0
+[13:20:05] [LED] LED: Cleared row 2, col 0
+[13:20:05] [LED] LED: Cleared row 3, col 0
+[13:20:05] [LED] LED: Cleared row 4, col 0
+[13:20:05] [LED] LED: Cleared row 5, col 0
+[13:20:05] [LED] LED: Cleared row 6, col 0
+[13:20:05] [LED] LED: Cleared row 7, col 0
+[13:20:05] [LED] LED: Cleared row 8, col 0
+[13:20:05] [LED] LED: Cleared row 9, col 0
+[13:20:05] [LED] LED: Cleared row 10, col 0
+[13:20:05] [LED] LED: Cleared row 11, col 0
+[13:20:05] [INFO] Displaying character 'H' in column 0
+[13:20:05] [LED] LED: Row 12 + Row 10 for 'H'
+[13:20:05] [INFO] Status: DISPLAYING: H
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 1
+[13:20:05] [LED] LED: Cleared row 1, col 1
+[13:20:05] [LED] LED: Cleared row 2, col 1
+[13:20:05] [LED] LED: Cleared row 3, col 1
+[13:20:05] [LED] LED: Cleared row 4, col 1
+[13:20:05] [LED] LED: Cleared row 5, col 1
+[13:20:05] [LED] LED: Cleared row 6, col 1
+[13:20:05] [LED] LED: Cleared row 7, col 1
+[13:20:05] [LED] LED: Cleared row 8, col 1
+[13:20:05] [LED] LED: Cleared row 9, col 1
+[13:20:05] [LED] LED: Cleared row 10, col 1
+[13:20:05] [LED] LED: Cleared row 11, col 1
+[13:20:05] [INFO] Displaying character 'I' in column 1
+[13:20:05] [LED] LED: Row 12 + Row 11 for 'I'
+[13:20:05] [INFO] Status: DISPLAYING: HI
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 2
+[13:20:05] [LED] LED: Cleared row 1, col 2
+[13:20:05] [LED] LED: Cleared row 2, col 2
+[13:20:05] [LED] LED: Cleared row 3, col 2
+[13:20:05] [LED] LED: Cleared row 4, col 2
+[13:20:05] [LED] LED: Cleared row 5, col 2
+[13:20:05] [LED] LED: Cleared row 6, col 2
+[13:20:05] [LED] LED: Cleared row 7, col 2
+[13:20:05] [LED] LED: Cleared row 8, col 2
+[13:20:05] [LED] LED: Cleared row 9, col 2
+[13:20:05] [LED] LED: Cleared row 10, col 2
+[13:20:05] [LED] LED: Cleared row 11, col 2
+[13:20:05] [INFO] Displaying character 'S' in column 2
+[13:20:05] [LED] LED: Row 0 + Row 4 for 'S'
+[13:20:05] [INFO] Status: DISPLAYING: HIS
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 3
+[13:20:05] [LED] LED: Cleared row 1, col 3
+[13:20:05] [LED] LED: Cleared row 2, col 3
+[13:20:05] [LED] LED: Cleared row 3, col 3
+[13:20:05] [LED] LED: Cleared row 4, col 3
+[13:20:05] [LED] LED: Cleared row 5, col 3
+[13:20:05] [LED] LED: Cleared row 6, col 3
+[13:20:05] [LED] LED: Cleared row 7, col 3
+[13:20:05] [LED] LED: Cleared row 8, col 3
+[13:20:05] [LED] LED: Cleared row 9, col 3
+[13:20:05] [LED] LED: Cleared row 10, col 3
+[13:20:05] [LED] LED: Cleared row 11, col 3
+[13:20:05] [INFO] Displaying character 'T' in column 3
+[13:20:05] [LED] LED: Row 0 + Row 5 for 'T'
+[13:20:05] [INFO] Status: DISPLAYING: HIST
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 4
+[13:20:05] [LED] LED: Cleared row 1, col 4
+[13:20:05] [LED] LED: Cleared row 2, col 4
+[13:20:05] [LED] LED: Cleared row 3, col 4
+[13:20:05] [LED] LED: Cleared row 4, col 4
+[13:20:05] [LED] LED: Cleared row 5, col 4
+[13:20:05] [LED] LED: Cleared row 6, col 4
+[13:20:05] [LED] LED: Cleared row 7, col 4
+[13:20:05] [LED] LED: Cleared row 8, col 4
+[13:20:05] [LED] LED: Cleared row 9, col 4
+[13:20:05] [LED] LED: Cleared row 10, col 4
+[13:20:05] [LED] LED: Cleared row 11, col 4
+[13:20:05] [INFO] Displaying character 'O' in column 4
+[13:20:05] [LED] LED: Row 11 + Row 8 for 'O'
+[13:20:05] [INFO] Status: DISPLAYING: HISTO
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 5
+[13:20:05] [LED] LED: Cleared row 1, col 5
+[13:20:05] [LED] LED: Cleared row 2, col 5
+[13:20:05] [LED] LED: Cleared row 3, col 5
+[13:20:05] [LED] LED: Cleared row 4, col 5
+[13:20:05] [LED] LED: Cleared row 5, col 5
+[13:20:05] [LED] LED: Cleared row 6, col 5
+[13:20:05] [LED] LED: Cleared row 7, col 5
+[13:20:05] [LED] LED: Cleared row 8, col 5
+[13:20:05] [LED] LED: Cleared row 9, col 5
+[13:20:05] [LED] LED: Cleared row 10, col 5
+[13:20:05] [LED] LED: Cleared row 11, col 5
+[13:20:05] [INFO] Displaying character 'R' in column 5
+[13:20:05] [LED] LED: Row 11 + Row 11 for 'R'
+[13:20:05] [INFO] Status: DISPLAYING: HISTOR
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:05] [LED] LED: Cleared row 0, col 6
+[13:20:05] [LED] LED: Cleared row 1, col 6
+[13:20:05] [LED] LED: Cleared row 2, col 6
+[13:20:05] [LED] LED: Cleared row 3, col 6
+[13:20:05] [LED] LED: Cleared row 4, col 6
+[13:20:05] [LED] LED: Cleared row 5, col 6
+[13:20:05] [LED] LED: Cleared row 6, col 6
+[13:20:05] [LED] LED: Cleared row 7, col 6
+[13:20:05] [LED] LED: Cleared row 8, col 6
+[13:20:05] [LED] LED: Cleared row 9, col 6
+[13:20:05] [LED] LED: Cleared row 10, col 6
+[13:20:05] [LED] LED: Cleared row 11, col 6
+[13:20:05] [INFO] Displaying character 'Y' in column 6
+[13:20:05] [LED] LED: Row 0 + Row 10 for 'Y'
+[13:20:05] [INFO] Status: DISPLAYING: HISTORY
+[13:20:05] [INFO] === Text Alignment Debug ===
+[13:20:05] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:05] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:05] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:05] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:05] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 7
+[13:20:06] [LED] LED: Cleared row 1, col 7
+[13:20:06] [LED] LED: Cleared row 2, col 7
+[13:20:06] [LED] LED: Cleared row 3, col 7
+[13:20:06] [LED] LED: Cleared row 4, col 7
+[13:20:06] [LED] LED: Cleared row 5, col 7
+[13:20:06] [LED] LED: Cleared row 6, col 7
+[13:20:06] [LED] LED: Cleared row 7, col 7
+[13:20:06] [LED] LED: Cleared row 8, col 7
+[13:20:06] [LED] LED: Cleared row 9, col 7
+[13:20:06] [LED] LED: Cleared row 10, col 7
+[13:20:06] [LED] LED: Cleared row 11, col 7
+[13:20:06] [INFO] Displaying character ' ' in column 7
+[13:20:06] [LED] LED: Space character - no punches
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY 
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 8
+[13:20:06] [LED] LED: Cleared row 1, col 8
+[13:20:06] [LED] LED: Cleared row 2, col 8
+[13:20:06] [LED] LED: Cleared row 3, col 8
+[13:20:06] [LED] LED: Cleared row 4, col 8
+[13:20:06] [LED] LED: Cleared row 5, col 8
+[13:20:06] [LED] LED: Cleared row 6, col 8
+[13:20:06] [LED] LED: Cleared row 7, col 8
+[13:20:06] [LED] LED: Cleared row 8, col 8
+[13:20:06] [LED] LED: Cleared row 9, col 8
+[13:20:06] [LED] LED: Cleared row 10, col 8
+[13:20:06] [LED] LED: Cleared row 11, col 8
+[13:20:06] [INFO] Displaying character 'I' in column 8
+[13:20:06] [LED] LED: Row 12 + Row 11 for 'I'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY I
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 9
+[13:20:06] [LED] LED: Cleared row 1, col 9
+[13:20:06] [LED] LED: Cleared row 2, col 9
+[13:20:06] [LED] LED: Cleared row 3, col 9
+[13:20:06] [LED] LED: Cleared row 4, col 9
+[13:20:06] [LED] LED: Cleared row 5, col 9
+[13:20:06] [LED] LED: Cleared row 6, col 9
+[13:20:06] [LED] LED: Cleared row 7, col 9
+[13:20:06] [LED] LED: Cleared row 8, col 9
+[13:20:06] [LED] LED: Cleared row 9, col 9
+[13:20:06] [LED] LED: Cleared row 10, col 9
+[13:20:06] [LED] LED: Cleared row 11, col 9
+[13:20:06] [INFO] Displaying character 'N' in column 9
+[13:20:06] [LED] LED: Row 11 + Row 7 for 'N'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 10
+[13:20:06] [LED] LED: Cleared row 1, col 10
+[13:20:06] [LED] LED: Cleared row 2, col 10
+[13:20:06] [LED] LED: Cleared row 3, col 10
+[13:20:06] [LED] LED: Cleared row 4, col 10
+[13:20:06] [LED] LED: Cleared row 5, col 10
+[13:20:06] [LED] LED: Cleared row 6, col 10
+[13:20:06] [LED] LED: Cleared row 7, col 10
+[13:20:06] [LED] LED: Cleared row 8, col 10
+[13:20:06] [LED] LED: Cleared row 9, col 10
+[13:20:06] [LED] LED: Cleared row 10, col 10
+[13:20:06] [LED] LED: Cleared row 11, col 10
+[13:20:06] [INFO] Displaying character ' ' in column 10
+[13:20:06] [LED] LED: Space character - no punches
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN 
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 11
+[13:20:06] [LED] LED: Cleared row 1, col 11
+[13:20:06] [LED] LED: Cleared row 2, col 11
+[13:20:06] [LED] LED: Cleared row 3, col 11
+[13:20:06] [LED] LED: Cleared row 4, col 11
+[13:20:06] [LED] LED: Cleared row 5, col 11
+[13:20:06] [LED] LED: Cleared row 6, col 11
+[13:20:06] [LED] LED: Cleared row 7, col 11
+[13:20:06] [LED] LED: Cleared row 8, col 11
+[13:20:06] [LED] LED: Cleared row 9, col 11
+[13:20:06] [LED] LED: Cleared row 10, col 11
+[13:20:06] [LED] LED: Cleared row 11, col 11
+[13:20:06] [INFO] Displaying character 'H' in column 11
+[13:20:06] [LED] LED: Row 12 + Row 10 for 'H'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN H
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 12
+[13:20:06] [LED] LED: Cleared row 1, col 12
+[13:20:06] [LED] LED: Cleared row 2, col 12
+[13:20:06] [LED] LED: Cleared row 3, col 12
+[13:20:06] [LED] LED: Cleared row 4, col 12
+[13:20:06] [LED] LED: Cleared row 5, col 12
+[13:20:06] [LED] LED: Cleared row 6, col 12
+[13:20:06] [LED] LED: Cleared row 7, col 12
+[13:20:06] [LED] LED: Cleared row 8, col 12
+[13:20:06] [LED] LED: Cleared row 9, col 12
+[13:20:06] [LED] LED: Cleared row 10, col 12
+[13:20:06] [LED] LED: Cleared row 11, col 12
+[13:20:06] [INFO] Displaying character 'O' in column 12
+[13:20:06] [LED] LED: Row 11 + Row 8 for 'O'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN HO
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 13
+[13:20:06] [LED] LED: Cleared row 1, col 13
+[13:20:06] [LED] LED: Cleared row 2, col 13
+[13:20:06] [LED] LED: Cleared row 3, col 13
+[13:20:06] [LED] LED: Cleared row 4, col 13
+[13:20:06] [LED] LED: Cleared row 5, col 13
+[13:20:06] [LED] LED: Cleared row 6, col 13
+[13:20:06] [LED] LED: Cleared row 7, col 13
+[13:20:06] [LED] LED: Cleared row 8, col 13
+[13:20:06] [LED] LED: Cleared row 9, col 13
+[13:20:06] [LED] LED: Cleared row 10, col 13
+[13:20:06] [LED] LED: Cleared row 11, col 13
+[13:20:06] [INFO] Displaying character 'L' in column 13
+[13:20:06] [LED] LED: Row 11 + Row 5 for 'L'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN HOL
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 14
+[13:20:06] [LED] LED: Cleared row 1, col 14
+[13:20:06] [LED] LED: Cleared row 2, col 14
+[13:20:06] [LED] LED: Cleared row 3, col 14
+[13:20:06] [LED] LED: Cleared row 4, col 14
+[13:20:06] [LED] LED: Cleared row 5, col 14
+[13:20:06] [LED] LED: Cleared row 6, col 14
+[13:20:06] [LED] LED: Cleared row 7, col 14
+[13:20:06] [LED] LED: Cleared row 8, col 14
+[13:20:06] [LED] LED: Cleared row 9, col 14
+[13:20:06] [LED] LED: Cleared row 10, col 14
+[13:20:06] [LED] LED: Cleared row 11, col 14
+[13:20:06] [INFO] Displaying character 'E' in column 14
+[13:20:06] [LED] LED: Row 12 + Row 7 for 'E'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN HOLE
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [LED] LED: Cleared row 0, col 15
+[13:20:06] [LED] LED: Cleared row 1, col 15
+[13:20:06] [LED] LED: Cleared row 2, col 15
+[13:20:06] [LED] LED: Cleared row 3, col 15
+[13:20:06] [LED] LED: Cleared row 4, col 15
+[13:20:06] [LED] LED: Cleared row 5, col 15
+[13:20:06] [LED] LED: Cleared row 6, col 15
+[13:20:06] [LED] LED: Cleared row 7, col 15
+[13:20:06] [LED] LED: Cleared row 8, col 15
+[13:20:06] [LED] LED: Cleared row 9, col 15
+[13:20:06] [LED] LED: Cleared row 10, col 15
+[13:20:06] [LED] LED: Cleared row 11, col 15
+[13:20:06] [INFO] Displaying character 'S' in column 15
+[13:20:06] [LED] LED: Row 0 + Row 4 for 'S'
+[13:20:06] [INFO] Status: DISPLAYING: HISTORY IN HOLES
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
+[13:20:06] [INFO] Status: DISPLAY COMPLETE
+[13:20:06] [INFO] Message will be displayed for 10 seconds
+[13:20:06] [INFO] === Text Alignment Debug ===
+[13:20:06] [INFO] Punch Card Geometry: x=0, y=0, w=860, h=393
+[13:20:06] [INFO] Punch Card Global Position: x=550, y=360
+[13:20:06] [INFO] Punch Card Local Position: x=20, y=107
+[13:20:06] [ERROR] Error in text alignment: 'NoneType' object has no attribute 'contentsMargins'
+[13:20:06] [ERROR] Traceback: Traceback (most recent call last): File "/Users/griffingilreath/Documents/MiniDrive/Coding?/Punch-Card-Project/src/display/gui_display.py", line 3126, in align_message_with_card content_margins = content_container.layout().contentsMargins() if content_container else QMargins(20, 20, 20, 20) AttributeError: 'NoneType' object has no attribute 'contentsMargins' 
