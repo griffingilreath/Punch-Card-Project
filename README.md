@@ -971,6 +971,13 @@ A summary of version changes is provided below. For more detailed information, s
 - [CHANGELOG.md](docs/versions/CHANGELOG.md) - Technical changelog with detailed changes
 - [Release Notes](docs/versions/release_notes.md) - User-focused update notes
 
+### v0.6.8 (March 19, 2024) - Sound Control and Menu Bar Improvements
+- **Sound Control System**: Improved implementation with proper volume slider and mute functionality
+- **Menu Bar Enhancements**: Fixed duplication issues and improved organization
+- **UI Improvements**: Better text alignment, status label positioning, and window resizing
+- **Bug Fixes**: Resolved indentation issues and improved error handling
+- **Technical Improvements**: Enhanced sound manager integration and menu action handling
+
 ### v0.6.7 (March 29, 2025) - Settings System Overhaul and Animation Manager Beta
 - **Implemented comprehensive Settings Manager** for centralized configuration
 - **Introduced Animation Manager (Beta)** for coordinated animation control
