@@ -30,25 +30,36 @@ from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QProgressBar, QSplitter, QGridLayout,
     QSpinBox, QFrame, QSlider, QTabWidget, QTextEdit, QSpacerItem,
     QSizePolicy, QFormLayout, QDoubleSpinBox, QGroupBox, QDialogButtonBox,
-    QWidgetAction, QListWidget
+    QWidgetAction
 )
 from PyQt6.QtCore import (
-    Qt, QTimer, QThread, pyqtSignal, QSize, QRect, 
-    QUrl, QObject, QEvent, QCoreApplication, QDateTime, QRectF, QPoint
+    Qt, QTimer, QSize, QRect, QPoint, QPointF, QRectF, QDateTime,
+    pyqtSignal, QEvent, pyqtSlot, QFile, QTextStream, QIODevice
 )
 from PyQt6.QtGui import (
-    QIcon, QPalette, QTextCursor, QColor,
-    QPixmap, QKeyEvent, QTextCharFormat, QPainter, QPainterPath,
-    QBrush, QPen
+    QColor, QPainter, QPen, QBrush, QFont, QPainterPath,
+    QPixmap, QIcon, QKeyEvent, QPalette, QFontMetrics, QAction
 )
-    
-try:
-    from PyQt6.QtMultimedia import QSoundEffect
-except ImportError:
-    print("QSoundEffect not available - running without sound effects")
 
-# Import animation manager
-from src.animation.animation_manager import AnimationManager, AnimationType, AnimationState
+# Import the message database
+from src.core.message_database import MessageDatabase
+
+# Import the animation manager components
+try:
+    from src.display.animation_manager import AnimationManager, AnimationType, AnimationState
+except ImportError:
+    logging.warning("Animation manager not available. Basic animations will be used.")
+
+# Import the sound manager
+from src.utils.sound_manager import SoundManager, get_sound_manager
+
+# Import message bus
+try:
+    from src.utils.message_bus import get_message_bus, EVENT_NEW_MESSAGE, EVENT_DISPLAY_COMPLETE
+    HAS_MESSAGE_BUS = True
+except ImportError:
+    logging.warning("Message bus not available. Direct message handling will be used.")
+    HAS_MESSAGE_BUS = False
 
 # Import utility modules
 from src.utils.colors import COLORS
@@ -1582,6 +1593,14 @@ class MessageGenerator:
         self.console_logger = None
         self.use_api = True
         self.api_status = "Not initialized"
+        
+        # Get the message bus
+        try:
+            from src.utils.message_bus import get_message_bus, EVENT_API_STATUS_CHANGED
+            self.message_bus = get_message_bus()
+        except ImportError:
+            self.message_bus = None
+            
         self.init_api_manager()
     
     def init_api_manager(self):
@@ -1598,14 +1617,23 @@ class MessageGenerator:
             
             if success:
                 self.log(f"API connection successful: {status}", "SUCCESS")
+                # Publish API status change event
+                if self.message_bus:
+                    self.message_bus.publish(EVENT_API_STATUS_CHANGED, {"status": "connected", "message": status})
             else:
                 self.log(f"API connection failed: {status}. Using fallback messages.", "WARNING")
                 self.use_api = False
+                # Publish API status change event
+                if self.message_bus:
+                    self.message_bus.publish(EVENT_API_STATUS_CHANGED, {"status": "error", "message": status})
                 
         except Exception as e:
             self.api_status = f"Error: {str(e)}"
             self.log(f"Failed to initialize API manager: {str(e)}. Using fallback messages.", "ERROR")
             self.use_api = False
+            # Publish API status change event
+            if self.message_bus:
+                self.message_bus.publish(EVENT_API_STATUS_CHANGED, {"status": "error", "message": str(e)})
     
     def log(self, message, level="INFO"):
         """Log a message if console logger is available."""
@@ -1646,7 +1674,18 @@ class MessageGenerator:
         if not self.use_api or not self.api_manager:
             # Log fallback message generation
             self.log(f"Using fallback message (API status: {self.api_status})", "INFO")
-            return random.choice(self.messages)
+            message = random.choice(self.messages)
+            
+            # Publish the generated message to the message bus
+            try:
+                from src.utils.message_bus import get_message_bus, EVENT_NEW_MESSAGE
+                message_bus = get_message_bus()
+                message_bus.publish(EVENT_NEW_MESSAGE, {"message": message, "source": "Local"})
+                self.log(f"Published local message to bus: {message}", "INFO")
+            except Exception as e:
+                self.log(f"Error publishing message to bus: {str(e)}", "ERROR")
+                
+            return message
             
         try:
             # Use API to generate message with prompt from settings
@@ -1677,18 +1716,54 @@ class MessageGenerator:
                 message = message.upper()
                 
                 self.log(f"Generated message via API: {message}", "SUCCESS")
+                
+                # Publish the generated message to the message bus
+                try:
+                    from src.utils.message_bus import get_message_bus, EVENT_NEW_MESSAGE
+                    message_bus = get_message_bus()
+                    message_bus.publish(EVENT_NEW_MESSAGE, {"message": message, "source": "AI"})
+                    self.log(f"Published API message to bus: {message}", "INFO")
+                except Exception as e:
+                    self.log(f"Error publishing message to bus: {str(e)}", "ERROR")
+                
                 return message
             else:
                 self.log(f"API message generation failed: {message}", "ERROR")
                 self.api_status = f"Failed: {message}"
-                return random.choice(self.messages)
+                
+                # Fallback to predefined message
+                message = random.choice(self.messages)
+                
+                # Publish fallback message to the message bus
+                try:
+                    from src.utils.message_bus import get_message_bus, EVENT_NEW_MESSAGE
+                    message_bus = get_message_bus()
+                    message_bus.publish(EVENT_NEW_MESSAGE, {"message": message, "source": "Fallback"})
+                    self.log(f"Published fallback message to bus: {message}", "INFO")
+                except Exception as e:
+                    self.log(f"Error publishing message to bus: {str(e)}", "ERROR")
+                
+                return message
                 
         except Exception as e:
             self.log(f"Error generating message with API: {str(e)}", "ERROR")
             import traceback
             self.log(f"Traceback: {traceback.format_exc()}", "ERROR")
             self.api_status = f"Error: {str(e)}"
-            return random.choice(self.messages)
+            
+            # Fallback to predefined message
+            message = random.choice(self.messages)
+            
+            # Publish fallback message to the message bus
+            try:
+                from src.utils.message_bus import get_message_bus, EVENT_NEW_MESSAGE
+                message_bus = get_message_bus()
+                message_bus.publish(EVENT_NEW_MESSAGE, {"message": message, "source": "Error"})
+                self.log(f"Published error fallback message to bus: {message}", "INFO")
+            except Exception as e:
+                self.log(f"Error publishing message to bus: {str(e)}", "ERROR")
+            
+            return message
 
 class HardwareDetector:
     """Detects and monitors hardware components like Raspberry Pi and LED controller."""
@@ -2701,202 +2776,212 @@ class PunchCardDisplay(QMainWindow):
         
         # ================== CONTENT CONTAINER ==================
         # Create container for all content below menu bar
-        content_container = QWidget()
-        content_layout = QVBoxLayout(content_container)
-        content_layout.setContentsMargins(20, 20, 20, 20)  # Normal margins
-        content_layout.setSpacing(10)  # EXACTLY 10px spacing between all elements
-        self.main_layout.addWidget(content_container)
+        self.content_container = QWidget()
+        self.content_layout = QVBoxLayout(self.content_container)
+        self.content_layout.setContentsMargins(10, 0, 10, 10)
+        self.main_layout.addWidget(self.content_container, 1)  # 1 = stretch factor
         
-        # Create the stats panel but don't add it to the layout yet - it will be positioned when shown
-        self.stats_panel = StatsPanel(self)
-        self.stats_panel.hide()  # Initially hidden
+        # Set dark background
+        self.content_container.setAutoFillBackground(True)
+        palette = self.content_container.palette()
+        palette.setColor(QPalette.ColorRole.Window, COLORS['background'])
+        self.content_container.setPalette(palette)
         
-        # Create the sound settings dialog
-        self.sound_settings_dialog = SoundSettingsDialog(self)
+        # Create the top info container (for message and stats)
+        self.top_info_container = QWidget()
+        self.top_info_layout = QVBoxLayout(self.top_info_container)
+        self.top_info_layout.setContentsMargins(0, 0, 0, 0)
+        self.top_info_layout.setSpacing(0)  # Minimal spacing
         
-        # Connect sound settings signals
-        self.sound_settings_dialog.volume_changed.connect(self.on_sound_volume_changed)
-        self.sound_settings_dialog.mute_changed.connect(self.on_sound_mute_changed)
-        self.sound_settings_dialog.sound_mappings_changed.connect(self.on_sound_mappings_changed)
-        
-        # Store the punch card instance
-        self.punch_card_instance = punch_card
-        
-        # Use the stats from the punch card instance
-        self.stats = self.punch_card_instance.stats if punch_card else PunchCardStats()
-        
-        # ================== TOP SECTION (MESSAGE LABEL) ==================
-        # Create message label in its own container
-        message_container = QWidget()
-        message_layout = QHBoxLayout(message_container)
-        message_layout.setContentsMargins(35, 10, 0, 0)  # Left padding (reduced by 5px) and top padding to move down
+        # Add message label
+        self.message_container = QFrame()
+        self.message_container.setFrameShape(QFrame.Shape.NoFrame)
+        self.message_container.setFixedHeight(40)
+        self.message_container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.message_layout = QHBoxLayout(self.message_container)
+        self.message_layout.setContentsMargins(20, 0, 20, 0)
         
         self.message_label = QLabel("SYSTEM READY")
-        self.message_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.message_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.message_label.setStyleSheet(f"""
-            {get_font_css(size=14)}
             color: {COLORS['text'].name()};
+            {get_font_css(bold=True, size=FONT_SIZE+2)}
         """)
-        message_layout.addWidget(self.message_label)
-        message_layout.addStretch(1)  # Push everything to the left
+        self.message_layout.addWidget(self.message_label)
         
-        content_layout.addWidget(message_container)
-        
-        # ================== CENTER SECTION (CARD) ==================
-        # Create punch card in content layout - always create a new PunchCardWidget
-        self.punch_card = PunchCardWidget()
-        content_layout.addWidget(self.punch_card)
-        
-        # ================== BOTTOM SECTION (STATUS LABEL) ==================
-        # Create status label in its own container
-        status_container = QWidget()
-        status_layout = QHBoxLayout(status_container)
-        status_layout.setContentsMargins(35, 0, 0, 10)  # Left padding (reduced by 5px) and bottom padding
-        
+        # Add status label (right-aligned)
         self.status_label = QLabel("READY")
-        self.status_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.status_label.setStyleSheet(f"""
-            {get_font_css(size=14)}
-            color: {COLORS['text'].name()};
+            color: {COLORS['status_text'].name()};
+            {get_font_css(bold=True, size=FONT_SIZE)}
         """)
-        status_layout.addWidget(self.status_label)
-        status_layout.addStretch(1)  # Push everything to the left
+        self.message_layout.addWidget(self.status_label)
         
-        content_layout.addWidget(status_container)
+        self.top_info_layout.addWidget(self.message_container)
         
-        # Position the labels initially
-        self.position_text_elements()
+        # Add separator
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        separator.setStyleSheet(f"background-color: {COLORS['hole_outline'].name()};")
+        self.top_info_layout.addWidget(separator)
         
-        # Add the hidden UI elements in a container
-        hidden_container = QWidget()
-        hidden_layout = QVBoxLayout(hidden_container)
-        hidden_layout.setContentsMargins(0, 0, 0, 0)
-        hidden_layout.setSpacing(0)
+        # Add the top info container to the content layout
+        self.content_layout.addWidget(self.top_info_container)
         
-        self.hardware_status_label = QLabel("")
-        self.hardware_status_label.setVisible(False)
-        self.hardware_status_label.setMaximumHeight(0)
-        hidden_layout.addWidget(self.hardware_status_label)
+        # Create punch card panel to hold card + animation overlay
+        self.punch_card_panel = QWidget()
+        self.punch_card_panel.setFixedHeight(350)  # Ensure consistent height
+        self.punch_card_panel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         
-        self.keyboard_hint_label = QLabel("")
-        self.keyboard_hint_label.setVisible(False)
-        self.keyboard_hint_label.setMaximumHeight(0)
-        hidden_layout.addWidget(self.keyboard_hint_label)
+        # Create stacked layout for punch card panel
+        self.punch_card_layout = QVBoxLayout(self.punch_card_panel)
+        self.punch_card_layout.setContentsMargins(0, 0, 0, 0)
+        self.punch_card_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         
-        self.api_status_label = QLabel("")
-        self.api_status_label.setVisible(False)
-        self.api_status_label.setMaximumHeight(0)
-        hidden_layout.addWidget(self.api_status_label)
+        # Create the punch card widget
+        if punch_card:
+            self.punch_card = punch_card
+        else:
+            self.punch_card = PunchCardWidget(self)
         
-        # Create hidden button container
-        self.button_container = QWidget()
-        self.button_container.setVisible(False)
-        self.button_container.setMaximumHeight(0)
-        button_layout = QHBoxLayout(self.button_container)
+        self.punch_card_layout.addWidget(self.punch_card, 0, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         
-        # Create required buttons (hidden)
-        self.start_button = RetroButton("DISPLAY MESSAGE")
-        self.clear_button = RetroButton("CLEAR")
-        self.api_button = RetroButton("API CONSOLE")
-        self.exit_button = RetroButton("EXIT")
+        # Add the punch card panel to the content layout
+        self.content_layout.addWidget(self.punch_card_panel)
         
-        # Connect button signals
+        # Create a container for the keyboard hint
+        self.keyboard_hint_container = QWidget()
+        self.keyboard_hint_container.setFixedHeight(30)
+        self.keyboard_hint_layout = QHBoxLayout(self.keyboard_hint_container)
+        self.keyboard_hint_layout.setContentsMargins(10, 0, 10, 0)
+        
+        # Add keyboard hint label
+        self.keyboard_hint_label = QLabel("Press [SPACE] to skip hardware detection")
+        self.keyboard_hint_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.keyboard_hint_label.setStyleSheet(f"""
+            {get_font_css(italic=True, size=FONT_SIZE-2)}
+            color: {QColor(150, 150, 150).name()};
+            padding: 5px;
+        """)
+        self.keyboard_hint_layout.addWidget(self.keyboard_hint_label)
+        
+        self.content_layout.addWidget(self.keyboard_hint_container)
+        
+        # Create buttons container
+        self.buttons_container = QWidget()
+        self.buttons_container.setFixedHeight(60)
+        self.buttons_layout = QHBoxLayout(self.buttons_container)
+        
+        # Create control buttons
+        self.start_button = RetroButton("DISPLAY MESSAGE", self)
         self.start_button.clicked.connect(self.start_display)
+        self.start_button.setFixedSize(180, 40)
+        
+        self.clear_button = RetroButton("CLEAR CARD", self)
         self.clear_button.clicked.connect(self.punch_card.clear_grid)
-        self.api_button.clicked.connect(self.show_api_console)
+        self.clear_button.setFixedSize(120, 40)
+        
+        self.exit_button = RetroButton("EXIT", self)
         self.exit_button.clicked.connect(self.close)
+        self.exit_button.setFixedSize(100, 40)
         
-        # Add buttons to layout
-        button_layout.addWidget(self.start_button)
-        button_layout.addWidget(self.clear_button)
-        button_layout.addWidget(self.api_button)
-        button_layout.addWidget(self.exit_button)
+        # Add buttons to layout with center alignment
+        self.buttons_layout.addStretch(1)
+        self.buttons_layout.addWidget(self.start_button)
+        self.buttons_layout.addWidget(self.clear_button)
+        self.buttons_layout.addWidget(self.exit_button)
+        self.buttons_layout.addStretch(1)
         
-        hidden_layout.addWidget(self.button_container)
+        self.content_layout.addWidget(self.buttons_container)
         
-        # Add the hidden container to the content layout
-        content_layout.addWidget(hidden_container, 0)  # 0 = fixed, non-stretching
-        
-        # Initialize variables
-        self.showing_splash = True  # Start with splash screen
-        self.led_delay = 100
-        self.message_delay = 3000
-        self.message_display_time = 5  # Default 5 seconds for message display
-        self.current_message = ""
-        self.current_char_index = 0
-        self.running = False
-        self.card_errors = {}
-        self.hardware_detected = False
-        self.splash_step = 0
-        self.splash_delay = 50
-        
-        # Setup timers
-        self.timer = QTimer()
+        # ================== SETUP DISPLAY LOOP ==================
+        # Create a timer for displaying characters
+        self.timer = QTimer(self)
         self.timer.timeout.connect(self.display_next_char)
         
-        # Add a timer for message display time
-        self.message_display_timer = QTimer()
-        self.message_display_timer.setSingleShot(True)
-        self.message_display_timer.timeout.connect(self.clear_message)
-        
-        # Create API console window
-        self.api_console = APIConsoleWindow(self)
-        
-        # Setup menu bar actions
-        self.menu_bar.setup_menu_actions(self)
-        
-        # Initialize clock timer to update clock in menu bar
-        self.clock_timer = QTimer()
-        self.clock_timer.timeout.connect(self.update_clock)
-        self.clock_timer.start(1000)  # Update every second
-        
-        # Initialize message generator
-        self.message_generator = MessageGenerator()
-        
-        # Set up keyboard shortcuts
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        
-        # Initialize auto-timer but don't start it yet
-        self.auto_timer = QTimer()
+        # Create a timer for auto-generating messages
+        self.auto_timer = QTimer(self)
         self.auto_timer.timeout.connect(self.generate_next_message)
         
-        # Initialize hardware detector
-        self.hardware_detector = HardwareDetector(self.console)
-        
-        # Add splash screen timer
-        self.splash_timer = QTimer()
-        self.splash_timer.timeout.connect(self.update_splash)
-        self.splash_step = 0
-        self.showing_splash = True
-        self.hardware_check_complete = False
-        self.countdown_seconds = 10
-        self.countdown_timer = QTimer()
+        # Create a timer for hardware detection countdown
+        self.countdown_timer = QTimer(self)
         self.countdown_timer.timeout.connect(self.update_countdown)
         
-        # Hardware status update timer
-        self.hardware_status_timer = QTimer()
-        self.hardware_status_timer.timeout.connect(self.update_hardware_status)
-        self.hardware_status_timer.start(500)  # Check every 500ms
+        # Create a timer for splash screen
+        self.splash_timer = QTimer(self)
+        self.splash_timer.timeout.connect(self.update_splash)
         
-        # Add more variables for animation control
-        self.hardware_detection_finished = False
-        self.animation_started = False
+        # Create a timer for message display timeout
+        self.message_display_timer = QTimer(self)
+        self.message_display_timer.timeout.connect(self.on_message_display_timeout)
+        
+        # Create a timer for updating the clock
+        self.clock_timer = QTimer(self)
+        self.clock_timer.timeout.connect(self.update_clock)
+        self.clock_timer.start(1000)  # Update clock every second
+        
+        # ================== INITIALIZE STATE ==================
+        # Initialize message generator
+        self.message_generator = MessageGenerator()
+        self.message_generator.set_console_logger(self.console)
         
         # Initialize animation manager
-        self.animation_manager = AnimationManager(self.punch_card, self)
-        self.animation_manager.animation_finished.connect(self.on_animation_finished)
+        try:
+            from src.display.animation_manager import AnimationManager, AnimationType, AnimationState
+            self.animation_manager = AnimationManager(self.punch_card, self.console)
+            self.animation_manager.on_animation_complete = self.on_animation_finished
+            self.console.log("Animation manager initialized", "INFO")
+        except ImportError:
+            self.console.log("Animation manager not available. Using basic animations.", "WARNING")
+            self.animation_manager = None
+            
+        # Initialize the API console window
+        self.api_console = APIConsoleWindow(self)
         
-        # Always start with splash screen
+        # Set initial state
+        self.running = False  # Not currently displaying a message
+        self.showing_splash = True  # Start with splash screen
+        self.current_message = ""
+        self.current_char_index = 0
+        self.led_delay = 100  # milliseconds between each character
+        self.message_interval = 5000  # milliseconds between auto-generated messages
+        self.message_display_time = 3000  # milliseconds to display a message
+        self.animation_started = False
+        self.hardware_check_complete = False
+        self.hardware_detection_finished = False
+        self.countdown_seconds = 5
+        
+        # Create statistics panel (hidden by default)
+        self.stats_panel = StatsPanel(self)
+        self.stats_panel.hide()
+        
+        # Initialize auto-message generation
+        self.auto_message_enabled = False  # Disabled by default
+        
+        # Import and initialize message bus
+        try:
+            from src.utils.message_bus import get_message_bus, EVENT_NEW_MESSAGE
+            self.message_bus = get_message_bus()
+            
+            # Subscribe to new message events
+            self.message_bus.subscribe(EVENT_NEW_MESSAGE, self.on_new_message_event)
+            self.console.log("Subscribed to message bus events", "INFO")
+        except ImportError:
+            self.console.log("Message bus not available. Using direct message handling.", "WARNING")
+            self.message_bus = None
+            
+        # Start the splash screen animation
         self.start_splash_screen()
         
-        # Load settings from file
-        self.load_settings()
+        # Start hardware detection
+        self.hardware_detector.detect_hardware()
         
-        # Provide console logger to the message generator
-        if hasattr(self, 'console'):
-            self.message_generator.set_console_logger(self.console)
-            self.console.log("MessageGenerator initialized with console logger", "INFO")
-        
+        # Set up auto-skip option
+        self.keyboard_hint_label.setText(f"Press [SPACE] to skip hardware detection ({self.countdown_seconds}s remaining)")
+        self.countdown_timer.start(1000)
+    
     def on_sound_volume_changed(self, value):
         """Handle volume changes from sound settings."""
         if hasattr(self, 'sound_manager'):
@@ -3850,55 +3935,39 @@ class PunchCardDisplay(QMainWindow):
         QTimer.singleShot(500, self.start_animation)
 
     def generate_next_message(self):
-        """Generate and display the next message, using OpenAI API when available."""
-        # Only generate messages when not running, not showing splash screen, and no animation is playing
+        """Generate and display the next message."""
+        # Only generate messages when not running, not showing splash, and no animation is playing
         if (not self.running and 
             not self.showing_splash and 
             hasattr(self, 'animation_manager') and 
-            self.animation_manager.state != AnimationState.PLAYING):
+            self.animation_manager.animation_state != AnimationState.PLAYING):
             
             # Update status to show we're generating a message
             self.update_status("GENERATING MESSAGE...")
-            
-            # Update console with info about message source
-            if self.message_generator.use_api and self.message_generator.api_manager:
-                self.console.log("Generating message using OpenAI API", "INFO")
-            else:
-                self.console.log("Generating message using predefined templates", "INFO")
             
             try:
                 # Generate the message
                 message = self.message_generator.generate_message()
                 
-                # Log the generated message for debugging
-                self.console.log(f"Generated message: '{message}'", "INFO")
-                
                 # Determine source for statistics tracking
-                source = "AI" if self.message_generator.use_api else "Local"
+                source = "OpenAI" if self.message_generator.use_api else "Local"
                 
-                # Make sure message fits on punch card
-                if len(message) > 80:
-                    message = message[:77] + "..."
-                    self.console.log(f"Message truncated to 80 characters", "INFO")
-                
-                # Force uppercase for punch card display
-                message = message.upper()
-                
-                # Display the message with correct source
+                # Display the message
                 self.display_message(message, source=source)
                 
                 # Update API console if we're using the API
-                if hasattr(self, 'api_console') and self.message_generator.use_api:
-                    self.api_console.log(f"Displayed message: {message}", "INFO")
-            
+                if hasattr(self, 'api_console'):
+                    self.api_console.log(f"Generated message: {message}", "INFO")
             except Exception as e:
-                # Log any errors that occur during message generation or display
-                self.console.log(f"Error in message generation or display: {str(e)}", "ERROR")
-                import traceback
-                self.console.log(f"Traceback: {traceback.format_exc()}", "ERROR")
+                # Log any errors that occur during message generation
+                self.console.log(f"Error generating message: {str(e)}", "ERROR")
                 
-                # Fall back to a basic message if there's an error
-                self.display_message("ERROR IN MESSAGE GENERATION", source="Error")
+                # Update status
+                self.update_status("ERROR GENERATING MESSAGE")
+                
+                # Re-enable auto-message generation if it was enabled
+                if hasattr(self, 'auto_message_enabled') and self.auto_message_enabled:
+                    self.auto_timer.start(5000)  # Try again in 5 seconds
                 
         else:
             # Log reason for skipping message generation
@@ -3906,9 +3975,38 @@ class PunchCardDisplay(QMainWindow):
                 self.console.log("Skipping message generation: already displaying message", "INFO")
             elif self.showing_splash:
                 self.console.log("Skipping message generation: splash screen active", "INFO")
-            elif hasattr(self, 'animation_manager') and self.animation_manager.state == AnimationState.PLAYING:
+            elif hasattr(self, 'animation_manager') and self.animation_manager.animation_state == AnimationState.PLAYING:
                 self.console.log("Skipping message generation: animation is playing", "INFO")
                 
+    def on_new_message_event(self, data):
+        """Handle a new message event from the message bus."""
+        # Only handle messages when not showing splash screen and not already displaying
+        if self.showing_splash or self.running:
+            self.console.log("Ignoring message event during splash or current display", "INFO")
+            return
+            
+        # Extract message and source from event data
+        message = data.get("message", "")
+        source = data.get("source", "Bus")
+        
+        self.console.log(f"Received message event: '{message}' from source {source}", "INFO")
+        
+        # Display the message
+        self.display_message(message, source=source)
+        
+    def on_message_display_timeout(self):
+        """Handle message display timeout."""
+        # Re-enable buttons
+        self.start_button.setEnabled(True)
+        self.clear_button.setEnabled(True)
+        
+        # Start auto-generation timer if enabled
+        if hasattr(self, 'auto_message_enabled') and self.auto_message_enabled:
+            self.auto_timer.start(self.message_interval)
+            
+        # Update status
+        self.update_status("READY")
+
     def keyPressEvent(self, event: QKeyEvent):
         """Handle keyboard shortcuts."""
         if event.key() == Qt.Key.Key_C:
