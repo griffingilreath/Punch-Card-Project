@@ -1210,7 +1210,7 @@ class SettingsDialog(QDialog):
         confirm = QMessageBox.question(
             self,
             "Reset Statistics",
-            "Are you sure you want to reset all message statistics?",
+            "Are you sure you want to reset all message statistics?\nThis cannot be undone.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -1501,6 +1501,7 @@ class MessageGenerator:
         self.api_manager = None
         self.console_logger = None
         self.use_api = True
+        self.api_status = "Not initialized"
         self.init_api_manager()
     
     def init_api_manager(self):
@@ -2189,8 +2190,15 @@ class SoundControlWidget(QWidget):
     
     def open_sound_settings(self):
         """Open sound settings dialog."""
-        if hasattr(self.menu_bar, 'sound_control'):
-            self.menu_bar.sound_control.open_sound_settings()
+        # Get the parent application window to show the dialog
+        parent_window = self.parent()
+        while parent_window and not isinstance(parent_window, PunchCardDisplay):
+            parent_window = parent_window.parent()
+            
+        if parent_window and hasattr(parent_window, 'sound_settings_dialog'):
+            parent_window.sound_settings_dialog.show()
+        elif parent_window and hasattr(parent_window, 'sound_manager'):
+            parent_window.sound_manager.open_sound_settings()
     
     def update_icon_state(self):
         """Update the icon state based on current sound settings."""
@@ -2873,6 +2881,10 @@ class PunchCardDisplay(QMainWindow):
             self.console.log("Ignoring message display request during splash animation", "WARNING")
             return
             
+        # Log the message being displayed 
+        self.console.log(f"Display message called: '{message}' from source: {source}", "INFO")
+        
+        # Convert to uppercase to ensure proper punch card display
         self.current_message = message.upper()
         self.current_char_index = 0
         
@@ -2885,6 +2897,7 @@ class PunchCardDisplay(QMainWindow):
         
         # Update message label
         self.message_label.setText(message)
+        self.console.log(f"Updated message label to: '{message}'", "INFO")
         
         # Update label margins
         self.update_label_margins()
@@ -2902,6 +2915,9 @@ class PunchCardDisplay(QMainWindow):
                 self.stats_panel.refresh_stats()
         
         self.update_status(f"PROCESSING: {message}")
+        
+        # Start the display process
+        self.console.log(f"Starting display for message: '{message}'", "INFO")
         self.start_display()
     
     def start_display(self):
@@ -3480,8 +3496,11 @@ class PunchCardDisplay(QMainWindow):
     def show_card_settings(self):
         """Show the card dimensions settings tab."""
         self.update_status("Opening Card Settings...")
-        self.settings.setCurrentIndex(2)  # Assuming card settings is on tab index 2
-        self.settings.exec()
+        # Create and show the settings dialog with Card Dimensions tab selected
+        from src.display.settings_dialog import SettingsDialog
+        settings_dialog = SettingsDialog(self)
+        settings_dialog.tab_widget.setCurrentIndex(1)  # Card Dimensions tab index
+        settings_dialog.exec()
         
     def show_api_settings(self):
         """Show the API settings tab."""
@@ -3731,18 +3750,39 @@ class PunchCardDisplay(QMainWindow):
             else:
                 self.console.log("Generating message using predefined templates", "INFO")
             
-            # Generate the message
-            message = self.message_generator.generate_message()
+            try:
+                # Generate the message
+                message = self.message_generator.generate_message()
+                
+                # Log the generated message for debugging
+                self.console.log(f"Generated message: '{message}'", "INFO")
+                
+                # Determine source for statistics tracking
+                source = "AI" if self.message_generator.use_api else "Local"
+                
+                # Make sure message fits on punch card
+                if len(message) > 80:
+                    message = message[:77] + "..."
+                    self.console.log(f"Message truncated to 80 characters", "INFO")
+                
+                # Force uppercase for punch card display
+                message = message.upper()
+                
+                # Display the message with correct source
+                self.display_message(message, source=source)
+                
+                # Update API console if we're using the API
+                if hasattr(self, 'api_console') and self.message_generator.use_api:
+                    self.api_console.log(f"Displayed message: {message}", "INFO")
             
-            # Determine source for statistics tracking
-            source = "OpenAI" if self.message_generator.use_api else "Local"
-            
-            # Display the message with correct source
-            self.display_message(message, source=source)
-            
-            # Update API console if we're using the API
-            if hasattr(self, 'api_console') and self.message_generator.use_api:
-                self.api_console.log(f"Generated message: {message}", "INFO")
+            except Exception as e:
+                # Log any errors that occur during message generation or display
+                self.console.log(f"Error in message generation or display: {str(e)}", "ERROR")
+                import traceback
+                self.console.log(f"Traceback: {traceback.format_exc()}", "ERROR")
+                
+                # Fall back to a basic message if there's an error
+                self.display_message("ERROR IN MESSAGE GENERATION", source="Error")
                 
         else:
             # Log reason for skipping message generation
@@ -3760,13 +3800,14 @@ class PunchCardDisplay(QMainWindow):
         elif event.key() == Qt.Key.Key_A:
             self.api_console.show()
         elif event.key() == Qt.Key.Key_S:
-            if self.settings.exec() == QDialog.DialogCode.Accepted:
-                settings = self.settings.get_settings()
-                self.led_delay = settings['led_delay']
-                self.message_display_time = settings['message_display_time']
-                self.timer.setInterval(self.led_delay)
-                self.console.log(f"Settings updated: {settings}")
-                self.console.log(f"Message display time set to {self.message_display_time} seconds", "INFO")
+            # Create and show settings dialog
+            from src.display.settings_dialog import SettingsDialog
+            settings_dialog = SettingsDialog(self)
+            if settings_dialog.exec() == QDialog.DialogCode.Accepted:
+                # Update settings if accepted
+                # No need to manually update values as the settings dialog
+                # will handle saving and applying the settings
+                self.console.log("Settings updated", "INFO")
         elif event.key() == Qt.Key.Key_Space and self.showing_splash and not self.hardware_check_complete:
             # Skip hardware detection and use virtual mode
             self.auto_skip_hardware_detection()
@@ -3846,6 +3887,10 @@ class PunchCardDisplay(QMainWindow):
             self.console.log("Ignoring message display request during splash animation", "WARNING")
             return
             
+        # Log the message being displayed 
+        self.console.log(f"Display message called: '{message}' from source: {source}", "INFO")
+        
+        # Convert to uppercase to ensure proper punch card display
         self.current_message = message.upper()
         self.current_char_index = 0
         
@@ -3858,6 +3903,7 @@ class PunchCardDisplay(QMainWindow):
         
         # Update message label
         self.message_label.setText(message)
+        self.console.log(f"Updated message label to: '{message}'", "INFO")
         
         # Update label margins
         self.update_label_margins()
@@ -3875,6 +3921,9 @@ class PunchCardDisplay(QMainWindow):
                 self.stats_panel.refresh_stats()
         
         self.update_status(f"PROCESSING: {message}")
+        
+        # Start the display process
+        self.console.log(f"Starting display for message: '{message}'", "INFO")
         self.start_display()
 
     def initialize_sound_system(self):
