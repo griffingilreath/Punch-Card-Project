@@ -2921,20 +2921,31 @@ class PunchCardDisplay(QMainWindow):
         self.start_display()
     
     def start_display(self):
-        """Start displaying the message."""
-        if not self.current_message:
-            return  # Don't start if there's no message
+        """Start displaying the current message."""
+        self.console.log(f"Start display called for message: '{self.current_message}'", "INFO")
+        
+        # Check if message exists
+        if not hasattr(self, 'current_message') or not self.current_message:
+            self.console.log("No message to display", "WARNING")
+            return
             
-        self.running = True
-        self.start_button.setEnabled(False)
-        self.clear_button.setEnabled(False)
-        self.update_status("TYPING")
-        self.timer.start(self.led_delay)
+        # Start the timer to display characters
+        if hasattr(self, 'timer'):
+            self.timer.start()
+            self.running = True
+            self.console.log(f"Display timer started with interval {self.led_delay}ms", "INFO")
+        else:
+            self.console.log("ERROR: Display timer not initialized", "ERROR")
     
     def display_next_char(self):
         """Display the next character in the message."""
+        # Log current display state
+        self.console.log(f"display_next_char called, index: {self.current_char_index}, message: '{self.current_message}'", "DEBUG")
+        
         if self.current_char_index < len(self.current_message) and self.current_char_index < self.punch_card.num_cols:
             char = self.current_message[self.current_char_index]
+            self.console.log(f"Displaying character '{char}' at index {self.current_char_index}", "DEBUG")
+            
             self._display_character(char, self.current_char_index)
             
             # Play punch sound for each character (non-blocking)
@@ -2947,78 +2958,70 @@ class PunchCardDisplay(QMainWindow):
                 self.update_status(f"DISPLAYING: {self.current_message[:self.current_char_index]}")
         else:
             # Display complete
+            self.console.log("Message display complete", "INFO")
             self.timer.stop()
             self.running = False
             
-            # Play completion sound (non-blocking)
-            self.play_sound("complete")
-            
-            # Update the message's display time in the database
+            # Update message in database with display time
             if hasattr(self, 'message_db') and hasattr(self, 'message_number'):
                 self.message_db.update_display_time(self.message_number)
-                self.console.log(f"Updated display time for message #{self.message_number} in database", "INFO")
+                self.console.log(f"Updated display time for message #{self.message_number}", "INFO")
             
-            # Update status
+            # Enable buttons again
             self.update_status("DISPLAY COMPLETE")
             
-            # Start the message display timer
-            display_time_ms = self.message_display_time * 1000
-            self.message_display_timer.start(display_time_ms)
+            # Play completion sound
+            self.play_sound("complete")
             
-            # Keep buttons disabled until the message display time is complete
-            self.start_button.setEnabled(False)
-            self.clear_button.setEnabled(False)
+            # Emit signal to start auto message timer
+            if hasattr(self, 'auto_timer'):
+                message_display_time = getattr(self, 'message_display_time', 5000)
+                if message_display_time > 0:
+                    self.console.log(f"Setting auto timer for {message_display_time}ms", "INFO")
+                    self.auto_timer.start(message_display_time)
     
     def _display_character(self, char: str, col: int):
-        """Display a character on the punch card grid."""
-        # Convert to uppercase
-        char = char.upper()
+        """Display a character on the punch card at the specified column."""
+        # Skip non-displayable characters
+        if not char or char == ' ':
+            return
+            
+        # Log the character being displayed
+        self.console.log(f"Displaying character '{char}' at column {col}", "DEBUG")
         
-        # Clear only the rows we'll use for this character
-        rows_to_clear = []
-        if char.isalpha():
-            if char in "ABCDEFGHI":
-                rows_to_clear = [0, ord(char) - ord('A') + 3]
-            elif char in "JKLMNOPQR":
-                rows_to_clear = [1, ord(char) - ord('J') + 3]
-            else:  # S-Z
-                rows_to_clear = [2]
-                digit = ord(char) - ord('S') + 2
-                if digit <= 9:
-                    rows_to_clear.append(digit + 2)
-        elif char.isdigit():
-            digit = int(char)
-            rows_to_clear = [2] if digit == 0 else [digit + 2]
-        elif char != ' ':
-            rows_to_clear = [1, 2]  # Special characters
-        
-        # Clear only necessary rows
-        for row in rows_to_clear:
-            if 0 <= row < self.punch_card.num_rows:
-                self.punch_card.set_led(row, col, False)
-        
-        # Set the LEDs for the character
-        if char.isalpha():
-            if char in "ABCDEFGHI":
-                self.punch_card.set_led(0, col, True)  # Row 12
-                self.punch_card.set_led(ord(char) - ord('A') + 3, col, True)
-            elif char in "JKLMNOPQR":
-                self.punch_card.set_led(1, col, True)  # Row 11
-                self.punch_card.set_led(ord(char) - ord('J') + 3, col, True)
-            else:  # S-Z
-                self.punch_card.set_led(2, col, True)  # Row 0
-                digit = ord(char) - ord('S') + 2
-                if digit <= 9:
-                    self.punch_card.set_led(digit + 2, col, True)
-        elif char.isdigit():
-            digit = int(char)
-            if digit == 0:
-                self.punch_card.set_led(2, col, True)  # Row 0
+        try:
+            # Convert to uppercase
+            char = char.upper()
+            
+            # Map the character to a row on the punch card
+            char_map = {
+                '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+                'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9,
+                'J': 1, 'K': 2, 'L': 3, 'M': 4, 'N': 5, 'O': 6, 'P': 7, 'Q': 8, 'R': 9,
+                'S': 2, 'T': 3, 'U': 4, 'V': 5, 'W': 6, 'X': 7, 'Y': 8, 'Z': 9,
+                '.': 10, ',': 10, ':': 10, ';': 10, '?': 10, '!': 10, '@': 10, '#': 10,
+                '$': 10, '%': 10, '^': 10, '&': 10, '*': 10, '(': 10, ')': 10, '-': 10,
+                '_': 10, '+': 10, '=': 10, '{': 10, '}': 10, '[': 10, ']': 10, '|': 10,
+                '\\': 10, '/': 10, '<': 10, '>': 10, '\'': 10, '\"': 10, '`': 10, '~': 10
+            }
+            
+            # Get row from mapping or default to special character row
+            row = char_map.get(char, 11)
+            
+            # Log the row mapping
+            self.console.log(f"Character '{char}' mapped to row {row}", "DEBUG")
+            
+            # Set the LED at the specified position
+            if 0 <= row < self.punch_card.num_rows and 0 <= col < self.punch_card.num_cols:
+                self.punch_card.set_led(row, col, True)
+                self.console.log(f"Set LED at row {row}, column {col} to ON", "DEBUG")
             else:
-                self.punch_card.set_led(digit + 2, col, True)
-        elif char != ' ':
-            self.punch_card.set_led(1, col, True)  # Row 11
-            self.punch_card.set_led(2, col, True)  # Row 0
+                self.console.log(f"ERROR: Position ({row}, {col}) out of bounds", "ERROR")
+                
+        except Exception as e:
+            self.console.log(f"Error displaying character '{char}' at column {col}: {str(e)}", "ERROR")
+            import traceback
+            self.console.log(f"Traceback: {traceback.format_exc()}", "ERROR")
 
     def update_card_dimensions(self, settings: Dict[str, Any]):
         """Update the punch card dimensions with new settings."""
@@ -3767,9 +3770,17 @@ class PunchCardDisplay(QMainWindow):
                 
                 # Force uppercase for punch card display
                 message = message.upper()
+                self.console.log(f"Prepared message for display: '{message}'", "INFO")
                 
                 # Display the message with correct source
-                self.display_message(message, source=source)
+                self.console.log(f"Calling display_message with: '{message}', source: {source}", "INFO")
+                
+                # Check if display_message exists 
+                if hasattr(self, 'display_message'):
+                    self.display_message(message, source=source)
+                    self.console.log(f"Display method called successfully", "INFO")
+                else:
+                    self.console.log("ERROR: display_message method not found", "ERROR")
                 
                 # Update API console if we're using the API
                 if hasattr(self, 'api_console') and self.message_generator.use_api:
