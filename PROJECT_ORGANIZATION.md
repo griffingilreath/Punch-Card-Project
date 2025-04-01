@@ -1,63 +1,100 @@
-# Project Organization Status
+# Punch Card Project Organization
 
-## v0.6.6 Project Organization
+This document outlines the organization of the Punch Card Project codebase.
 
-After the v0.6.6 release, the project has been organized using the Git Flow branching model:
+## Directory Structure
 
-### Repository Structure
+```
+punch-card-project/
+├── .github/            # GitHub workflows and templates
+├── assets/             # Static assets and resources
+├── backups/            # Important backups (consider gitignoring)
+│   └── test_fixes/     # Test fixes from previous versions
+├── config/             # Configuration files
+│   └── punch_card_settings.json
+├── docs/               # Documentation
+│   └── versions/       # Version documentation
+├── logs/               # Log files (gitignored)
+├── release_notes/      # Release notes
+├── resources/          # Resource files
+├── scripts/            # Utility scripts
+│   ├── animation/      # Animation-specific scripts
+│   ├── deployment/     # Deployment scripts
+│   └── maintenance/    # Maintenance scripts
+├── secrets/            # Secret files (gitignored)
+├── src/                # Source code
+│   ├── animation/      # Animation code
+│   ├── api/            # API-related code
+│   ├── core/           # Core application code
+│   ├── display/        # Display-related code
+│   ├── utils/          # Utility functions
+│   └── main.py         # Main module
+├── tests/              # Test files
+│   ├── animation/      # Animation tests
+│   ├── api/            # API tests
+│   ├── core/           # Core tests
+│   └── display/        # Display tests
+├── versions/           # Version tracking if needed
+├── .gitignore          # Git ignore file
+├── CHANGELOG.md        # Changelog
+├── README.md           # Project readme
+├── requirements.txt    # Python dependencies
+└── run.py              # Main entry point script
+```
 
-- **main branch**: Contains the production code for v0.6.6
-- **develop branch**: Contains the development code for the next version (v0.6.7-dev)
-- **tags**: All major versions are tagged (v0.1.0 through v0.6.6)
+## Main Components
 
-### Project Organization
+### Source Code (`src/`)
 
-1. **Code Structure**:
-   - Code is organized into logical modules (src/api, src/core, src/display, src/utils)
-   - Test files are located in tests/integration
-   - Documentation is in the docs/ directory
-   - Release notes are in release_notes/
+- **animation/**: Contains animation-related code
+- **api/**: Contains API integration code
+- **core/**: Contains core application logic
+- **display/**: Contains UI display code
+- **utils/**: Contains utility functions and helpers
+- **main.py**: Main application entry point
 
-2. **File Management**:
-   - Backup files (.bak) are moved to archives/v0.6.6/backups
-   - Integration tests are moved to tests/integration
-   - .gitignore updated to exclude temporary files
+### Tests (`tests/`)
 
-### Git Flow Implementation
+- Organized by component to mirror the `src/` directory structure
+- Each test module corresponds to a source module
 
-- The branching strategy is documented in [docs/BRANCHING_STRATEGY.md](docs/BRANCHING_STRATEGY.md)
-- For future development, all new features should be created in feature branches from develop
-- Releases should be prepared in release branches
-- Hotfixes should be created directly from main
+### Scripts
 
-### Next Steps
+- **scripts/animation/**: Animation-specific scripts
+- **scripts/deployment/**: Scripts for deployment and release management
+- **scripts/maintenance/**: Scripts for maintenance tasks
 
-For future development:
+### Configuration
 
-1. Create feature branches for new functionality:
-   ```bash
-   git checkout develop
-   git checkout -b feature/new-feature
-   ```
+- Configuration files are stored in the `config/` directory
+- Sensitive data should be stored in the `secrets/` directory (gitignored)
 
-2. Merge completed features into develop:
-   ```bash
-   git checkout develop
-   git merge --no-ff feature/new-feature
-   git push origin develop
-   ```
+### Documentation
 
-3. Prepare releases using release branches:
-   ```bash
-   git checkout develop
-   git checkout -b release/x.y.z
-   # Update version numbers
-   # Test and fix bugs
-   # When ready, merge to main and back to develop
-   ```
+- **docs/**: General documentation
+- **docs/versions/**: Version-specific documentation
+- **release_notes/**: Release notes and change logs
 
-### Version Management
+## Entry Points
 
-- Main branch contains released version (v0.6.6)
-- Develop branch contains v0.6.7-dev
-- Version history is available in the README 
+- **run.py**: Main application entry point
+- Use this script to launch the application with appropriate arguments
+
+## Development Guidelines
+
+1. **Maintain Directory Structure**: Follow the established directory structure when adding new files
+2. **Keep Modules Focused**: Each module should have a single responsibility
+3. **Test Coverage**: Write tests for all functionality
+4. **Documentation**: Document all modules, classes, and functions
+5. **Configuration**: Keep configuration separate from code
+
+## Version Control
+
+- Use semantic versioning (MAJOR.MINOR.PATCH)
+- Document changes in CHANGELOG.md
+- Tag releases in git
+
+## Deployment
+
+- Use scripts/deployment for automating the deployment process
+- Follow the release checklist in the documentation 
