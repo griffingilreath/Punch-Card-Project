@@ -724,6 +724,63 @@ class SettingsDialog(QDialog):
         separator2.setFrameShadow(QFrame.Shadow.Sunken)
         layout.addWidget(separator2)
         
+        # Message Prompt Section
+        prompt_group = QGroupBox("Message Generation Prompt")
+        prompt_layout = QVBoxLayout()
+        prompt_group.setLayout(prompt_layout)
+        
+        # Add description
+        prompt_description = QLabel("Set the prompt that will be sent to OpenAI to generate messages. This defines what kind of messages will be created.")
+        prompt_description.setWordWrap(True)
+        prompt_layout.addWidget(prompt_description)
+        
+        # Add prompt text editor
+        self.prompt_text = QTextEdit()
+        self.prompt_text.setPlaceholderText("Enter the prompt that will be sent to OpenAI...")
+        self.prompt_text.setMinimumHeight(80)
+        self.prompt_text.setStyleSheet(f"""
+            background-color: {COLORS['console_bg'].name()};
+            color: {COLORS['console_text'].name()};
+            border: 1px solid {COLORS['hole_outline'].name()};
+            {get_font_css(size=11)}
+        """)
+        # Set default prompt
+        self.prompt_text.setText("Generate a short, interesting message for a punch card display (15-30 characters). The message should be creative, mysterious, or thought-provoking. No hashtags, quotes, or special formatting. Keep it uppercase and simple.")
+        prompt_layout.addWidget(self.prompt_text)
+        
+        # Add preset buttons
+        preset_label = QLabel("Preset Prompts:")
+        prompt_layout.addWidget(preset_label)
+        
+        preset_layout = QHBoxLayout()
+        
+        creative_btn = RetroButton("Creative")
+        creative_btn.clicked.connect(lambda: self.set_preset_prompt("creative"))
+        preset_layout.addWidget(creative_btn)
+        
+        mystery_btn = RetroButton("Mystery")
+        mystery_btn.clicked.connect(lambda: self.set_preset_prompt("mystery"))
+        preset_layout.addWidget(mystery_btn)
+        
+        tech_btn = RetroButton("Retro Tech")
+        tech_btn.clicked.connect(lambda: self.set_preset_prompt("tech"))
+        preset_layout.addWidget(tech_btn)
+        
+        thought_btn = RetroButton("Thought-provoking")
+        thought_btn.clicked.connect(lambda: self.set_preset_prompt("thought"))
+        preset_layout.addWidget(thought_btn)
+        
+        prompt_layout.addLayout(preset_layout)
+        
+        # Add prompt group to main layout
+        layout.addWidget(prompt_group)
+        
+        # Add separator
+        separator3 = QFrame()
+        separator3.setFrameShape(QFrame.Shape.HLine)
+        separator3.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator3)
+        
         # Usage and Cost Tracking Section
         usage_group = QGroupBox("Usage and Cost Tracking")
         usage_layout = QVBoxLayout()
@@ -758,10 +815,10 @@ class SettingsDialog(QDialog):
         layout.addWidget(usage_group)
         
         # Add separator
-        separator3 = QFrame()
-        separator3.setFrameShape(QFrame.Shape.HLine)
-        separator3.setFrameShadow(QFrame.Shadow.Sunken)
-        layout.addWidget(separator3)
+        separator4 = QFrame()
+        separator4.setFrameShape(QFrame.Shape.HLine)
+        separator4.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator4)
         
         # Service status section
         service_group = QGroupBox("OpenAI Service Status")
@@ -1364,6 +1421,10 @@ class SettingsDialog(QDialog):
                 if "temperature" in settings:
                     temp_value = int(settings["temperature"] * 100)
                     self.temperature_slider.setValue(temp_value)
+                    
+                # Set prompt if it exists
+                if "openai_prompt" in settings:
+                    self.prompt_text.setText(settings["openai_prompt"])
                 
             except Exception as e:
                 print(f"Error loading settings: {e}")
@@ -1382,7 +1443,7 @@ class SettingsDialog(QDialog):
             # Display settings
             "led_delay": self.led_delay.value(),
             "interval": self.interval_spin.value(),
-            "message_display_time": self.message_display_time.value(),
+            "message_display_time": self.display_time_spin.value(),
             "delay_factor": self.delay_factor_spin.value(),
             "random_delay": self.random_delay.isChecked(),
             "show_splash": self.show_splash.isChecked(),
@@ -1403,7 +1464,8 @@ class SettingsDialog(QDialog):
             
             # OpenAI settings (don't overwrite API key if placeholder)
             "openai_model": self.model_combo.currentText(),
-            "temperature": float(self.temperature_slider.value()) / 100.0
+            "temperature": float(self.temperature_slider.value()) / 100.0,
+            "openai_prompt": self.prompt_text.toPlainText()
         }
         
         # API key - only save if it's not the placeholder
@@ -1480,6 +1542,24 @@ class SettingsDialog(QDialog):
         # Update values from settings
         self.update_card_dimensions()
 
+    def set_preset_prompt(self, preset_type: str):
+        """Set the prompt text based on predefined presets."""
+        presets = {
+            "creative": "Generate a short, creative message for a punch card display (15-30 characters). Make it artistic, imaginative, and unique. Focus on creativity and originality.",
+            
+            "mystery": "Generate a short, mysterious message for a punch card display (15-30 characters). Make it enigmatic, cryptic, and intriguing - like a clue to an unsolved mystery.",
+            
+            "tech": "Generate a short, retro computing message for a punch card display (15-30 characters). Reference vintage computers, programming, or tech concepts from the punch card era.",
+            
+            "thought": "Generate a short, philosophical message for a punch card display (15-30 characters). Make it thought-provoking, insightful, and contemplative. Focus on deep questions or realizations."
+        }
+        
+        if preset_type in presets:
+            self.prompt_text.setText(presets[preset_type])
+        else:
+            # Default prompt
+            self.prompt_text.setText("Generate a short, interesting message for a punch card display (15-30 characters). The message should be creative, mysterious, or thought-provoking. No hashtags, quotes, or special formatting. Keep it uppercase and simple.")
+
 class MessageGenerator:
     """Generates messages for display using OpenAI integration when available."""
     def __init__(self):
@@ -1509,9 +1589,11 @@ class MessageGenerator:
         try:
             from src.api.api_manager import APIManager
             self.api_manager = APIManager()
+            self.log(f"API manager initialized", "INFO")
             
             # Test API connection
             success, status, _ = self.api_manager.check_api_connection()
+            self.api_status = status
             self.use_api = success
             
             if success:
@@ -1521,6 +1603,7 @@ class MessageGenerator:
                 self.use_api = False
                 
         except Exception as e:
+            self.api_status = f"Error: {str(e)}"
             self.log(f"Failed to initialize API manager: {str(e)}. Using fallback messages.", "ERROR")
             self.use_api = False
     
@@ -1535,23 +1618,51 @@ class MessageGenerator:
         """Set a reference to the console logger."""
         self.console_logger = logger
     
+    def get_prompt_from_settings(self):
+        """Get the message generation prompt from settings."""
+        try:
+            import json
+            import os
+            
+            settings_path = "punch_card_settings.json"
+            
+            if os.path.exists(settings_path):
+                with open(settings_path, "r") as f:
+                    settings = json.load(f)
+                
+                if "openai_prompt" in settings and settings["openai_prompt"]:
+                    return settings["openai_prompt"]
+            
+            # If no settings file or no prompt in settings, return default prompt
+            return "Generate a short, interesting message for a punch card display (15-30 characters). The message should be creative, mysterious, or thought-provoking. No hashtags, quotes, or special formatting. Keep it uppercase and simple."
+            
+        except Exception as e:
+            self.log(f"Error loading prompt from settings: {str(e)}", "ERROR")
+            # Return default prompt on error
+            return "Generate a short, interesting message for a punch card display (15-30 characters). The message should be creative, mysterious, or thought-provoking. No hashtags, quotes, or special formatting. Keep it uppercase and simple."
+    
     def generate_message(self) -> str:
         """Generate a message using OpenAI API or fallback to predefined messages."""
         if not self.use_api or not self.api_manager:
-            # Fallback to predefined messages
+            # Log fallback message generation
+            self.log(f"Using fallback message (API status: {self.api_status})", "INFO")
             return random.choice(self.messages)
             
         try:
-            # Use API to generate message with appropriate prompt
-            prompt = "Generate a short, interesting message for a punch card display (15-30 characters). The message should be creative, mysterious, or thought-provoking. No hashtags, quotes, or special formatting. Keep it uppercase and simple."
+            # Use API to generate message with prompt from settings
+            prompt = self.get_prompt_from_settings()
             
-            # Log API request
-            self.log("Requesting message from OpenAI API", "INFO")
+            # Log API request with prompt info
+            self.log(f"Requesting message from OpenAI API with custom prompt", "INFO")
+            self.log(f"Prompt: {prompt[:50]}..." if len(prompt) > 50 else f"Prompt: {prompt}", "DEBUG")
             
             # Call OpenAI API via the manager
             success, message = self.api_manager.generate_message(prompt)
             
             if success:
+                # Log raw API response
+                self.log(f"Raw API response: {message}", "DEBUG")
+                
                 # Clean up message: remove quotes, limit length, convert to uppercase
                 message = message.strip()
                 if message.startswith('"') and message.endswith('"'):
@@ -1559,6 +1670,7 @@ class MessageGenerator:
                     
                 # Ensure message isn't too long (80 chars max for punch card)
                 if len(message) > 80:
+                    self.log(f"Message too long ({len(message)} chars), truncating", "WARNING")
                     message = message[:77] + "..."
                     
                 # Convert to uppercase
@@ -1568,11 +1680,15 @@ class MessageGenerator:
                 return message
             else:
                 self.log(f"API message generation failed: {message}", "ERROR")
+                self.api_status = f"Failed: {message}"
                 return random.choice(self.messages)
                 
         except Exception as e:
             self.log(f"Error generating message with API: {str(e)}", "ERROR")
-        return random.choice(self.messages)
+            import traceback
+            self.log(f"Traceback: {traceback.format_exc()}", "ERROR")
+            self.api_status = f"Error: {str(e)}"
+            return random.choice(self.messages)
 
 class HardwareDetector:
     """Detects and monitors hardware components like Raspberry Pi and LED controller."""
@@ -4067,10 +4183,12 @@ class PunchCardDisplay(QMainWindow):
         
     def show_api_settings(self):
         """Show the API settings tab in the settings dialog."""
-        if hasattr(self, 'settings'):
-            # Show the settings dialog with the API tab selected
-            self.settings.tab_widget.setCurrentIndex(2)  # API tab index
-            self.settings.exec()
+        self.update_status("Opening API Settings...")
+        # Create and show the settings dialog with API tab selected
+        from src.display.settings_dialog import SettingsDialog
+        settings_dialog = SettingsDialog(self)
+        settings_dialog.tab_widget.setCurrentIndex(2)  # OpenAI API tab index
+        settings_dialog.exec()
 
     def show_statistics_dialog(self):
         """Show/hide the statistics panel as an overlay in the main window."""
