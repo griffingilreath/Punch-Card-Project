@@ -55,6 +55,7 @@ from src.utils.colors import COLORS
 from src.utils.fonts import get_font, get_font_css, FONT_SIZE, FONT_FAMILY
 from src.utils.ui_components import RetroButton, ClassicTitleBar
 from src.utils.sound_manager import SoundManager
+from src.core.punch_card import PunchCardStats
 
 from src.display.settings_dialog import SettingsDialog
 
@@ -80,6 +81,24 @@ NOTCH_HEIGHT = int(6.35 * SCALE_FACTOR)   # 4/16 inch = 6.35mm
 # Number of rows and columns
 NUM_ROWS = 12
 NUM_COLS = 80
+
+class ConsoleLogger:
+    """Simple logger class that acts as a placeholder when no real console is available"""
+    def __init__(self):
+        self.logs = []
+        
+    def log(self, message, level="INFO"):
+        """Log a message with specified level"""
+        self.logs.append((level, message))
+        print(f"[{level}] {message}")
+
+    def show(self):
+        """Placeholder for show method"""
+        pass
+
+    def clear(self):
+        """Clear logs"""
+        self.logs = []
 
 class PunchCardWidget(QWidget):
     """Widget for displaying the minimalist punch card."""
@@ -2094,15 +2113,8 @@ class SoundControlWidget(QWidget):
     
     def open_sound_settings(self):
         """Open sound settings dialog."""
-        if self.parent() and hasattr(self.parent(), 'sound_settings'):
-            # Show the dialog
-            dialog = self.parent().sound_settings
-            dialog.show()
-            dialog.raise_()
-            dialog.activateWindow()
-            
-            # Update the menu bar icon state after dialog closes
-            dialog.finished.connect(self.update_icon_state)
+        if hasattr(self.menu_bar, 'sound_control'):
+            self.menu_bar.sound_control.open_sound_settings()
     
     def update_icon_state(self):
         """Update the icon state based on current sound settings."""
@@ -2358,13 +2370,15 @@ class InAppMenuBar(QWidget):
         # ---- Settings menu ----
         display_settings_action = self.settings_menu_popup.addAction("Display Settings...")
         sound_settings_action = self.settings_menu_popup.addAction("Sound Settings...")
+        statistics_action = self.settings_menu_popup.addAction("Statistics...")
         api_settings_action = self.settings_menu_popup.addAction("API Settings...")
         self.settings_menu_popup.addSeparator()
         inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
         
-        # Connect Settings menu signals
+        # Connect settings menu signals
         display_settings_action.triggered.connect(main_window.show_card_settings)
-        sound_settings_action.triggered.connect(lambda: main_window.sound_settings.show())
+        sound_settings_action.triggered.connect(lambda: main_window.menu_bar.sound_control.open_sound_settings())
+        statistics_action.triggered.connect(main_window.show_statistics_dialog)
         api_settings_action.triggered.connect(main_window.show_api_settings)
         inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
         
@@ -2423,27 +2437,39 @@ class PunchCardDisplay(QMainWindow):
     
     def __init__(self, punch_card=None):
         super().__init__()
-        self.setWindowTitle("Punch Card Display")
-        self.setMinimumSize(900, 600)
         
-        # Create console first for logging
+        # Create console window first
         self.console = ConsoleWindow(self)
-        self.console.show()  # Show console early for debugging
         
-        # Initialize sound manager early
+        # Initialize hardware detector
+        self.hardware_detector = HardwareDetector(self.console)
+        
+        # Initialize sound manager
         self.sound_manager = SoundManager(self.console)
         self.sound_manager.load_mac_system_sounds()
         
-        # Create sound settings dialog
-        self.sound_settings = SoundSettingsDialog(self)
+        # Update sound mappings to match SoundManager's defaults
+        self.sound_manager.update_sound_mappings({
+            'punch': 'Tink',
+            'complete': 'Glass',
+            'clear': 'Pop',
+            'startup': 'Hero',
+            'eject': 'Submarine',
+            'insert': 'Bottle'
+        })
         
-        # Connect sound settings signals
-        self.sound_settings.volume_changed.connect(self.on_sound_volume_changed)
-        self.sound_settings.mute_changed.connect(self.on_sound_mute_changed)
-        self.sound_settings.sound_mappings_changed.connect(self.on_sound_mappings_changed)
+        # Set window title
+        self.setWindowTitle("Punch Card Display")
         
-        # Store the punch card instance
-        self.punch_card_instance = punch_card
+        # Set window size and style
+        self.setMinimumSize(1000, 700)
+        
+        # Create central widget and layout
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.main_layout = QVBoxLayout(self.central_widget)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)  # No margins to allow full-width menu bar
+        self.main_layout.setSpacing(0)  # Reduce spacing to minimize shifts
         
         # Set window style and background color
         self.setStyleSheet(f"""
@@ -2453,13 +2479,6 @@ class PunchCardDisplay(QMainWindow):
                 {get_font_css(bold=False, size=FONT_SIZE)}
             }}
         """)
-        
-        # Create central widget and layout
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        self.main_layout = QVBoxLayout(central_widget)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)  # No margins to allow full-width menu bar
-        self.main_layout.setSpacing(0)  # Reduce spacing to minimize shifts
         
         # ================== MENU BAR SECTION ==================
         # Add custom in-app menu bar
@@ -2483,6 +2502,24 @@ class PunchCardDisplay(QMainWindow):
         content_layout.setContentsMargins(20, 20, 20, 20)  # Normal margins
         content_layout.setSpacing(10)  # EXACTLY 10px spacing between all elements
         self.main_layout.addWidget(content_container)
+        
+        # Create the stats panel but don't add it to the layout yet - it will be positioned when shown
+        self.stats_panel = StatsPanel(self)
+        self.stats_panel.hide()  # Initially hidden
+        
+        # Create the sound settings dialog
+        self.sound_settings_dialog = SoundSettingsDialog(self)
+        
+        # Connect sound settings signals
+        self.sound_settings_dialog.volume_changed.connect(self.on_sound_volume_changed)
+        self.sound_settings_dialog.mute_changed.connect(self.on_sound_mute_changed)
+        self.sound_settings_dialog.sound_mappings_changed.connect(self.on_sound_mappings_changed)
+        
+        # Store the punch card instance
+        self.punch_card_instance = punch_card
+        
+        # Use the stats from the punch card instance
+        self.stats = self.punch_card_instance.stats if punch_card else PunchCardStats()
         
         # ================== TOP SECTION (MESSAGE LABEL) ==================
         # Create message label in its own container
@@ -2766,6 +2803,13 @@ class PunchCardDisplay(QMainWindow):
         
         # Update label margins
         self.update_label_margins()
+        
+        # Update statistics
+        if hasattr(self, 'stats'):
+            self.stats.update_message_stats(message, message_type=source or "Local")
+            # Refresh stats panel if visible
+            if hasattr(self, 'stats_panel') and self.stats_panel.isVisible():
+                self.stats_panel.refresh_stats()
         
         self.update_status(f"PROCESSING: {message}")
         self.start_display()
@@ -3703,6 +3747,13 @@ class PunchCardDisplay(QMainWindow):
         # Update label margins
         self.update_label_margins()
         
+        # Update statistics
+        if hasattr(self, 'stats'):
+            self.stats.update_message_stats(message, message_type=source or "Local")
+            # Refresh stats panel if visible
+            if hasattr(self, 'stats_panel') and self.stats_panel.isVisible():
+                self.stats_panel.refresh_stats()
+        
         self.update_status(f"PROCESSING: {message}")
         self.start_display()
 
@@ -3795,6 +3846,35 @@ class PunchCardDisplay(QMainWindow):
         else:
             self.console.log("Failed to open Sound settings", "WARNING")
 
+    def show_statistics_dialog(self):
+        """Show/hide the statistics panel as an overlay in the main window."""
+        if self.stats_panel.isVisible():
+            self.stats_panel.hide()
+        else:
+            # Position the panel in the top-right corner of the window
+            x = self.width() - self.stats_panel.width() - 20
+            y = 60  # Below the menu bar
+            self.stats_panel.move(x, y)
+            
+            # Refresh stats before showing
+            self.stats_panel.refresh_stats()
+            
+            self.stats_panel.show()
+            self.stats_panel.raise_()  # Ensure it's on top
+
+    def resizeEvent(self, event):
+        """Handle window resize events."""
+        super().resizeEvent(event)
+        
+        # Update text element positions on resize
+        self.position_text_elements()
+        
+        # Update stats panel position if visible
+        if hasattr(self, 'stats_panel') and self.stats_panel.isVisible():
+            x = self.width() - self.stats_panel.width() - 20
+            y = 60  # Below the menu bar
+            self.stats_panel.move(x, y)
+
 class SoundSettingsDialog(QDialog):
     """Dialog for configuring sound settings."""
     
@@ -3823,9 +3903,8 @@ class SoundSettingsDialog(QDialog):
             QGroupBox {{
                 color: {COLORS['text'].name()};
                 border: 1px solid {COLORS['hole_outline'].name()};
-                border-radius: 5px;
-                margin-top: 1em;
-                padding: 10px;
+                border-radius: 0px;
+                margin-top: 1.5ex;
                 {get_font_css(size=12)}
             }}
             QCheckBox {{
@@ -4082,6 +4161,279 @@ class SoundSettingsDialog(QDialog):
         # Close dialog
         self.accept()
 
+class StatsPanel(QFrame):
+    """Panel for viewing punch card statistics in an angular and modular design."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumSize(450, 550)  # Slightly reduced size
+        self.setStyleSheet("""
+            QFrame {
+                background-color: black;
+                color: white;
+                border: 1px solid #444444;
+            }
+            QLabel {
+                color: white;
+                font-family: 'Courier New';
+                font-size: 12px;
+                padding: 1px;
+                min-width: 120px;  # Reduced minimum width
+            }
+            QGroupBox {
+                color: white;
+                border: 1px solid #444444;
+                border-radius: 0px;
+                margin-top: 1.5ex;
+                font-family: 'Courier New';
+                font-size: 12px;
+                font-weight: bold;
+                padding: 4px;  # Reduced padding
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                padding: 0 5px;  # Reduced padding
+                color: white;
+                font-family: 'Courier New';
+                font-size: 12px;
+                font-weight: bold;
+            }
+        """)
+        
+        # Main layout
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)  # Reduced margins
+        layout.setSpacing(8)  # Reduced spacing
+        
+        # Header
+        header_label = QLabel("📊 Punch Card Statistics")
+        header_label.setStyleSheet(f"{get_font_css(size=14, bold=True)}")  # Reduced size
+        layout.addWidget(header_label)
+        
+        # Stats content layout
+        content_layout = QVBoxLayout()
+        content_layout.setSpacing(8)  # Reduced spacing
+        layout.addLayout(content_layout)
+        
+        # Add General Stats
+        self.general_group = QGroupBox("General Statistics")
+        general_layout = QGridLayout()
+        self.general_group.setLayout(general_layout)
+        general_layout.setContentsMargins(8, 15, 8, 8)  # Reduced margins
+        general_layout.setSpacing(4)  # Reduced spacing
+        general_layout.setColumnMinimumWidth(1, 120)  # Reduced minimum width
+        
+        # We'll populate these in update_stats
+        self.cards_processed_label = QLabel("0")
+        self.total_holes_label = QLabel("0")
+        self.avg_msg_length_label = QLabel("0.00 characters")
+        self.processing_rate_label = QLabel("0.00 cards/hour")
+        self.most_used_char_label = QLabel("None")
+        self.least_used_char_label = QLabel("None")
+        
+        # Set alignment for all value labels
+        for label in [self.cards_processed_label, self.total_holes_label, 
+                     self.avg_msg_length_label, self.processing_rate_label,
+                     self.most_used_char_label, self.least_used_char_label]:
+            label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            label.setMinimumWidth(120)  # Reduced minimum width
+        
+        general_layout.addWidget(QLabel("Cards Processed:"), 0, 0)
+        general_layout.addWidget(self.cards_processed_label, 0, 1)
+        
+        general_layout.addWidget(QLabel("Total Holes:"), 1, 0)
+        general_layout.addWidget(self.total_holes_label, 1, 1)
+        
+        general_layout.addWidget(QLabel("Avg Message Length:"), 2, 0)
+        general_layout.addWidget(self.avg_msg_length_label, 2, 1)
+        
+        general_layout.addWidget(QLabel("Processing Rate:"), 3, 0)
+        general_layout.addWidget(self.processing_rate_label, 3, 1)
+        
+        general_layout.addWidget(QLabel("Most Used Char:"), 4, 0)
+        general_layout.addWidget(self.most_used_char_label, 4, 1)
+        
+        general_layout.addWidget(QLabel("Least Used Char:"), 5, 0)
+        general_layout.addWidget(self.least_used_char_label, 5, 1)
+        
+        content_layout.addWidget(self.general_group)
+        
+        # Message Types
+        self.types_group = QGroupBox("Message Types")
+        types_layout = QGridLayout()
+        self.types_group.setLayout(types_layout)
+        types_layout.setContentsMargins(8, 15, 8, 8)  # Reduced margins
+        types_layout.setSpacing(4)  # Reduced spacing
+        types_layout.setColumnMinimumWidth(1, 120)  # Reduced minimum width
+        
+        self.local_count_label = QLabel("0")
+        self.ai_count_label = QLabel("0")
+        self.database_count_label = QLabel("0")
+        self.other_count_label = QLabel("0")
+        
+        # Set alignment for all value labels
+        for label in [self.local_count_label, self.ai_count_label,
+                     self.database_count_label, self.other_count_label]:
+            label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            label.setMinimumWidth(120)  # Reduced minimum width
+        
+        types_layout.addWidget(QLabel("Local:"), 0, 0)
+        types_layout.addWidget(self.local_count_label, 0, 1)
+        
+        types_layout.addWidget(QLabel("AI:"), 1, 0)
+        types_layout.addWidget(self.ai_count_label, 1, 1)
+        
+        types_layout.addWidget(QLabel("Database:"), 2, 0)
+        types_layout.addWidget(self.database_count_label, 2, 1)
+        
+        types_layout.addWidget(QLabel("Other:"), 3, 0)
+        types_layout.addWidget(self.other_count_label, 3, 1)
+        
+        content_layout.addWidget(self.types_group)
+        
+        # Error Statistics
+        self.error_group = QGroupBox("Error Statistics")
+        error_layout = QGridLayout()
+        self.error_group.setLayout(error_layout)
+        error_layout.setContentsMargins(8, 15, 8, 8)  # Reduced margins
+        error_layout.setSpacing(4)  # Reduced spacing
+        error_layout.setColumnMinimumWidth(1, 120)  # Reduced minimum width
+        
+        self.encoding_errors_label = QLabel("0")
+        self.invalid_chars_label = QLabel("0")
+        self.msg_too_long_label = QLabel("0")
+        self.other_errors_label = QLabel("0")
+        
+        # Set alignment for all value labels
+        for label in [self.encoding_errors_label, self.invalid_chars_label,
+                     self.msg_too_long_label, self.other_errors_label]:
+            label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            label.setMinimumWidth(120)  # Reduced minimum width
+        
+        error_layout.addWidget(QLabel("Encoding Errors:"), 0, 0)
+        error_layout.addWidget(self.encoding_errors_label, 0, 1)
+        
+        error_layout.addWidget(QLabel("Invalid Characters:"), 1, 0)
+        error_layout.addWidget(self.invalid_chars_label, 1, 1)
+        
+        error_layout.addWidget(QLabel("Message Too Long:"), 2, 0)
+        error_layout.addWidget(self.msg_too_long_label, 2, 1)
+        
+        error_layout.addWidget(QLabel("Other Errors:"), 3, 0)
+        error_layout.addWidget(self.other_errors_label, 3, 1)
+        
+        content_layout.addWidget(self.error_group)
+        
+        # Add buttons with more spacing
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(8)  # Reduced spacing
+        
+        self.refresh_btn = RetroButton("Refresh")
+        self.refresh_btn.clicked.connect(self.refresh_stats)
+        button_layout.addWidget(self.refresh_btn)
+        
+        self.reset_btn = RetroButton("Reset")
+        self.reset_btn.clicked.connect(self.reset_stats)
+        button_layout.addWidget(self.reset_btn)
+        
+        button_layout.addStretch()
+        
+        self.close_btn = RetroButton("Close")
+        self.close_btn.clicked.connect(self.hide)
+        button_layout.addWidget(self.close_btn)
+        
+        layout.addLayout(button_layout)
+        
+        # Add a refresh timer to update stats periodically 
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.timeout.connect(self.refresh_stats)
+        self.refresh_timer.setInterval(5000)  # 5 seconds
+        
+    def showEvent(self, event):
+        """Handle show event to update stats and start refresh timer."""
+        super().showEvent(event)
+        self.refresh_stats()
+        self.refresh_timer.start(5000)  # Refresh every 5 seconds
+    
+    def hideEvent(self, event):
+        """Handle hide event to stop refresh timer."""
+        super().hideEvent(event)
+        if hasattr(self, 'refresh_timer') and self.refresh_timer.isActive():
+            self.refresh_timer.stop()
+    
+    def refresh_stats(self):
+        """Refresh the statistics display."""
+        if not hasattr(self.parent(), 'stats'):
+            return
+            
+        stats = self.parent().stats.get_stats()
+        
+        # Update general stats
+        self.cards_processed_label.setText(f"{stats.get('cards_processed', 0):,}")
+        self.total_holes_label.setText(f"{stats.get('total_holes', 0):,}")
+        
+        avg_msg_length = stats.get('average_message_length', 0)
+        self.avg_msg_length_label.setText(f"{avg_msg_length:.2f} characters")
+        
+        processing_rate = stats.get('processing_rate', 0)
+        self.processing_rate_label.setText(f"{processing_rate:.2f} cards/hour")
+        
+        most_used = stats.get('most_used_char', '')
+        if most_used:
+            self.most_used_char_label.setText(f"'{most_used}'")
+        else:
+            self.most_used_char_label.setText("None")
+            
+        least_used = stats.get('least_used_char', '')
+        if least_used:
+            self.least_used_char_label.setText(f"'{least_used}'")
+        else:
+            self.least_used_char_label.setText("None")
+        
+        # Update message types
+        message_types = stats.get('message_types', {})
+        self.local_count_label.setText(f"{message_types.get('Local', 0):,}")
+        self.ai_count_label.setText(f"{message_types.get('AI', 0):,}")
+        self.database_count_label.setText(f"{message_types.get('Database', 0):,}")
+        self.other_count_label.setText(f"{message_types.get('Other', 0):,}")
+        
+        # Update error stats
+        error_stats = stats.get('error_stats', {})
+        self.encoding_errors_label.setText(f"{error_stats.get('encoding_errors', 0):,}")
+        self.invalid_chars_label.setText(f"{error_stats.get('invalid_characters', 0):,}")
+        self.msg_too_long_label.setText(f"{error_stats.get('message_too_long', 0):,}")
+        self.other_errors_label.setText(f"{error_stats.get('other_errors', 0):,}")
+    
+    def reset_stats(self):
+        """Reset the statistics."""
+        confirm = QMessageBox.question(
+            self, 
+            "Reset Statistics",
+            "Are you sure you want to reset all punch card statistics?\nThis cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            if hasattr(self.parent(), 'stats'):
+                # Create a new PunchCardStats instance with default values
+                self.parent().stats = PunchCardStats()
+                QMessageBox.information(
+                    self, 
+                    "Statistics Reset",
+                    "Punch card statistics have been reset."
+                )
+                self.refresh_stats()
+    
+    def paintEvent(self, event):
+        """Custom paint event to draw an angular border."""
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Draw border
+        painter.setPen(QPen(QColor(COLORS['hole_outline']), 1))
+        painter.drawRect(self.rect().adjusted(0, 0, -1, -1))
 
 def run_gui_app():
     """

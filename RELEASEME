@@ -1,0 +1,15 @@
+# Punch Card Project Release Notes
+
+## Version 0.6.9 (2024-02-14)
+- Enhanced statistics panel with improved layout and visibility
+- Added real-time statistics tracking for punch card operations
+- Improved text field sizing and alignment in statistics window
+- Added automatic refresh of statistics every 5 seconds
+- Fixed padding and margin issues in statistics display
+- Improved error handling and logging for statistics tracking
+- Added support for saving and loading statistics between sessions
+
+Note: Please add a screenshot of the statistics panel to docs/images/stats_panel_0.6.9.png
+
+## Version 0.6.8 (2024-02-13)
+// ... existing code ... 
