@@ -383,7 +383,7 @@ class PunchCardStats:
         except Exception as e:
             print(f"Warning: Could not save stats to file: {e}")
     
-    def update_message_stats(self, message: str):
+    def update_message_stats(self, message: str, message_type: str = "Local"):
         """Update statistics for a processed message"""
         self.stats['cards_processed'] += 1
         self.stats['last_update'] = time.time()
