@@ -1478,8 +1478,9 @@ class SettingsDialog(QDialog):
         self.update_card_dimensions()
 
 class MessageGenerator:
-    """Generates random messages for display."""
+    """Generates messages for display using OpenAI integration when available."""
     def __init__(self):
+        # Fallback messages when API is not available
         self.messages = [
             "HELLO WORLD",
             "WELCOME TO THE PUNCH CARD DISPLAY",
@@ -1492,10 +1493,82 @@ class MessageGenerator:
             "HISTORY IN HOLES",
             "DATA PUNCHED IN TIME"
         ]
+        
+        # Initialize API manager reference (will be set later)
+        self.api_manager = None
+        self.console_logger = None
+        self.use_api = True
+        self.init_api_manager()
+    
+    def init_api_manager(self):
+        """Initialize the API manager reference."""
+        try:
+            from src.api.api_manager import APIManager
+            self.api_manager = APIManager()
+            
+            # Test API connection
+            success, status, _ = self.api_manager.check_api_connection()
+            self.use_api = success
+            
+            if success:
+                self.log(f"API connection successful: {status}", "SUCCESS")
+            else:
+                self.log(f"API connection failed: {status}. Using fallback messages.", "WARNING")
+                self.use_api = False
+                
+        except Exception as e:
+            self.log(f"Failed to initialize API manager: {str(e)}. Using fallback messages.", "ERROR")
+            self.use_api = False
+    
+    def log(self, message, level="INFO"):
+        """Log a message if console logger is available."""
+        if self.console_logger:
+            self.console_logger.log(message, level)
+        else:
+            print(f"[{level}] {message}")
+    
+    def set_console_logger(self, logger):
+        """Set a reference to the console logger."""
+        self.console_logger = logger
     
     def generate_message(self) -> str:
-        """Generate a random message."""
-        return random.choice(self.messages)
+        """Generate a message using OpenAI API or fallback to predefined messages."""
+        if not self.use_api or not self.api_manager:
+            # Fallback to predefined messages
+            return random.choice(self.messages)
+            
+        try:
+            # Use API to generate message with appropriate prompt
+            prompt = "Generate a short, interesting message for a punch card display (15-30 characters). The message should be creative, mysterious, or thought-provoking. No hashtags, quotes, or special formatting. Keep it uppercase and simple."
+            
+            # Log API request
+            self.log("Requesting message from OpenAI API", "INFO")
+            
+            # Call OpenAI API via the manager
+            success, message = self.api_manager.generate_message(prompt)
+            
+            if success:
+                # Clean up message: remove quotes, limit length, convert to uppercase
+                message = message.strip()
+                if message.startswith('"') and message.endswith('"'):
+                    message = message[1:-1]
+                    
+                # Ensure message isn't too long (80 chars max for punch card)
+                if len(message) > 80:
+                    message = message[:77] + "..."
+                    
+                # Convert to uppercase
+                message = message.upper()
+                
+                self.log(f"Generated message via API: {message}", "SUCCESS")
+                return message
+            else:
+                self.log(f"API message generation failed: {message}", "ERROR")
+                return random.choice(self.messages)
+                
+        except Exception as e:
+            self.log(f"Error generating message with API: {str(e)}", "ERROR")
+            return random.choice(self.messages)
 
 class HardwareDetector:
     """Detects and monitors hardware components like Raspberry Pi and LED controller."""
@@ -2688,6 +2761,11 @@ class PunchCardDisplay(QMainWindow):
         # Load settings from file
         self.load_settings()
         
+        # Provide console logger to the message generator
+        if hasattr(self, 'console'):
+            self.message_generator.set_console_logger(self.console)
+            self.console.log("MessageGenerator initialized with console logger", "INFO")
+    
     def on_sound_volume_changed(self, value):
         """Handle volume changes from sound settings."""
         if hasattr(self, 'sound_manager'):
@@ -3620,15 +3698,35 @@ class PunchCardDisplay(QMainWindow):
         QTimer.singleShot(500, self.start_animation)
 
     def generate_next_message(self):
-        """Generate and display the next random message."""
+        """Generate and display the next message, using OpenAI API when available."""
         # Only generate messages when not running, not showing splash screen, and no animation is playing
         if (not self.running and 
             not self.showing_splash and 
             hasattr(self, 'animation_manager') and 
             self.animation_manager.state != AnimationState.PLAYING):
             
+            # Update status to show we're generating a message
+            self.update_status("GENERATING MESSAGE...")
+            
+            # Update console with info about message source
+            if self.message_generator.use_api and self.message_generator.api_manager:
+                self.console.log("Generating message using OpenAI API", "INFO")
+            else:
+                self.console.log("Generating message using predefined templates", "INFO")
+            
+            # Generate the message
             message = self.message_generator.generate_message()
-            self.display_message(message)
+            
+            # Determine source for statistics tracking
+            source = "OpenAI" if self.message_generator.use_api else "Local"
+            
+            # Display the message with correct source
+            self.display_message(message, source=source)
+            
+            # Update API console if we're using the API
+            if hasattr(self, 'api_console') and self.message_generator.use_api:
+                self.api_console.log(f"Generated message: {message}", "INFO")
+                
         else:
             # Log reason for skipping message generation
             if self.running:
@@ -3823,6 +3921,8 @@ class PunchCardDisplay(QMainWindow):
         # File menu
         file_menu = menubar.addMenu("File")
         file_menu.addAction("New Message", self.new_message)
+        # Add a specific action for generating OpenAI messages
+        openai_action = file_menu.addAction("Generate Message with OpenAI", self.generate_openai_message)
         file_menu.addAction("Open Message", self.open_message)
         file_menu.addAction("Save Message", self.save_message)
         file_menu.addSeparator()
@@ -3831,20 +3931,71 @@ class PunchCardDisplay(QMainWindow):
         # Settings menu
         settings_menu = menubar.addMenu("Settings")
         settings_menu.addAction("Sound Settings", self.open_sound_settings)
+        settings_menu.addAction("API Settings", self.show_api_settings)
         
         # Help menu
         help_menu = menubar.addMenu("Help")
         help_menu.addAction("About", self.show_about)
         help_menu.addAction("Documentation", self.show_documentation)
-    
-    def open_sound_settings(self):
-        """Open macOS System Settings to Sound settings."""
-        from src.utils.sound_manager import get_sound_manager
-        sound_manager = get_sound_manager(self.console)
-        if sound_manager.open_sound_settings():
-            self.console.log("Opened Sound settings", "INFO")
-        else:
-            self.console.log("Failed to open Sound settings", "WARNING")
+        
+    def generate_openai_message(self):
+        """Generate a message specifically using the OpenAI API."""
+        # Only proceed if not already displaying a message
+        if self.running or self.showing_splash:
+            self.console.log("Cannot generate message now: already displaying message or splash screen", "WARNING")
+            return
+            
+        # Check if API is available
+        if not hasattr(self.message_generator, 'api_manager') or not self.message_generator.api_manager:
+            self.console.log("OpenAI API manager not initialized", "ERROR")
+            QMessageBox.warning(self, "API Error", "The OpenAI API is not properly configured. Please check your API settings.")
+            return
+            
+        # Force API usage even if it was disabled
+        original_use_api = self.message_generator.use_api
+        self.message_generator.use_api = True
+        
+        # Update status
+        self.update_status("REQUESTING MESSAGE FROM OPENAI...")
+        
+        # Try to generate message
+        try:
+            self.console.log("Requesting message from OpenAI API", "INFO")
+            
+            # Generate message
+            message = self.message_generator.generate_message()
+            
+            # Display message with OpenAI source
+            self.display_message(message, source="OpenAI")
+            
+            # Show API console
+            if hasattr(self, 'api_console'):
+                self.api_console.log(f"Successfully generated message: {message}", "RESPONSE")
+                
+            # Update status if needed
+            if not self.running:
+                self.update_status("READY")
+                
+        except Exception as e:
+            # Restore original API usage setting
+            self.message_generator.use_api = original_use_api
+            
+            # Log error
+            error_msg = f"Failed to generate message with OpenAI API: {str(e)}"
+            self.console.log(error_msg, "ERROR")
+            
+            # Show error message
+            QMessageBox.critical(self, "API Error", f"Failed to generate message with OpenAI API:\n\n{str(e)}")
+            
+            # Update status
+            self.update_status("ERROR: API REQUEST FAILED")
+        
+    def show_api_settings(self):
+        """Show the API settings tab in the settings dialog."""
+        if hasattr(self, 'settings'):
+            # Show the settings dialog with the API tab selected
+            self.settings.tab_widget.setCurrentIndex(2)  # API tab index
+            self.settings.exec()
 
     def show_statistics_dialog(self):
         """Show/hide the statistics panel as an overlay in the main window."""
