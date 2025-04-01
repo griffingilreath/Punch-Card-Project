@@ -30,7 +30,7 @@ from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QProgressBar, QSplitter, QGridLayout,
     QSpinBox, QFrame, QSlider, QTabWidget, QTextEdit, QSpacerItem,
     QSizePolicy, QFormLayout, QDoubleSpinBox, QGroupBox, QDialogButtonBox,
-    QWidgetAction
+    QWidgetAction, QListWidget
 )
 from PyQt6.QtCore import (
     Qt, QTimer, QThread, pyqtSignal, QSize, QRect, 
@@ -56,6 +56,9 @@ from src.utils.fonts import get_font, get_font_css, FONT_SIZE, FONT_FAMILY
 from src.utils.ui_components import RetroButton, ClassicTitleBar
 from src.utils.sound_manager import SoundManager
 from src.core.punch_card import PunchCardStats
+
+# Import database class for message storage
+from src.core.message_database import MessageDatabase
 
 from src.display.settings_dialog import SettingsDialog
 
@@ -2531,6 +2534,10 @@ class PunchCardDisplay(QMainWindow):
             'insert': 'Bottle'
         })
         
+        # Initialize message database for persistent storage
+        self.message_db = MessageDatabase("message_history.json")
+        self.console.log(f"Message database initialized with {self.message_db.get_message_count()} messages", "INFO")
+        
         # Set window title
         self.setWindowTitle("Punch Card Display")
         
@@ -2882,6 +2889,11 @@ class PunchCardDisplay(QMainWindow):
         # Update label margins
         self.update_label_margins()
         
+        # Save the message to the database
+        if hasattr(self, 'message_db'):
+            self.message_number = self.message_db.add_message(message, source)
+            self.console.log(f"Message saved to database with ID #{self.message_number}", "INFO")
+        
         # Update statistics
         if hasattr(self, 'stats'):
             self.stats.update_message_stats(message, message_type=source or "Local")
@@ -2924,6 +2936,11 @@ class PunchCardDisplay(QMainWindow):
             
             # Play completion sound (non-blocking)
             self.play_sound("complete")
+            
+            # Update the message's display time in the database
+            if hasattr(self, 'message_db') and hasattr(self, 'message_number'):
+                self.message_db.update_display_time(self.message_number)
+                self.console.log(f"Updated display time for message #{self.message_number} in database", "INFO")
             
             # Update status
             self.update_status("DISPLAY COMPLETE")
@@ -3845,6 +3862,11 @@ class PunchCardDisplay(QMainWindow):
         # Update label margins
         self.update_label_margins()
         
+        # Save the message to the database
+        if hasattr(self, 'message_db'):
+            self.message_number = self.message_db.add_message(message, source)
+            self.console.log(f"Message saved to database with ID #{self.message_number}", "INFO")
+        
         # Update statistics
         if hasattr(self, 'stats'):
             self.stats.update_message_stats(message, message_type=source or "Local")
@@ -3926,12 +3948,16 @@ class PunchCardDisplay(QMainWindow):
         file_menu.addAction("Open Message", self.open_message)
         file_menu.addAction("Save Message", self.save_message)
         file_menu.addSeparator()
+        # Add browse database option
+        file_menu.addAction("Browse Database", self.browse_database)
+        file_menu.addSeparator()
         file_menu.addAction("Exit", self.close)
         
         # Settings menu
         settings_menu = menubar.addMenu("Settings")
         settings_menu.addAction("Sound Settings", self.open_sound_settings)
         settings_menu.addAction("API Settings", self.show_api_settings)
+        settings_menu.addAction("Database Statistics", self.show_message_stats)
         
         # Help menu
         help_menu = menubar.addMenu("Help")
@@ -4025,6 +4051,743 @@ class PunchCardDisplay(QMainWindow):
             x = self.width() - self.stats_panel.width() - 20
             y = 60  # Below the menu bar
             self.stats_panel.move(x, y)
+
+    def open_message(self):
+        """Open a message from the database."""
+        if not hasattr(self, 'message_db'):
+            QMessageBox.warning(self, "Database Error", "Message database not initialized.")
+            return
+            
+        # If we're already displaying a message, ask for confirmation
+        if self.running:
+            confirm = QMessageBox.question(
+                self, 
+                "Confirm Open", 
+                "Opening a message will stop the current display. Continue?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if confirm != QMessageBox.StandardButton.Yes:
+                return
+            
+            # Stop the current display
+            self.timer.stop()
+            self.running = False
+            
+        # Create a simple dialog to enter a message number
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Open Message")
+        dialog.setMinimumWidth(300)
+        
+        # Use the app's dark theme
+        dialog.setStyleSheet(f"""
+            QDialog {{
+                background-color: {COLORS['background'].name()};
+                color: {COLORS['text'].name()};
+            }}
+            QLabel {{
+                color: {COLORS['text'].name()};
+                {get_font_css(size=12)}
+            }}
+            QLineEdit {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+                border-radius: 3px;
+            }}
+            QPushButton {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px 10px;
+                border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['button_hover'].name()};
+            }}
+        """)
+        
+        layout = QVBoxLayout(dialog)
+        
+        # Add message number input
+        input_layout = QFormLayout()
+        message_number_input = QLineEdit()
+        message_number_input.setPlaceholderText("Enter message number")
+        input_layout.addRow("Message #:", message_number_input)
+        layout.addLayout(input_layout)
+        
+        # Add message count info
+        message_count = self.message_db.get_message_count()
+        info_label = QLabel(f"Database contains {message_count} messages.")
+        layout.addWidget(info_label)
+        
+        # Show recent messages if available
+        if message_count > 0:
+            recent_label = QLabel("Recent messages:")
+            layout.addWidget(recent_label)
+            
+            # Get the last 5 messages (or fewer if there aren't that many)
+            recent_messages = []
+            for i in range(max(1, self.message_db.current_message_number - 4), self.message_db.current_message_number + 1):
+                msg = self.message_db.get_message(i)
+                if msg:
+                    recent_messages.append((msg.message_number, msg.content[:20] + "..." if len(msg.content) > 20 else msg.content))
+            
+            # Display recent messages
+            for number, preview in recent_messages:
+                message_btn = QPushButton(f"#{number}: {preview}")
+                message_btn.clicked.connect(lambda _, n=number: message_number_input.setText(str(n)))
+                layout.addWidget(message_btn)
+        
+        # Add buttons
+        button_layout = QHBoxLayout()
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.clicked.connect(dialog.reject)
+        open_btn = QPushButton("Open")
+        open_btn.clicked.connect(dialog.accept)
+        button_layout.addWidget(cancel_btn)
+        button_layout.addWidget(open_btn)
+        layout.addLayout(button_layout)
+        
+        # Show the dialog
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+            
+        # Get the message number from input
+        try:
+            message_number = int(message_number_input.text())
+        except ValueError:
+            QMessageBox.warning(self, "Invalid Input", "Please enter a valid message number.")
+            return
+            
+        # Try to get the message from database
+        message_record = self.message_db.get_message(message_number)
+        if not message_record:
+            QMessageBox.warning(self, "Message Not Found", f"Message #{message_number} was not found in the database.")
+            return
+            
+        # Display the message
+        self.display_message(message_record.content, source=message_record.source)
+        self.console.log(f"Opened message #{message_number} from database", "INFO")
+    
+    def save_message(self):
+        """Save the current message to a text file."""
+        if not self.current_message:
+            QMessageBox.warning(self, "No Message", "There is no message to save.")
+            return
+            
+        # Get the message number
+        message_number = getattr(self, 'message_number', 0)
+        
+        # Create a formatted message with metadata
+        formatted_message = f"Message #{message_number}:\n{self.current_message}"
+        
+        # Add source if available
+        if hasattr(self, 'message_db') and message_number > 0:
+            message_record = self.message_db.get_message(message_number)
+            if message_record:
+                formatted_message = (
+                    f"Message #{message_number}\n"
+                    f"Content: {message_record.content}\n"
+                    f"Source: {message_record.source}\n"
+                    f"Generated: {message_record.generated_at}\n"
+                    f"Last displayed: {message_record.last_displayed or 'Never'}\n"
+                    f"Display count: {message_record.display_count}"
+                )
+        
+        # Ask for a file location to save
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Message",
+            f"message_{message_number}.txt",
+            "Text Files (*.txt);;All Files (*)"
+        )
+        
+        if not file_path:
+            return  # User cancelled
+            
+        # Save to file
+        try:
+            with open(file_path, 'w') as file:
+                file.write(formatted_message)
+            self.console.log(f"Message saved to {file_path}", "INFO")
+            QMessageBox.information(self, "Message Saved", f"Message saved successfully to {file_path}")
+        except Exception as e:
+            self.console.log(f"Error saving message: {str(e)}", "ERROR")
+            QMessageBox.critical(self, "Save Error", f"Failed to save message: {str(e)}")
+
+    def browse_database(self):
+        """Browse and search messages in the database."""
+        if not hasattr(self, 'message_db'):
+            QMessageBox.warning(self, "Database Error", "Message database not initialized.")
+            return
+            
+        # Create dialog
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Message Database Browser")
+        dialog.resize(600, 500)
+        
+        # Use app's dark theme
+        dialog.setStyleSheet(f"""
+            QDialog {{
+                background-color: {COLORS['background'].name()};
+                color: {COLORS['text'].name()};
+            }}
+            QLabel {{
+                color: {COLORS['text'].name()};
+                {get_font_css(size=12)}
+            }}
+            QLineEdit {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+                border-radius: 3px;
+            }}
+            QTextEdit {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+            }}
+            QPushButton {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px 10px;
+                border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['button_hover'].name()};
+            }}
+            QListWidget {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+                border-radius: 3px;
+            }}
+            QListWidget::item:selected {{
+                background-color: {COLORS['button_hover'].name()};
+            }}
+        """)
+        
+        # Create layout
+        layout = QVBoxLayout(dialog)
+        
+        # Add database stats
+        stats_label = QLabel(f"Database contains {self.message_db.get_message_count()} messages")
+        layout.addWidget(stats_label)
+        
+        # Add search box
+        search_layout = QHBoxLayout()
+        search_input = QLineEdit()
+        search_input.setPlaceholderText("Search messages...")
+        search_btn = QPushButton("Search")
+        search_layout.addWidget(search_input)
+        search_layout.addWidget(search_btn)
+        layout.addLayout(search_layout)
+        
+        # Add message list
+        message_list = QListWidget()
+        layout.addWidget(message_list, 1)  # 1 = stretch factor to fill space
+        
+        # Add message details area
+        details_layout = QHBoxLayout()
+        message_details = QTextEdit()
+        message_details.setReadOnly(True)
+        details_layout.addWidget(message_details)
+        layout.addLayout(details_layout)
+        
+        # Add action buttons
+        button_layout = QHBoxLayout()
+        open_btn = QPushButton("Open Selected")
+        export_btn = QPushButton("Export All")
+        close_btn = QPushButton("Close")
+        button_layout.addWidget(open_btn)
+        button_layout.addWidget(export_btn)
+        button_layout.addStretch()
+        button_layout.addWidget(close_btn)
+        layout.addLayout(button_layout)
+        
+        # Function to populate the message list
+        def populate_message_list(search_text=""):
+            message_list.clear()
+            search_text = search_text.lower()
+            
+            for message in self.message_db.messages:
+                # Apply search filter if provided
+                if search_text and search_text not in message.content.lower():
+                    continue
+                    
+                # Create list item with preview
+                preview = message.content[:40] + "..." if len(message.content) > 40 else message.content
+                item_text = f"#{message.message_number} [{message.source}]: {preview}"
+                message_list.addItem(item_text)
+        
+        # Function to update message details when selection changes
+        def update_message_details():
+            selected_items = message_list.selectedItems()
+            if not selected_items:
+                message_details.clear()
+                return
+                
+            # Extract message number from the selected item text
+            item_text = selected_items[0].text()
+            try:
+                # Extract message number from "#{number} [source]: preview"
+                message_number = int(item_text.split('#')[1].split(' ')[0])
+                message_record = self.message_db.get_message(message_number)
+                
+                if message_record:
+                    details = (
+                        f"Message #{message_record.message_number}\n\n"
+                        f"Content:\n{message_record.content}\n\n"
+                        f"Source: {message_record.source}\n"
+                        f"Generated: {message_record.generated_at}\n"
+                        f"Last displayed: {message_record.last_displayed or 'Never'}\n"
+                        f"Display count: {message_record.display_count}"
+                    )
+                    message_details.setText(details)
+                else:
+                    message_details.setText("Message details not found.")
+            except (ValueError, IndexError):
+                message_details.setText("Could not parse message number.")
+        
+        # Connect signals
+        search_btn.clicked.connect(lambda: populate_message_list(search_input.text()))
+        search_input.returnPressed.connect(lambda: populate_message_list(search_input.text()))
+        message_list.itemSelectionChanged.connect(update_message_details)
+        close_btn.clicked.connect(dialog.close)
+        
+        # Function to open selected message
+        def open_selected_message():
+            selected_items = message_list.selectedItems()
+            if not selected_items:
+                return
+                
+            # Extract message number from the selected item text
+            item_text = selected_items[0].text()
+            try:
+                message_number = int(item_text.split('#')[1].split(' ')[0])
+                message_record = self.message_db.get_message(message_number)
+                
+                if message_record:
+                    dialog.accept()  # Close the dialog
+                    # Display the message
+                    self.display_message(message_record.content, source=message_record.source)
+                    self.console.log(f"Opened message #{message_number} from database browser", "INFO")
+            except (ValueError, IndexError):
+                QMessageBox.warning(dialog, "Error", "Could not parse message number.")
+        
+        # Function to export all messages
+        def export_all_messages():
+            if not self.message_db.messages:
+                QMessageBox.information(dialog, "Export", "No messages to export.")
+                return
+                
+            # Ask for a file location to save
+            file_path, _ = QFileDialog.getSaveFileName(
+                dialog,
+                "Export All Messages",
+                "all_messages.txt",
+                "Text Files (*.txt);;JSON Files (*.json);;All Files (*)"
+            )
+            
+            if not file_path:
+                return  # User cancelled
+                
+            try:
+                if file_path.lower().endswith('.json'):
+                    # Export as JSON
+                    with open(file_path, 'w') as file:
+                        data = {
+                            'messages': [
+                                {
+                                    'message_number': msg.message_number,
+                                    'content': msg.content,
+                                    'source': msg.source,
+                                    'generated_at': msg.generated_at,
+                                    'last_displayed': msg.last_displayed,
+                                    'display_count': msg.display_count
+                                }
+                                for msg in self.message_db.messages
+                            ],
+                            'export_date': datetime.datetime.now().isoformat()
+                        }
+                        json.dump(data, file, indent=2)
+                else:
+                    # Export as text
+                    with open(file_path, 'w') as file:
+                        file.write(f"Punch Card Message Database Export\n")
+                        file.write(f"Generated: {datetime.datetime.now().isoformat()}\n")
+                        file.write(f"Total Messages: {len(self.message_db.messages)}\n\n")
+                        
+                        for msg in self.message_db.messages:
+                            file.write(f"--- Message #{msg.message_number} ---\n")
+                            file.write(f"Content: {msg.content}\n")
+                            file.write(f"Source: {msg.source}\n")
+                            file.write(f"Generated: {msg.generated_at}\n")
+                            file.write(f"Last displayed: {msg.last_displayed or 'Never'}\n")
+                            file.write(f"Display count: {msg.display_count}\n\n")
+                
+                self.console.log(f"Exported all messages to {file_path}", "INFO")
+                QMessageBox.information(dialog, "Export Complete", f"All messages exported to {file_path}")
+            except Exception as e:
+                self.console.log(f"Error exporting messages: {str(e)}", "ERROR")
+                QMessageBox.critical(dialog, "Export Error", f"Failed to export messages: {str(e)}")
+        
+        # Connect button signals
+        open_btn.clicked.connect(open_selected_message)
+        export_btn.clicked.connect(export_all_messages)
+        
+        # Populate list initially
+        populate_message_list()
+        
+        # Show dialog
+        dialog.exec()
+
+    def new_message(self):
+        """Create a new message and add it to the database."""
+        # If we're already displaying a message, ask for confirmation
+        if self.running:
+            confirm = QMessageBox.question(
+                self, 
+                "Confirm New Message", 
+                "Creating a new message will stop the current display. Continue?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if confirm != QMessageBox.StandardButton.Yes:
+                return
+            
+            # Stop the current display
+            self.timer.stop()
+            self.running = False
+        
+        # Create dialog for input
+        dialog = QDialog(self)
+        dialog.setWindowTitle("New Message")
+        dialog.resize(500, 250)
+        
+        # Apply dark theme
+        dialog.setStyleSheet(f"""
+            QDialog {{
+                background-color: {COLORS['background'].name()};
+                color: {COLORS['text'].name()};
+            }}
+            QLabel {{
+                color: {COLORS['text'].name()};
+                {get_font_css(size=12)}
+            }}
+            QTextEdit {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+                {get_font_css(size=12)}
+            }}
+            QLineEdit {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+                border-radius: 3px;
+                {get_font_css(size=12)}
+            }}
+            QPushButton {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-radius: 3px;
+                padding: 5px 15px;
+                {get_font_css(size=12)}
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['button_hover'].name()};
+            }}
+        """)
+        
+        layout = QVBoxLayout(dialog)
+        
+        # Add field for message content
+        message_label = QLabel("Enter message (max 80 characters):")
+        layout.addWidget(message_label)
+        
+        message_input = QTextEdit()
+        message_input.setPlaceholderText("Enter your message here...")
+        message_input.setAcceptRichText(False)
+        layout.addWidget(message_input, 1)
+        
+        # Add field for source
+        source_layout = QHBoxLayout()
+        source_label = QLabel("Source:")
+        source_input = QLineEdit("User")
+        source_layout.addWidget(source_label)
+        source_layout.addWidget(source_input, 1)
+        layout.addLayout(source_layout)
+        
+        # Character count display
+        char_count = QLabel("0/80 characters")
+        layout.addWidget(char_count)
+        
+        # Update character count when text changes
+        def update_char_count():
+            count = len(message_input.toPlainText())
+            char_count.setText(f"{count}/80 characters")
+            # Set text color based on length
+            if count > 80:
+                char_count.setStyleSheet("color: red;")
+            else:
+                char_count.setStyleSheet("")
+        
+        message_input.textChanged.connect(update_char_count)
+        
+        # Add button layout
+        button_layout = QHBoxLayout()
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.clicked.connect(dialog.reject)
+        create_btn = QPushButton("Create")
+        create_btn.clicked.connect(dialog.accept)
+        button_layout.addWidget(cancel_btn)
+        button_layout.addWidget(create_btn)
+        layout.addLayout(button_layout)
+        
+        # Show dialog
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+            
+        # Get message content
+        message = message_input.toPlainText().strip()
+        source = source_input.text().strip() or "User"
+        
+        # Validate message
+        if not message:
+            QMessageBox.warning(self, "Empty Message", "Please enter a message.")
+            return
+            
+        if len(message) > 80:
+            confirm = QMessageBox.question(
+                self,
+                "Message Too Long",
+                f"Your message is {len(message)} characters long, which exceeds the maximum of 80 characters. Do you want to truncate it?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if confirm != QMessageBox.StandardButton.Yes:
+                return
+                
+            # Truncate the message
+            message = message[:77] + "..."
+            
+        # Display the message (which will also save it to the database)
+        self.display_message(message, source=source)
+        self.console.log(f"New message created by user: {message[:30]}...", "INFO")
+
+    def show_message_stats(self):
+        """Show statistics about the message database."""
+        if not hasattr(self, 'message_db'):
+            QMessageBox.warning(self, "Database Error", "Message database not initialized.")
+            return
+        
+        # Create dialog
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Message Database Statistics")
+        dialog.resize(550, 400)
+        
+        # Apply dark theme
+        dialog.setStyleSheet(f"""
+            QDialog {{
+                background-color: {COLORS['background'].name()};
+                color: {COLORS['text'].name()};
+            }}
+            QLabel {{
+                color: {COLORS['text'].name()};
+                {get_font_css(size=12)}
+            }}
+            QTextEdit {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                padding: 5px;
+                {get_font_css(size=12)}
+            }}
+            QPushButton {{
+                background-color: {COLORS['button_bg'].name()};
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-radius: 3px;
+                padding: 5px 15px;
+                {get_font_css(size=12)}
+            }}
+            QPushButton:hover {{
+                background-color: {COLORS['button_hover'].name()};
+            }}
+            QGroupBox {{
+                color: {COLORS['text'].name()};
+                border: 1px solid {COLORS['hole_outline'].name()};
+                border-radius: 0px;
+                margin-top: 1.5ex;
+                {get_font_css(size=12)}
+            }}
+        """)
+        
+        layout = QVBoxLayout(dialog)
+        
+        # Add header
+        header_label = QLabel("📊 Message Database Statistics")
+        header_label.setStyleSheet(f"{get_font_css(size=16, bold=True)}")
+        layout.addWidget(header_label)
+        
+        # Calculate statistics
+        total_messages = len(self.message_db.messages)
+        
+        if total_messages == 0:
+            # No messages
+            layout.addWidget(QLabel("No messages in database."))
+        else:
+            # Message counts
+            message_count_group = QGroupBox("Message Counts")
+            message_count_layout = QFormLayout()
+            
+            total_label = QLabel(f"{total_messages}")
+            total_label.setStyleSheet(f"{get_font_css(bold=True)}")
+            
+            message_count_layout.addRow("Total Messages:", total_label)
+            
+            # Count by source
+            source_counts = {}
+            for msg in self.message_db.messages:
+                source = msg.source
+                source_counts[source] = source_counts.get(source, 0) + 1
+            
+            for source, count in sorted(source_counts.items()):
+                source_label = QLabel(f"{count} ({count/total_messages*100:.1f}%)")
+                message_count_layout.addRow(f"{source} Messages:", source_label)
+            
+            message_count_group.setLayout(message_count_layout)
+            layout.addWidget(message_count_group)
+            
+            # Character statistics
+            char_stats_group = QGroupBox("Message Content Statistics")
+            char_stats_layout = QFormLayout()
+            
+            # Calculate average length
+            total_length = sum(len(msg.content) for msg in self.message_db.messages)
+            avg_length = total_length / total_messages if total_messages > 0 else 0
+            
+            # Find shortest and longest messages
+            shortest_msg = min(self.message_db.messages, key=lambda x: len(x.content))
+            longest_msg = max(self.message_db.messages, key=lambda x: len(x.content))
+            
+            char_stats_layout.addRow("Average Length:", QLabel(f"{avg_length:.2f} characters"))
+            char_stats_layout.addRow("Shortest Message:", QLabel(f"{len(shortest_msg.content)} characters (#{shortest_msg.message_number})"))
+            char_stats_layout.addRow("Longest Message:", QLabel(f"{len(longest_msg.content)} characters (#{longest_msg.message_number})"))
+            
+            # Calculate most frequently used characters
+            char_counts = {}
+            for msg in self.message_db.messages:
+                for char in msg.content:
+                    char_counts[char] = char_counts.get(char, 0) + 1
+            
+            if char_counts:
+                most_common_char = max(char_counts.items(), key=lambda x: x[1])
+                char_stats_layout.addRow("Most Common Character:", QLabel(f"'{most_common_char[0]}' (used {most_common_char[1]} times)"))
+            
+            char_stats_group.setLayout(char_stats_layout)
+            layout.addWidget(char_stats_group)
+            
+            # Display statistics
+            display_stats_group = QGroupBox("Display Statistics")
+            display_stats_layout = QFormLayout()
+            
+            # Calculate display counts
+            total_displays = sum(msg.display_count for msg in self.message_db.messages)
+            avg_displays = total_displays / total_messages if total_messages > 0 else 0
+            
+            # Find most displayed message
+            most_displayed = max(self.message_db.messages, key=lambda x: x.display_count)
+            
+            # Count never displayed messages
+            never_displayed = sum(1 for msg in self.message_db.messages if msg.display_count == 0)
+            
+            display_stats_layout.addRow("Total Displays:", QLabel(f"{total_displays}"))
+            display_stats_layout.addRow("Average Displays Per Message:", QLabel(f"{avg_displays:.2f}"))
+            display_stats_layout.addRow("Most Displayed Message:", QLabel(f"#{most_displayed.message_number} ({most_displayed.display_count} times)"))
+            display_stats_layout.addRow("Never Displayed Messages:", QLabel(f"{never_displayed} ({never_displayed/total_messages*100:.1f}%)"))
+            
+            display_stats_group.setLayout(display_stats_layout)
+            layout.addWidget(display_stats_group)
+        
+        # Add close button
+        button_layout = QHBoxLayout()
+        export_btn = QPushButton("Export Statistics")
+        close_btn = QPushButton("Close")
+        button_layout.addWidget(export_btn)
+        button_layout.addStretch()
+        button_layout.addWidget(close_btn)
+        layout.addLayout(button_layout)
+        
+        # Connect buttons
+        close_btn.clicked.connect(dialog.close)
+        
+        # Function to export statistics
+        def export_statistics():
+            file_path, _ = QFileDialog.getSaveFileName(
+                dialog,
+                "Export Statistics",
+                "message_stats.txt",
+                "Text Files (*.txt);;JSON Files (*.json);;All Files (*)"
+            )
+            
+            if not file_path:
+                return  # User cancelled
+                
+            try:
+                with open(file_path, 'w') as file:
+                    file.write("PUNCH CARD DATABASE STATISTICS\n")
+                    file.write("============================\n\n")
+                    
+                    file.write(f"Generated: {datetime.datetime.now().isoformat()}\n\n")
+                    
+                    # Message counts
+                    file.write("MESSAGE COUNTS\n")
+                    file.write(f"Total Messages: {total_messages}\n")
+                    
+                    for source, count in sorted(source_counts.items()):
+                        file.write(f"{source} Messages: {count} ({count/total_messages*100:.1f}%)\n")
+                    
+                    file.write("\nMESSAGE CONTENT STATISTICS\n")
+                    file.write(f"Average Length: {avg_length:.2f} characters\n")
+                    file.write(f"Shortest Message: {len(shortest_msg.content)} characters (#{shortest_msg.message_number})\n")
+                    file.write(f"Longest Message: {len(longest_msg.content)} characters (#{longest_msg.message_number})\n")
+                    
+                    if char_counts:
+                        file.write(f"Most Common Character: '{most_common_char[0]}' (used {most_common_char[1]} times)\n")
+                    
+                    file.write("\nDISPLAY STATISTICS\n")
+                    file.write(f"Total Displays: {total_displays}\n")
+                    file.write(f"Average Displays Per Message: {avg_displays:.2f}\n")
+                    file.write(f"Most Displayed Message: #{most_displayed.message_number} ({most_displayed.display_count} times)\n")
+                    file.write(f"Never Displayed Messages: {never_displayed} ({never_displayed/total_messages*100:.1f}%)\n")
+                    
+                    # Message listing
+                    file.write("\nMESSAGE LISTING\n")
+                    for msg in sorted(self.message_db.messages, key=lambda x: x.message_number):
+                        file.write(f"#{msg.message_number}: {msg.content[:40]}{'...' if len(msg.content) > 40 else ''}\n")
+                        file.write(f"  Source: {msg.source}\n")
+                        file.write(f"  Generated: {msg.generated_at}\n")
+                        file.write(f"  Display Count: {msg.display_count}\n")
+                        file.write("\n")
+                
+                QMessageBox.information(dialog, "Export Complete", f"Statistics exported to {file_path}")
+            except Exception as e:
+                self.console.log(f"Error exporting statistics: {str(e)}", "ERROR")
+                QMessageBox.critical(dialog, "Export Error", f"Failed to export statistics: {str(e)}")
+        
+        # Connect export button
+        export_btn.clicked.connect(export_statistics)
+        
+        # Show dialog
+        dialog.exec()
 
 class SoundSettingsDialog(QDialog):
     """Dialog for configuring sound settings."""
@@ -4198,7 +4961,6 @@ class SoundSettingsDialog(QDialog):
         
         # Buttons at the bottom
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(10)
         
         # System sound settings button (left-aligned)
         system_button = QPushButton("System Sound Settings...")
