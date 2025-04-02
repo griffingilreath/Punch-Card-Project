@@ -39,7 +39,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtGui import (
     QIcon, QPalette, QTextCursor, QColor,
     QPixmap, QKeyEvent, QTextCharFormat, QPainter, QPainterPath,
-    QBrush, QPen
+    QBrush, QPen, QAction
 )
     
 try:
@@ -1959,177 +1959,6 @@ class WiFiStatusWidget(QWidget):
             painter.drawRect(x, y, bar_width, bar_height)
             painter.setPen(Qt.PenStyle.NoPen)  # Reset pen for next iteration
 
-class SoundControlWidget(QWidget):
-    """Custom widget for displaying and controlling sound with volume slider."""
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFixedWidth(30)
-        self.setFixedHeight(22)
-        self.setProperty("muted", False)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        
-        # Create popup menu for sound controls
-        self.sound_menu = QMenu(self)
-        self.sound_menu.setStyleSheet("""
-            QMenu {
-                background-color: black;
-                color: white;
-                border: 1px solid white;
-                font-family: Courier New, monospace;
-                font-size: 12px;
-            }
-            QMenu::item {
-                padding: 4px 25px;
-            }
-            QMenu::item:selected {
-                background-color: white;
-                color: black;
-            }
-            QMenu::separator {
-                height: 1px;
-                background-color: #444444;
-                margin: 4px 2px;
-            }
-        """)
-        
-        # Create volume slider widget
-        volume_widget = QWidget()
-        volume_layout = QVBoxLayout(volume_widget)
-        volume_layout.setContentsMargins(10, 5, 10, 5)
-        
-        # Add volume label and value
-        volume_header = QHBoxLayout()
-        volume_label = QLabel("Volume")
-        volume_label.setStyleSheet("color: white; font-size: 10px;")
-        self.volume_value = QLabel("100%")
-        self.volume_value.setStyleSheet("color: white; font-size: 10px; text-align: right;")
-        volume_header.addWidget(volume_label)
-        volume_header.addWidget(self.volume_value)
-        volume_layout.addLayout(volume_header)
-        
-        # Create and style the volume slider
-        self.volume_slider = QSlider(Qt.Orientation.Horizontal)
-        self.volume_slider.setRange(0, 100)
-        self.volume_slider.setValue(100)
-        self.volume_slider.setFixedWidth(150)
-        self.volume_slider.setStyleSheet("""
-            QSlider::groove:horizontal {
-                background: #444444;
-                height: 4px;
-                border-radius: 2px;
-            }
-            QSlider::handle:horizontal {
-                background: white;
-                width: 8px;
-                height: 8px;
-                margin: -2px 0;
-                border-radius: 4px;
-            }
-            QSlider::sub-page:horizontal {
-                background: white;
-                height: 4px;
-                border-radius: 2px;
-            }
-        """)
-        volume_layout.addWidget(self.volume_slider)
-        
-        # Create volume action
-        volume_action = QWidgetAction(self)
-        volume_action.setDefaultWidget(volume_widget)
-        self.sound_menu.addAction(volume_action)
-        
-        # Add separator
-        self.sound_menu.addSeparator()
-        
-        # Add mute action
-        self.mute_action = self.sound_menu.addAction("Mute")
-        self.mute_action.setCheckable(True)
-        
-        # Add separator
-        self.sound_menu.addSeparator()
-        
-        # Add sound settings action
-        settings_action = self.sound_menu.addAction("Sound Settings...")
-        settings_action.triggered.connect(self.open_sound_settings)
-        
-        # Connect signals
-        self.volume_slider.valueChanged.connect(self.on_volume_changed)
-        self.mute_action.triggered.connect(self.toggle_mute)
-        
-        # Initialize with current sound manager state if available
-        if parent and hasattr(parent, 'sound_manager'):
-            volume = int(parent.sound_manager.volume * 100)
-            self.volume_slider.setValue(volume)
-            self.volume_value.setText(f"{volume}%")
-            self.mute_action.setChecked(parent.sound_manager.muted)
-            self.setProperty("muted", parent.sound_manager.muted)
-    
-    def mousePressEvent(self, event):
-        """Show the sound menu when clicked."""
-        if event.button() == Qt.MouseButton.LeftButton:
-            # Position the menu below the widget
-            pos = self.mapToGlobal(QPoint(0, self.height()))
-            self.sound_menu.exec(pos)
-    
-    def paintEvent(self, event):
-        """Draw the sound icon."""
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
-        # Set up colors
-        if self.property("muted"):
-            painter.setPen(QPen(QColor(255, 0, 0), 1))  # Red for muted
-        else:
-            painter.setPen(QPen(QColor(255, 255, 255), 1))  # White for unmuted
-        
-        # Draw speaker icon
-        painter.drawLine(5, 8, 5, 14)  # Left speaker line
-        painter.drawLine(5, 8, 8, 8)   # Top speaker line
-        painter.drawLine(5, 14, 8, 14) # Bottom speaker line
-        painter.drawLine(8, 8, 8, 14)  # Right speaker line
-        
-        # Draw sound waves if not muted
-        if not self.property("muted"):
-            painter.drawLine(10, 8, 12, 6)   # First wave
-            painter.drawLine(12, 6, 14, 8)   # First wave
-            painter.drawLine(14, 8, 16, 6)   # Second wave
-            painter.drawLine(16, 6, 18, 8)   # Second wave
-            painter.drawLine(18, 8, 20, 6)   # Third wave
-            painter.drawLine(20, 6, 22, 8)   # Third wave
-    
-    def on_volume_changed(self, value):
-        """Handle volume slider value changes."""
-        self.volume_value.setText(f"{value}%")
-        if self.parent() and hasattr(self.parent(), 'on_sound_volume_changed'):
-            self.parent().on_sound_volume_changed(value)
-    
-    def toggle_mute(self, checked):
-        """Toggle mute state."""
-        self.setProperty("muted", checked)
-        self.update()  # Trigger repaint to update icon
-        if self.parent() and hasattr(self.parent(), 'on_sound_mute_changed'):
-            self.parent().on_sound_mute_changed(checked)
-    
-    def open_sound_settings(self):
-        """Open sound settings dialog."""
-        if hasattr(self.menu_bar, 'sound_control'):
-            self.menu_bar.sound_control.open_sound_settings()
-    
-    def update_icon_state(self):
-        """Update the icon state based on current sound settings."""
-        if self.parent() and hasattr(self.parent(), 'sound_manager'):
-            # Update volume slider
-            volume = int(self.parent().sound_manager.volume * 100)
-            self.volume_slider.setValue(volume)
-            self.volume_value.setText(f"{volume}%")
-            
-            # Update mute state
-            muted = self.parent().sound_manager.muted
-            self.mute_action.setChecked(muted)
-            self.setProperty("muted", muted)
-            self.update()  # Trigger repaint to update icon
-
 class InAppMenuBar(QWidget):
     """Custom in-app menu bar that simulates classic Mac menu bar appearance."""
     
@@ -2160,13 +1989,6 @@ class InAppMenuBar(QWidget):
         self.right_layout = QHBoxLayout(self.right_container)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_layout.setSpacing(5)
-        
-        # Create and add sound control widget
-        self.sound_control = SoundControlWidget(self)
-        self.right_layout.addWidget(self.sound_control)
-        
-        # Add spacer between sound control and WiFi
-        self.right_layout.addItem(QSpacerItem(5, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed))
         
         # Add WiFi status
         self.wifi_status = WiFiStatusWidget(self)
@@ -2225,6 +2047,184 @@ class InAppMenuBar(QWidget):
         self.wifi_timer.timeout.connect(self.update_wifi_status)
         self.wifi_timer.start(5000)
         self.update_wifi_status()
+    
+    def paintEvent(self, event):
+        """Custom paint event to draw the menu bar with classic Mac styling."""
+        # Create painter for drawing
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)  # Turn off antialiasing for crisp lines
+        
+        # Step 1: Draw the black background over everything
+        painter.fillRect(self.rect(), QColor(0, 0, 0))
+        
+        # Step 2: Let the base class handle child widgets
+        painter.end()
+        super().paintEvent(event)
+        
+        # Step 3: Create a new painter to draw on top of everything
+        painter = QPainter(self)
+        
+        # Set up a pen for the white bottom border
+        pen = QPen(QColor(255, 255, 255))
+        pen.setWidth(1)
+        pen.setStyle(Qt.PenStyle.SolidLine)
+        painter.setPen(pen)
+        
+        # Draw the line precisely at the bottom of the widget
+        bottom_y = self.height() - 1
+        painter.drawLine(0, bottom_y, self.width(), bottom_y)
+    
+    def setup_menu_actions(self, main_window):
+        """Set up menu actions after the main window is fully initialized."""
+        # Define common menu style
+        menu_style = f"""
+            QMenu {{
+                background-color: black;
+                color: white;
+                border: 1px solid white;
+                {get_font_css(size=12)}
+            }}
+            QMenu::item {{
+                padding: 4px 25px;
+            }}
+            QMenu::item:selected {{
+                background-color: white;
+                color: black;
+            }}
+            QMenu::separator {{
+                height: 1px;
+                background-color: #444444;
+                margin: 4px 2px;
+            }}
+        """
+        
+        # Apply styles to all menus
+        self.apple_menu_popup.setStyleSheet(menu_style)
+        self.card_menu_popup.setStyleSheet(menu_style)
+        self.settings_menu_popup.setStyleSheet(menu_style)
+        self.console_menu_popup.setStyleSheet(menu_style)
+        self.notifications_popup.setStyleSheet(menu_style)
+        
+        # ---- Apple menu items ----
+        about_action = self.apple_menu_popup.addAction("About This Punch Card")
+        self.apple_menu_popup.addSeparator()
+        sleep_action = self.apple_menu_popup.addAction("Sleep")
+        restart_action = self.apple_menu_popup.addAction("Restart")
+        shutdown_action = self.apple_menu_popup.addAction("Shut Down")
+        
+        # Connect Apple menu signals
+        about_action.triggered.connect(main_window.show_about_dialog)
+        sleep_action.triggered.connect(main_window.start_sleep_mode)
+        restart_action.triggered.connect(main_window.restart_app)
+        shutdown_action.triggered.connect(main_window.safe_shutdown)
+        
+        # ---- Punch Card menu ----
+        display_message_action = self.card_menu_popup.addAction("Display Message")
+        clear_card_action = self.card_menu_popup.addAction("Clear Card")
+        self.card_menu_popup.addSeparator()
+        card_settings_action = self.card_menu_popup.addAction("Card Dimensions...")
+        
+        # Connect Punch Card menu signals
+        display_message_action.triggered.connect(main_window.start_display)
+        if hasattr(main_window, 'punch_card'):
+            clear_card_action.triggered.connect(main_window.punch_card.clear_grid)
+        card_settings_action.triggered.connect(main_window.show_card_settings)
+        
+        # ---- Settings menu ----
+        display_settings_action = self.settings_menu_popup.addAction("Display Settings...")
+        
+        # Add Sound submenu
+        sound_menu = QMenu("Sound", self.settings_menu_popup)
+        sound_menu.setStyleSheet(menu_style)
+        
+        # Add volume control
+        volume_action = QWidgetAction(sound_menu)
+        volume_widget = QWidget()
+        volume_layout = QHBoxLayout(volume_widget)
+        volume_layout.setContentsMargins(25, 5, 25, 5)
+        
+        volume_label = QLabel("Volume:")
+        volume_label.setStyleSheet("color: white;")
+        volume_layout.addWidget(volume_label)
+        
+        volume_slider = QSlider(Qt.Orientation.Horizontal)
+        volume_slider.setRange(0, 100)
+        volume_slider.setValue(100)
+        volume_slider.setFixedWidth(100)
+        volume_slider.setStyleSheet("""
+            QSlider::groove:horizontal {
+                background: #444444;
+                height: 4px;
+                border-radius: 2px;
+            }
+            QSlider::handle:horizontal {
+                background: white;
+                width: 12px;
+                height: 12px;
+                margin: -4px 0;
+                border-radius: 6px;
+            }
+        """)
+        volume_layout.addWidget(volume_slider)
+        
+        volume_value = QLabel("100%")
+        volume_value.setStyleSheet("color: white; min-width: 40px;")
+        volume_layout.addWidget(volume_value)
+        
+        volume_action.setDefaultWidget(volume_widget)
+        sound_menu.addAction(volume_action)
+        
+        # Add mute option
+        mute_action = sound_menu.addAction("Mute")
+        mute_action.setCheckable(True)
+        
+        # Add separator
+        sound_menu.addSeparator()
+        
+        # Add sound settings
+        sound_settings_action = sound_menu.addAction("Sound Settings...")
+        
+        # Add sound menu to settings menu
+        self.settings_menu_popup.addMenu(sound_menu)
+        
+        statistics_action = self.settings_menu_popup.addAction("Statistics...")
+        api_settings_action = self.settings_menu_popup.addAction("API Settings...")
+        self.settings_menu_popup.addSeparator()
+        inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
+        
+        # Connect settings menu signals
+        display_settings_action.triggered.connect(main_window.show_card_settings)
+        volume_slider.valueChanged.connect(lambda v: self.on_volume_changed(v, volume_value, main_window))
+        mute_action.triggered.connect(lambda checked: self.on_mute_changed(checked, main_window))
+        sound_settings_action.triggered.connect(lambda: main_window.sound_settings_dialog.show())
+        statistics_action.triggered.connect(main_window.show_statistics_dialog)
+        api_settings_action.triggered.connect(main_window.show_api_settings)
+        inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
+        
+        # ---- Console menu ----
+        system_console_action = self.console_menu_popup.addAction("System Console")
+        api_console_action = self.console_menu_popup.addAction("API Console")
+        
+        # Connect Console menu signals
+        system_console_action.triggered.connect(lambda: main_window.console.show())
+        api_console_action.triggered.connect(lambda: main_window.api_console.show())
+        
+        # ---- Notifications menu (for future use) ----
+        self.notifications_popup.addAction("No New Notifications")
+        self.notifications_popup.addSeparator()
+        notification_settings = self.notifications_popup.addAction("Notification Settings...")
+        clear_all = self.notifications_popup.addAction("Clear All")
+    
+    def on_volume_changed(self, value, label, main_window):
+        """Handle volume slider changes."""
+        label.setText(f"{value}%")
+        if hasattr(main_window, 'sound_manager'):
+            main_window.sound_manager.set_volume(value / 100.0)
+    
+    def on_mute_changed(self, checked, main_window):
+        """Handle mute state changes."""
+        if hasattr(main_window, 'sound_manager'):
+            main_window.sound_manager.set_muted(checked)
     
     def create_menu_button(self, text, is_apple=False):
         """Create a button that looks like a menu item."""
@@ -2311,117 +2311,6 @@ class InAppMenuBar(QWidget):
         if hasattr(self, 'wifi_status'):
             self.wifi_status.update_status()
     
-    def setup_menu_actions(self, main_window):
-        """Set up menu actions after the main window is fully initialized."""
-        # Define common menu style
-        menu_style = f"""
-            QMenu {{
-                background-color: black;
-                color: white;
-                border: 1px solid white;
-                {get_font_css(size=12)}
-            }}
-            QMenu::item {{
-                padding: 4px 25px;
-            }}
-            QMenu::item:selected {{
-                background-color: white;
-                color: black;
-            }}
-            QMenu::separator {{
-                height: 1px;
-                background-color: #444444;
-                margin: 4px 2px;
-            }}
-        """
-        
-        # Apply styles to all menus
-        self.apple_menu_popup.setStyleSheet(menu_style)
-        self.card_menu_popup.setStyleSheet(menu_style)
-        self.settings_menu_popup.setStyleSheet(menu_style)
-        self.console_menu_popup.setStyleSheet(menu_style)
-        self.notifications_popup.setStyleSheet(menu_style)
-        
-        # ---- Apple menu items ----
-        about_action = self.apple_menu_popup.addAction("About This Punch Card")
-        self.apple_menu_popup.addSeparator()
-        sleep_action = self.apple_menu_popup.addAction("Sleep")
-        restart_action = self.apple_menu_popup.addAction("Restart")
-        shutdown_action = self.apple_menu_popup.addAction("Shut Down")
-        
-        # Connect Apple menu signals
-        about_action.triggered.connect(main_window.show_about_dialog)
-        sleep_action.triggered.connect(main_window.start_sleep_mode)
-        restart_action.triggered.connect(main_window.restart_app)
-        shutdown_action.triggered.connect(main_window.safe_shutdown)
-        
-        # ---- Punch Card menu ----
-        display_message_action = self.card_menu_popup.addAction("Display Message")
-        clear_card_action = self.card_menu_popup.addAction("Clear Card")
-        self.card_menu_popup.addSeparator()
-        card_settings_action = self.card_menu_popup.addAction("Card Dimensions...")
-        
-        # Connect Punch Card menu signals
-        display_message_action.triggered.connect(main_window.start_display)
-        if hasattr(main_window, 'punch_card'):
-            clear_card_action.triggered.connect(main_window.punch_card.clear_grid)
-        card_settings_action.triggered.connect(main_window.show_card_settings)
-        
-        # ---- Settings menu ----
-        display_settings_action = self.settings_menu_popup.addAction("Display Settings...")
-        sound_settings_action = self.settings_menu_popup.addAction("Sound Settings...")
-        statistics_action = self.settings_menu_popup.addAction("Statistics...")
-        api_settings_action = self.settings_menu_popup.addAction("API Settings...")
-        self.settings_menu_popup.addSeparator()
-        inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
-        
-        # Connect settings menu signals
-        display_settings_action.triggered.connect(main_window.show_card_settings)
-        sound_settings_action.triggered.connect(lambda: main_window.menu_bar.sound_control.open_sound_settings())
-        statistics_action.triggered.connect(main_window.show_statistics_dialog)
-        api_settings_action.triggered.connect(main_window.show_api_settings)
-        inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
-        
-        # ---- Console menu ----
-        system_console_action = self.console_menu_popup.addAction("System Console")
-        api_console_action = self.console_menu_popup.addAction("API Console")
-        
-        # Connect Console menu signals
-        system_console_action.triggered.connect(lambda: main_window.console.show())
-        api_console_action.triggered.connect(lambda: main_window.api_console.show())
-        
-        # ---- Notifications menu (for future use) ----
-        self.notifications_popup.addAction("No New Notifications")
-        self.notifications_popup.addSeparator()
-        notification_settings = self.notifications_popup.addAction("Notification Settings...")
-        clear_all = self.notifications_popup.addAction("Clear All")
-    
-    def paintEvent(self, event):
-        """Custom paint event to draw the menu bar with classic Mac styling."""
-        # Create painter for drawing
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)  # Turn off antialiasing for crisp lines
-        
-        # Step 1: Draw the black background over everything
-        painter.fillRect(self.rect(), QColor(0, 0, 0))
-        
-        # Step 2: Let the base class handle child widgets
-        painter.end()
-        super().paintEvent(event)
-        
-        # Step 3: Create a new painter to draw on top of everything
-        painter = QPainter(self)
-        
-        # Set up a pen for the white bottom border
-        pen = QPen(QColor(255, 255, 255))
-        pen.setWidth(1)
-        pen.setStyle(Qt.PenStyle.SolidLine)
-        painter.setPen(pen)
-        
-        # Draw the line precisely at the bottom of the widget
-        bottom_y = self.height() - 1
-        painter.drawLine(0, bottom_y, self.width(), bottom_y)
-    
     def on_sound_volume_changed(self, value):
         """Handle volume changes from the sound control."""
         if hasattr(self.parent(), 'sound_manager'):
@@ -2445,18 +2334,8 @@ class PunchCardDisplay(QMainWindow):
         self.hardware_detector = HardwareDetector(self.console)
         
         # Initialize sound manager
-        self.sound_manager = SoundManager(self.console)
-        self.sound_manager.load_mac_system_sounds()
-        
-        # Update sound mappings to match SoundManager's defaults
-        self.sound_manager.update_sound_mappings({
-            'punch': 'Tink',
-            'complete': 'Glass',
-            'clear': 'Pop',
-            'startup': 'Hero',
-            'eject': 'Submarine',
-            'insert': 'Bottle'
-        })
+        self.sound_manager = None
+        self.initialize_sound_system()
         
         # Set window title
         self.setWindowTitle("Punch Card Display")
@@ -2485,11 +2364,6 @@ class PunchCardDisplay(QMainWindow):
         self.menu_bar = InAppMenuBar(self)
         self.main_layout.addWidget(self.menu_bar)
         
-        # Connect sound control signals
-        if hasattr(self.menu_bar, 'sound_control'):
-            self.menu_bar.sound_control.volume_slider.valueChanged.connect(self.on_sound_volume_changed)
-            self.menu_bar.sound_control.mute_action.triggered.connect(self.on_sound_mute_changed)
-        
         # Add spacer to separate menu bar from content
         menu_spacer = QWidget()
         menu_spacer.setFixedHeight(5)
@@ -2509,11 +2383,6 @@ class PunchCardDisplay(QMainWindow):
         
         # Create the sound settings dialog
         self.sound_settings_dialog = SoundSettingsDialog(self)
-        
-        # Connect sound settings signals
-        self.sound_settings_dialog.volume_changed.connect(self.on_sound_volume_changed)
-        self.sound_settings_dialog.mute_changed.connect(self.on_sound_mute_changed)
-        self.sound_settings_dialog.sound_mappings_changed.connect(self.on_sound_mappings_changed)
         
         # Store the punch card instance
         self.punch_card_instance = punch_card
@@ -3531,19 +3400,11 @@ class PunchCardDisplay(QMainWindow):
     def load_punch_card_sounds(self):
         """Load punch card sounds for animations using the SoundManager."""
         try:
-            # Import SoundManager
-            from src.utils.sound_manager import get_sound_manager
-            
-            # Get sound manager with console logger for feedback
-            self.sound_manager = get_sound_manager(self.console)
-            
-            # Log the action
-            self.console.log("Sound manager initialized", "INFO")
-            
+            if not hasattr(self, 'sound_manager'):
+                self.initialize_sound_system()
             return True
-
         except Exception as e:
-            self.console.log(f"Error initializing sound manager: {str(e)}", "ERROR")
+            self.console.log(f"Error loading punch card sounds: {str(e)}", "ERROR")
             import traceback
             self.console.log(f"Traceback: {traceback.format_exc()}", "ERROR")
             return False
@@ -3762,18 +3623,25 @@ class PunchCardDisplay(QMainWindow):
         try:
             from src.utils.sound_manager import get_sound_manager
             
-            # Create console if it doesn't exist yet
-            if not hasattr(self, 'console'):
-                self.console = ConsoleWindow(self)
-                self.console.show()
-            
-            self.console.log("Initializing sound system...", "INFO")
-            
-            # Get sound manager instance
-            self.sound_manager = get_sound_manager(self.console)
-            
-            # Test sound system after a delay
-            QTimer.singleShot(1000, self.test_sound_system)
+            # Only initialize if not already initialized
+            if self.sound_manager is None:
+                self.console.log("Initializing sound system...", "INFO")
+                
+                # Get sound manager instance
+                self.sound_manager = get_sound_manager(self.console)
+                
+                # Update sound mappings
+                self.sound_manager.update_sound_mappings({
+                    'punch': 'Tink',
+                    'complete': 'Glass',
+                    'clear': 'Pop',
+                    'startup': 'Hero',
+                    'eject': 'Submarine',
+                    'insert': 'Bottle'
+                })
+                
+                # Test sound system after a delay
+                QTimer.singleShot(1000, self.test_sound_system)
             
         except Exception as e:
             if hasattr(self, 'console'):
@@ -3784,7 +3652,7 @@ class PunchCardDisplay(QMainWindow):
     def test_sound_system(self):
         """Test the sound system by playing a test sound."""
         try:
-            if hasattr(self, 'sound_manager'):
+            if self.sound_manager is not None:
                 self.console.log("Testing sound system...", "INFO")
                 success = self.play_sound("punch")
                 if success:
@@ -3800,11 +3668,11 @@ class PunchCardDisplay(QMainWindow):
     def play_sound(self, sound_type: str) -> bool:
         """Play a sound using the SoundManager."""
         try:
-            if not hasattr(self, 'sound_manager'):
+            if self.sound_manager is None:
                 self.console.log("Sound manager not initialized, initializing now...", "WARNING")
                 self.initialize_sound_system()
             
-            if hasattr(self, 'sound_manager'):
+            if self.sound_manager is not None:
                 success = self.sound_manager.play_sound(sound_type)
                 if not success:
                     self.console.log(f"Failed to play sound: {sound_type}", "WARNING")
@@ -4166,7 +4034,7 @@ class StatsPanel(QFrame):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumSize(450, 550)  # Slightly reduced size
+        self.setMinimumSize(450, 550)
         self.setStyleSheet("""
             QFrame {
                 background-color: black;
@@ -4178,7 +4046,7 @@ class StatsPanel(QFrame):
                 font-family: 'Courier New';
                 font-size: 12px;
                 padding: 1px;
-                min-width: 120px;  # Reduced minimum width
+                min-width: 120px;
             }
             QGroupBox {
                 color: white;
@@ -4188,12 +4056,12 @@ class StatsPanel(QFrame):
                 font-family: 'Courier New';
                 font-size: 12px;
                 font-weight: bold;
-                padding: 4px;  # Reduced padding
+                padding: 4px;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
                 subcontrol-position: top left;
-                padding: 0 5px;  # Reduced padding
+                padding: 0 5px;
                 color: white;
                 font-family: 'Courier New';
                 font-size: 12px;
@@ -4203,26 +4071,26 @@ class StatsPanel(QFrame):
         
         # Main layout
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)  # Reduced margins
-        layout.setSpacing(8)  # Reduced spacing
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
         
         # Header
         header_label = QLabel("📊 Punch Card Statistics")
-        header_label.setStyleSheet(f"{get_font_css(size=14, bold=True)}")  # Reduced size
+        header_label.setStyleSheet(f"{get_font_css(size=14, bold=True)}")
         layout.addWidget(header_label)
         
         # Stats content layout
         content_layout = QVBoxLayout()
-        content_layout.setSpacing(8)  # Reduced spacing
+        content_layout.setSpacing(8)
         layout.addLayout(content_layout)
         
         # Add General Stats
         self.general_group = QGroupBox("General Statistics")
         general_layout = QGridLayout()
         self.general_group.setLayout(general_layout)
-        general_layout.setContentsMargins(8, 15, 8, 8)  # Reduced margins
-        general_layout.setSpacing(4)  # Reduced spacing
-        general_layout.setColumnMinimumWidth(1, 120)  # Reduced minimum width
+        general_layout.setContentsMargins(8, 15, 8, 8)
+        general_layout.setSpacing(4)
+        general_layout.setColumnMinimumWidth(1, 120)
         
         # We'll populate these in update_stats
         self.cards_processed_label = QLabel("0")
@@ -4237,7 +4105,7 @@ class StatsPanel(QFrame):
                      self.avg_msg_length_label, self.processing_rate_label,
                      self.most_used_char_label, self.least_used_char_label]:
             label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            label.setMinimumWidth(120)  # Reduced minimum width
+            label.setMinimumWidth(120)
         
         general_layout.addWidget(QLabel("Cards Processed:"), 0, 0)
         general_layout.addWidget(self.cards_processed_label, 0, 1)
@@ -4263,9 +4131,9 @@ class StatsPanel(QFrame):
         self.types_group = QGroupBox("Message Types")
         types_layout = QGridLayout()
         self.types_group.setLayout(types_layout)
-        types_layout.setContentsMargins(8, 15, 8, 8)  # Reduced margins
-        types_layout.setSpacing(4)  # Reduced spacing
-        types_layout.setColumnMinimumWidth(1, 120)  # Reduced minimum width
+        types_layout.setContentsMargins(8, 15, 8, 8)
+        types_layout.setSpacing(4)
+        types_layout.setColumnMinimumWidth(1, 120)
         
         self.local_count_label = QLabel("0")
         self.ai_count_label = QLabel("0")
@@ -4276,7 +4144,7 @@ class StatsPanel(QFrame):
         for label in [self.local_count_label, self.ai_count_label,
                      self.database_count_label, self.other_count_label]:
             label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            label.setMinimumWidth(120)  # Reduced minimum width
+            label.setMinimumWidth(120)
         
         types_layout.addWidget(QLabel("Local:"), 0, 0)
         types_layout.addWidget(self.local_count_label, 0, 1)
@@ -4296,9 +4164,9 @@ class StatsPanel(QFrame):
         self.error_group = QGroupBox("Error Statistics")
         error_layout = QGridLayout()
         self.error_group.setLayout(error_layout)
-        error_layout.setContentsMargins(8, 15, 8, 8)  # Reduced margins
-        error_layout.setSpacing(4)  # Reduced spacing
-        error_layout.setColumnMinimumWidth(1, 120)  # Reduced minimum width
+        error_layout.setContentsMargins(8, 15, 8, 8)
+        error_layout.setSpacing(4)
+        error_layout.setColumnMinimumWidth(1, 120)
         
         self.encoding_errors_label = QLabel("0")
         self.invalid_chars_label = QLabel("0")
@@ -4309,7 +4177,7 @@ class StatsPanel(QFrame):
         for label in [self.encoding_errors_label, self.invalid_chars_label,
                      self.msg_too_long_label, self.other_errors_label]:
             label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            label.setMinimumWidth(120)  # Reduced minimum width
+            label.setMinimumWidth(120)
         
         error_layout.addWidget(QLabel("Encoding Errors:"), 0, 0)
         error_layout.addWidget(self.encoding_errors_label, 0, 1)
@@ -4327,7 +4195,7 @@ class StatsPanel(QFrame):
         
         # Add buttons with more spacing
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(8)  # Reduced spacing
+        button_layout.setSpacing(8)
         
         self.refresh_btn = RetroButton("Refresh")
         self.refresh_btn.clicked.connect(self.refresh_stats)
