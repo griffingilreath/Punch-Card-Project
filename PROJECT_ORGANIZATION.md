@@ -6,6 +6,8 @@ This document outlines the organization of the Punch Card Project codebase.
 
 ```
 punch-card-project/
+├── bin/                    # Executable scripts
+│   └── punch_card         # Main application entry point
 ├── .github/            # GitHub workflows and templates
 ├── assets/             # Static assets and resources
 ├── backups/            # Important backups (consider gitignoring)
@@ -97,4 +99,13 @@ punch-card-project/
 ## Deployment
 
 - Use scripts/deployment for automating the deployment process
-- Follow the release checklist in the documentation 
+- Follow the release checklist in the documentation
+
+## Key Files
+
+- `bin/punch_card`: Main application entry point with command-line options
+- `src/core/punch_card.py`: Core application logic
+- `src/display/gui_display.py`: GUI implementation
+- `src/display/terminal_display.py`: Terminal interface
+- `src/utils/version_info.py`: Version information
+- `src/animation/animation_manager.py`: Animation system 

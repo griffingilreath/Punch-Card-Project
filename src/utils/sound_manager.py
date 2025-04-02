@@ -38,7 +38,9 @@ class SoundManager:
             "punch": "Tink",     # Short, crisp sound for typing
             "complete": "Glass", # Pleasant sound for message complete
             "clear": "Pop",     # Quick sound for clearing
-            "startup": "Hero"   # Dramatic sound for startup
+            "startup": "Hero",   # Dramatic sound for startup
+            "eject": "Submarine", # Submarine sound for card ejection
+            "insert": "Bottle"   # Bottle sound for card insertion
         }
         
         self.log("Initializing sound manager...", "INFO")
@@ -210,7 +212,11 @@ class SoundManager:
             if platform.system() == "Darwin":
                 try:
                     # Get the mapped sound name if it exists
-                    sound_file = self.sound_mappings.get(sound_name, sound_name)
+                    if sound_name not in self.sound_mappings:
+                        self.log(f"No mapping found for sound action '{sound_name}', using default", "WARNING")
+                        sound_file = sound_name
+                    else:
+                        sound_file = self.sound_mappings.get(sound_name)
                     
                     # Check if the sound exists in mac_sounds
                     if sound_file in self.mac_sounds:
@@ -227,7 +233,19 @@ class SoundManager:
                         else:
                             self.log(f"Sound file not found: {sound_path}", "ERROR")
                     else:
-                        self.log(f"Sound {sound_file} not found in mac_sounds dictionary", "ERROR")
+                        # Try to fall back to a default sound if the mapped sound is not available
+                        if sound_name in self.sound_mappings and "Pop" in self.mac_sounds:
+                            self.log(f"Sound '{sound_file}' not found, falling back to 'Pop'", "WARNING")
+                            sound_path = self.mac_sounds["Pop"]
+                            volume_arg = str(self.volume)
+                            subprocess.Popen([
+                                "afplay",
+                                "-v", volume_arg,
+                                sound_path
+                            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            return True
+                        else:
+                            self.log(f"Sound {sound_file} not found in mac_sounds dictionary", "ERROR")
                     return False
                 except Exception as e:
                     self.log(f"Error playing sound: {str(e)}", "ERROR")
@@ -248,7 +266,11 @@ class SoundManager:
                 return False
             
             # Get the mapped sound name if it exists
-            sound_file = self.sound_mappings.get(sound_name, sound_name)
+            if sound_name not in self.sound_mappings:
+                self.log(f"No mapping found for sound action '{sound_name}', using default", "WARNING")
+                sound_file = sound_name
+            else:
+                sound_file = self.sound_mappings.get(sound_name)
             
             # Check if the sound exists in mac_sounds
             if sound_file in self.mac_sounds:
@@ -265,7 +287,19 @@ class SoundManager:
                 else:
                     self.log(f"Sound file not found: {sound_path}", "ERROR")
             else:
-                self.log(f"Sound {sound_file} not found in mac_sounds dictionary", "ERROR")
+                # Try to fall back to a default sound if the mapped sound is not available
+                if sound_name in self.sound_mappings and "Pop" in self.mac_sounds:
+                    self.log(f"Sound '{sound_file}' not found, falling back to 'Pop'", "WARNING")
+                    sound_path = self.mac_sounds["Pop"]
+                    volume_arg = str(self.volume)
+                    subprocess.Popen([
+                        "afplay",
+                        "-v", volume_arg,
+                        sound_path
+                    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    return True
+                else:
+                    self.log(f"Sound {sound_file} not found in mac_sounds dictionary", "ERROR")
             return False
             
         except Exception as e:

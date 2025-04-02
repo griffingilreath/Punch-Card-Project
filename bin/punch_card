@@ -8,6 +8,22 @@ import sys
 import subprocess
 import argparse
 
+def setup_path():
+    """Set up the Python path to include the project root."""
+    # Get the directory containing this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Get the project root (parent of bin directory)
+    project_root = os.path.dirname(current_dir)
+    
+    # Add project root to Python path
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
+    
+    # Also add src directory to path
+    src_path = os.path.join(project_root, 'src')
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+
 def ensure_dependencies():
     """Make sure all required dependencies are installed."""
     try:
@@ -56,21 +72,20 @@ def parse_arguments():
 
 def run_app():
     """Run the Punch Card application."""
+    # Set up the Python path
+    setup_path()
+    
     # Parse command line arguments
     args = parse_arguments()
     
     # Set the working directory to the project root
-    project_root = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.chdir(project_root)
-    
-    # Add the project root to the Python path
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
     
     # Import the application module
     try:
         from src.core.punch_card import PunchCard
-        from src.display.gui_display import PunchCardDisplay
+        from src.display.main_window import MainWindow
         from PyQt6.QtWidgets import QApplication
         from PyQt6.QtCore import QTimer
         
@@ -82,7 +97,7 @@ def run_app():
         punch_card = PunchCard()
         
         # Create the main display
-        gui = PunchCardDisplay(punch_card)
+        gui = MainWindow(punch_card)
         
         # Configure based on command line arguments
         
@@ -117,13 +132,12 @@ def run_app():
                 
                 # Make sure animation_manager is connected to handle events
                 if hasattr(gui, 'animation_manager'):
-                    # Only connect if not already connected
-                    connected = False
-                    for connection in gui.animation_manager.animation_finished.receivers():
-                        if hasattr(gui, 'on_animation_finished'):
-                            connected = True
-                    
-                    if not connected and hasattr(gui, 'on_animation_finished'):
+                    # Connect the animation finished signal if not already connected
+                    if hasattr(gui, 'on_animation_finished'):
+                        try:
+                            gui.animation_manager.animation_finished.disconnect(gui.on_animation_finished)
+                        except:
+                            pass  # Signal wasn't connected
                         gui.animation_manager.animation_finished.connect(gui.on_animation_finished)
                 
                 print("✅ Animations enabled")

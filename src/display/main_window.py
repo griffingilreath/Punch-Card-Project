@@ -93,7 +93,7 @@ NOTCH_HEIGHT = int(6.35 * SCALE_FACTOR)   # 4/16 inch = 6.35mm
 NUM_ROWS = 12
 NUM_COLS = 80
 
-class PunchCardDisplay(QMainWindow):
+class MainWindow(QMainWindow):
     """Main window for the minimalist punch card display application."""
     
     def __init__(self, punch_card=None, enable_animations=True, animation_fps=30):
@@ -1547,7 +1547,7 @@ def run_gui_app():
         # Initialize application
         app = QApplication.instance() if QApplication.instance() else QApplication(sys.argv)
         punch_card = PunchCard()
-        gui = PunchCardDisplay(punch_card)
+        gui = MainWindow(punch_card)
         gui.show()
         
         # Run application

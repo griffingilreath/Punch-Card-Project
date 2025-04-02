@@ -337,12 +337,6 @@ PUNCH_DESCRIPTIONS = {
 
 class PunchCardStats:
     def __init__(self):
-        self.cards_processed = 0
-        self.total_holes = 0
-        self.character_stats = {}
-        self.message_length_stats = {}  # Track count of messages by length
-        self.start_time = time.time()
-        self.last_update = time.time()
         self.stats_file = 'punch_card_stats.json'
         self.stats = self.load_stats()
         
@@ -358,6 +352,16 @@ class PunchCardStats:
                         length = int(length)
                         message_length_stats[length] = message_length_stats.get(length, 0) + count
                     stats['message_length_stats'] = message_length_stats
+                
+                # Ensure message_types exists
+                if 'message_types' not in stats:
+                    stats['message_types'] = {
+                        'Local': 0,
+                        'AI': 0,
+                        'Database': 0,
+                        'Other': 0
+                    }
+                
                 return stats
         except (FileNotFoundError, json.JSONDecodeError):
             return {
@@ -365,6 +369,18 @@ class PunchCardStats:
                 'total_holes': 0,
                 'character_stats': {},
                 'message_length_stats': {},
+                'message_types': {
+                    'Local': 0,
+                    'AI': 0,
+                    'Database': 0,
+                    'Other': 0
+                },
+                'error_stats': {
+                    'encoding_errors': 0,
+                    'invalid_characters': 0,
+                    'message_too_long': 0,
+                    'other_errors': 0
+                },
                 'start_time': time.time(),
                 'last_update': time.time()
             }
@@ -408,7 +424,29 @@ class PunchCardStats:
         # Count total holes (1 for each actual character)
         self.stats['total_holes'] += len(message)
         
+        # Update message type statistics
+        if message_type not in self.stats['message_types']:
+            message_type = 'Other'
+        self.stats['message_types'][message_type] += 1
+        
         # Save updated statistics
+        self.save_stats()
+    
+    def update_error_stats(self, error_type: str):
+        """Update error statistics"""
+        if 'error_stats' not in self.stats:
+            self.stats['error_stats'] = {
+                'encoding_errors': 0,
+                'invalid_characters': 0,
+                'message_too_long': 0,
+                'other_errors': 0
+            }
+        
+        if error_type in self.stats['error_stats']:
+            self.stats['error_stats'][error_type] += 1
+        else:
+            self.stats['error_stats']['other_errors'] += 1
+        
         self.save_stats()
     
     def get_stats(self):
@@ -416,7 +454,37 @@ class PunchCardStats:
         # Update time operating
         self.stats['time_operating'] = time.time() - self.stats['start_time']
         
-        # Ensure message_length_stats exists
+        # Calculate processing rate (cards per hour)
+        elapsed_hours = max(0.001, (time.time() - self.stats['start_time']) / 3600)
+        self.stats['processing_rate'] = self.stats['cards_processed'] / elapsed_hours
+        
+        # Calculate average message length
+        if self.stats['cards_processed'] > 0:
+            self.stats['average_message_length'] = self.stats['total_holes'] / self.stats['cards_processed']
+        else:
+            self.stats['average_message_length'] = 0
+        
+        # Find most and least used characters
+        char_stats = self.stats['character_stats']
+        if char_stats:
+            most_used = max(char_stats.items(), key=lambda x: x[1])
+            least_used = min(char_stats.items(), key=lambda x: x[1])
+            self.stats['most_used_char'] = most_used[0]
+            self.stats['least_used_char'] = least_used[0]
+        else:
+            self.stats['most_used_char'] = ''
+            self.stats['least_used_char'] = ''
+        
+        # Ensure all required dictionaries exist
+        if 'message_types' not in self.stats:
+            self.stats['message_types'] = {'Local': 0, 'AI': 0, 'Database': 0, 'Other': 0}
+        if 'error_stats' not in self.stats:
+            self.stats['error_stats'] = {
+                'encoding_errors': 0,
+                'invalid_characters': 0,
+                'message_too_long': 0,
+                'other_errors': 0
+            }
         if 'message_length_stats' not in self.stats:
             self.stats['message_length_stats'] = {}
             
@@ -611,6 +679,35 @@ class PunchCard:
         self.generation_delay = DEFAULT_GENERATION_DELAY
         # Reset debug message display setting
         self.show_debug_messages = DEFAULT_SHOW_DEBUG_MESSAGES
+        
+        # Reset statistics
+        if hasattr(self, 'stats'):
+            self.stats = PunchCardStats()  # Create new stats instance
+            # Initialize with default values
+            self.stats.stats = {
+                'cards_processed': 0,
+                'total_holes': 0,
+                'character_stats': {},
+                'message_length_stats': {},
+                'message_types': {
+                    'Local': 0,
+                    'AI': 0,
+                    'Database': 0,
+                    'Other': 0
+                },
+                'error_stats': {
+                    'encoding_errors': 0,
+                    'invalid_characters': 0,
+                    'message_too_long': 0,
+                    'other_errors': 0
+                },
+                'start_time': time.time(),
+                'last_update': time.time()
+            }
+            # Save the reset statistics
+            self.stats.save_stats()
+        
+        # Save settings
         self._save_settings()
 
     def _ensure_terminal_size(self):
@@ -751,8 +848,30 @@ class PunchCard:
         
     def show_message(self, message: str, source: str = "Generated"):
         """Display a message on the LED grid"""
-        # Store the previous message grid state before clearing for the new message
-        previous_grid = [row[:] for row in self.grid]  # Deep copy of current grid
+        # Validate message
+        if not message:
+            self.stats.update_error_stats('invalid_characters')
+            return False
+            
+        # Check message length
+        if len(message) > self.columns:
+            self.stats.update_error_stats('message_too_long')
+            message = message[:self.columns]  # Truncate message
+            
+        # Validate characters
+        for char in message:
+            try:
+                pattern = self.char_to_led_pattern(char)
+                if not pattern:
+                    self.stats.update_error_stats('invalid_characters')
+                    return False
+            except Exception:
+                self.stats.update_error_stats('encoding_errors')
+                return False
+        
+        # Clear the grid before starting new message
+        self.grid = [[0 for _ in range(self.columns)] for _ in range(self.rows)]
+        self.current_column = 0
         
         # Add message to database and get message number
         self.message_number = self.message_db.add_message(message, source)
@@ -760,17 +879,21 @@ class PunchCard:
         message = message.ljust(self.columns)[:self.columns]
         
         # Update statistics
-        self.stats.update_message_stats(message)
+        self.stats.update_message_stats(message, source)
         
         # ===== TYPING STATE =====
         # Display each character with original delays
         for col, char in enumerate(message):
             self.current_column = col
-            pattern = self.char_to_led_pattern(char)
-            for row, is_punched in enumerate(pattern):
-                self.grid[row][col] = is_punched
-            self._display_grid(show_progress_bar=False)
-            time.sleep(self.led_delay)
+            try:
+                pattern = self.char_to_led_pattern(char)
+                for row, is_punched in enumerate(pattern):
+                    self.grid[row][col] = is_punched
+                self._display_grid(show_progress_bar=False)
+                time.sleep(self.led_delay)
+            except Exception:
+                self.stats.update_error_stats('encoding_errors')
+                continue
         
         # Update display time in database
         self.message_db.update_display_time(self.message_number)
@@ -825,10 +948,8 @@ class PunchCard:
         
         # Display empty card with "THINKING" status if delay is set
         if self.thinking_delay > 0:
-            # Create custom display method for thinking state to avoid recycling _display_static_card
             self._display_thinking_state()
             time.sleep(self.thinking_delay)
-            # Note: The actual generation delay happens in the main.py file, not here
         
     def _display_thinking_state(self):
         """Display an empty card with THINKING status"""

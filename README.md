@@ -1,9 +1,9 @@
-# Punch Card Project v0.6.9 - Enhanced Statistics and Analytics
+# Punch Card Project v0.7.0 - Component Refactoring
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
 [![PyQt6](https://img.shields.io/badge/PyQt-6.4-green.svg)](https://www.riverbankcomputing.com/software/pyqt/)
-[![Version](https://img.shields.io/badge/version-0.6.9-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.6.9)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.7.0)
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
 ```
@@ -20,7 +20,7 @@
 │ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
 │ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
 │ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.6.9  │
+│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.7.0  │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -38,17 +38,17 @@
 > 2. Update your key using the `update_api_key.py` script 
 > 3. Only use the secure methods described in the installation section
 
-**Status**: Beta - The Branching Update implements a comprehensive Git versioning strategy while building on v0.5.2's project organization.
+**Status**: Beta - The Component Architecture Update implements a modular, component-based architecture while maintaining backward compatibility.
 
-**What's New in v0.6.9**
+**What's New in v0.7.0**
 
-- **Enhanced Statistics Panel**: Completely redesigned with improved layout and real-time tracking
-- **Real-time Analytics**: Added automatic refresh of statistics every 5 seconds
-- **Improved UI Elements**: Better text field sizing and alignment in statistics window
-- **Performance Optimization**: Enhanced error handling and statistics tracking
-- **Data Persistence**: Added support for saving and loading statistics between sessions
+- **Component Architecture**: Extracted all major UI components into separate modules
+- **Enhanced Maintainability**: Reduced main window module size by over 70%
+- **Energy Usage Tracking**: Added electricity usage monitoring for M4 Mac Mini
+- **Improved Organization**: Created a well-structured component directory system
+- **File Reorganization**: Renamed `gui_display.py` to `main_window.py` to better reflect its role
 
-[See full release notes](release_notes/v0.6.9.md)
+[See full release notes](release_notes/v0.7.0.md)
 
 **Documentation**
 
@@ -56,7 +56,7 @@
 - [User Guide](docs/USER_GUIDE.md) - How to use the application
 - [API Integration](docs/API_INTEGRATION.md) - How to set up and use OpenAI API
 - [Keychain Integration](docs/KEYCHAIN_INTEGRATION.md) - How secure API key storage works
-- [Version 0.6.9 Release Notes](release_notes/v0.6.9.md) - Details about the latest release
+- [Version 0.7.0 Release Notes](release_notes/v0.7.0.md) - Details about the latest release
 
 **Organization**
 
