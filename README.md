@@ -1,9 +1,9 @@
-# Punch Card Project v0.7.0 - Component Refactoring
+# Punch Card Project v0.7.1 - Component Refactoring
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
 [![PyQt6](https://img.shields.io/badge/PyQt-6.4-green.svg)](https://www.riverbankcomputing.com/software/pyqt/)
-[![Version](https://img.shields.io/badge/version-0.7.0-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.7.0)
+[![Version](https://img.shields.io/badge/version-0.7.1-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.7.1)
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
 Current Version: 0.7.1
