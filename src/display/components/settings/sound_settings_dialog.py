@@ -144,7 +144,11 @@ class SoundSettingsDialog(QDialog):
             "punch": "Punch/Typing Sound",
             "complete": "Message Complete Sound",
             "clear": "Clear Card Sound",
-            "startup": "Startup Sound"
+            "startup": "Startup Sound",
+            "eject": "Card Ejection Sound",
+            "insert": "Card Insertion Sound",
+            "error": "Error Sound",
+            "success": "Success Sound"
         }
         
         # Get available sounds from sound manager

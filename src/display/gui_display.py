@@ -407,14 +407,23 @@ class PunchCardDisplay(QMainWindow):
         pass
     
     def resizeEvent(self, event):
-        """Handle resize events."""
+        """Handle window resize events."""
         super().resizeEvent(event)
-        # No need to reposition text elements as they're managed by layouts
+        
+        # Update text element positions on resize
+        self.position_text_elements()
+        
+        # Update stats panel position if visible
+        if hasattr(self, 'stats_panel') and self.stats_panel.isVisible():
+            x = self.width() - self.stats_panel.width() - 20
+            y = 60  # Below the menu bar
+            self.stats_panel.move(x, y)
     
     def showEvent(self, event):
         """Handle show event."""
         super().showEvent(event)
-        # No need to position text elements as they're managed by layouts
+        # Update margins after the window is shown
+        QTimer.singleShot(200, self.update_label_margins)
     
     def update_status(self, status: str):
         """Update the status overlay with a new status message."""
@@ -1365,50 +1374,27 @@ class PunchCardDisplay(QMainWindow):
             if hasattr(self, 'console'):
                 self.console.log(f"Error updating label margins: {str(e)}", "ERROR")
     
-    def resizeEvent(self, event):
-        """Handle resize events."""
-        super().resizeEvent(event)
-        # Adjust label margins on resize
-        QTimer.singleShot(100, self.update_label_margins)
-    
-    def showEvent(self, event):
-        """Handle show event."""
-        super().showEvent(event)
-        # Update margins after the window is shown
-        QTimer.singleShot(200, self.update_label_margins)
-        
-    def display_message(self, message: str, source: str = "", delay: int = 100):
-        """Display a message with optional source information."""
-        # Don't display messages during splash screen or when animations are running
-        if self.showing_splash:
-            self.console.log("Ignoring message display request during splash animation", "WARNING")
-            return
+    def show_statistics_dialog(self):
+        """Show/hide the statistics panel as an overlay in the main window."""
+        if self.stats_panel.isVisible():
+            self.stats_panel.hide()
+        else:
+            # Position the panel in the top-right corner of the window
+            x = self.width() - self.stats_panel.width() - 20
+            y = 60  # Below the menu bar
+            self.stats_panel.move(x, y)
             
-        self.current_message = message.upper()
-        self.current_char_index = 0
-        
-        # Clear the grid and play clear sound
-        self.punch_card.clear_grid()
-        self.play_sound("clear")
-        
-        self.led_delay = delay
-        self.timer.setInterval(delay)
-        
-        # Update message label
-        self.message_label.setText(message)
-        
-        # Update label margins
-        self.update_label_margins()
-        
-        # Update statistics
-        if hasattr(self, 'stats'):
-            self.stats.update_message_stats(message, message_type=source or "Local")
-            # Refresh stats panel if visible
-            if hasattr(self, 'stats_panel') and self.stats_panel.isVisible():
-                self.stats_panel.refresh_stats()
-        
-        self.update_status(f"PROCESSING: {message}")
-        self.start_display()
+            # Refresh stats before showing
+            self.stats_panel.refresh_stats()
+            
+            self.stats_panel.show()
+            self.stats_panel.raise_()  # Ensure it's on top
+
+    def show_message_bus_viewer(self):
+        """Show the message bus viewer window."""
+        from src.ui.message_bus_viewer import MessageBusViewer
+        self.message_bus_viewer = MessageBusViewer(self)
+        self.message_bus_viewer.show()
 
     def initialize_sound_system(self):
         """Initialize the sound system with proper logging."""
@@ -1496,44 +1482,6 @@ class PunchCardDisplay(QMainWindow):
         help_menu = menubar.addMenu("Help")
         help_menu.addAction("About", self.show_about)
         help_menu.addAction("Documentation", self.show_documentation)
-    
-    def open_sound_settings(self):
-        """Open macOS System Settings to Sound settings."""
-        from src.utils.sound_manager import get_sound_manager
-        sound_manager = get_sound_manager(self.console)
-        if sound_manager.open_sound_settings():
-            self.console.log("Opened Sound settings", "INFO")
-        else:
-            self.console.log("Failed to open Sound settings", "WARNING")
-
-    def show_statistics_dialog(self):
-        """Show/hide the statistics panel as an overlay in the main window."""
-        if self.stats_panel.isVisible():
-            self.stats_panel.hide()
-        else:
-            # Position the panel in the top-right corner of the window
-            x = self.width() - self.stats_panel.width() - 20
-            y = 60  # Below the menu bar
-            self.stats_panel.move(x, y)
-            
-            # Refresh stats before showing
-            self.stats_panel.refresh_stats()
-            
-            self.stats_panel.show()
-            self.stats_panel.raise_()  # Ensure it's on top
-
-    def resizeEvent(self, event):
-        """Handle window resize events."""
-        super().resizeEvent(event)
-        
-        # Update text element positions on resize
-        self.position_text_elements()
-        
-        # Update stats panel position if visible
-        if hasattr(self, 'stats_panel') and self.stats_panel.isVisible():
-            x = self.width() - self.stats_panel.width() - 20
-            y = 60  # Below the menu bar
-            self.stats_panel.move(x, y)
 
 def run_gui_app():
     """

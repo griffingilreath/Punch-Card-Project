@@ -26,13 +26,28 @@ class APIManager:
     """Manages OpenAI API interactions and settings."""
     
     def __init__(self):
-        """Initialize the API manager."""
-        logger.info("Initializing APIManager")
+        """Initialize the API Manager."""
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+        
+        # Create handlers
+        file_handler = logging.FileHandler('api_manager.log')
+        console_handler = logging.StreamHandler()
+        
+        # Create formatters and add it to handlers
+        log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(log_format)
+        console_handler.setFormatter(log_format)
+        
+        # Add handlers to the logger
+        self.logger.addHandler(file_handler)
+        self.logger.addHandler(console_handler)
+        
         self.client = None
         self.api_key = None
         self.model = "gpt-3.5-turbo"
         self.temperature = 0.7
-        self._load_settings()
+        self.settings = self._load_settings()
         logger.debug(f"APIManager initialized with model: {self.model}, temperature: {self.temperature}")
     
     def _load_settings(self):
@@ -40,86 +55,129 @@ class APIManager:
         try:
             # Get settings from settings manager
             settings_manager = get_settings()
-            logger.debug("Loading settings from settings manager")
+            self.logger.debug("Loading settings from settings manager")
             
             # Load API key if available
             self.api_key = settings_manager.get_api_key()
             if self.api_key:
-                logger.debug("API key found in settings")
+                self.logger.debug("API key found in settings")
                 try:
                     self.client = OpenAI(api_key=self.api_key)
-                    logger.info("OpenAI client initialized successfully")
+                    self.logger.info("OpenAI client initialized successfully")
                 except Exception as e:
-                    logger.error(f"Failed to initialize OpenAI client: {str(e)}")
+                    self.logger.error(f"Failed to initialize OpenAI client: {str(e)}")
             else:
-                logger.warning("No API key found in settings")
+                self.logger.warning("No API key found in settings")
             
             # Load model and temperature
             self.model = settings_manager.get_model()
             self.temperature = settings_manager.get_temperature()
-            logger.debug(f"Model set to: {self.model}")
-            logger.debug(f"Temperature set to: {self.temperature}")
+            self.logger.debug(f"Model set to: {self.model}")
+            self.logger.debug(f"Temperature set to: {self.temperature}")
             
         except Exception as e:
-            logger.error(f"Error loading API settings: {str(e)}", exc_info=True)
+            self.logger.error(f"Error loading API settings: {str(e)}", exc_info=True)
     
-    def check_api_connection(self) -> Tuple[bool, str, Optional[List[str]]]:
+    def log(self, message: str, level: str = "INFO"):
+        """Log a message with the specified level."""
+        level = level.upper()
+        if level == "DEBUG":
+            self.logger.debug(message)
+        elif level == "INFO":
+            self.logger.info(message)
+        elif level == "WARNING":
+            self.logger.warning(message)
+        elif level == "ERROR":
+            self.logger.error(message)
+        elif level == "CRITICAL":
+            self.logger.critical(message)
+        else:
+            self.logger.info(message)  # Default to INFO if level is not recognized
+    
+    def check_api_connection(self) -> bool:
         """
         Check if the API connection is working.
-        Returns: (success, status_message, available_models)
-        """
-        logger.info("Checking API connection")
         
-        if not self.api_key:
-            logger.warning("No API key configured")
-            return False, "No API key configured", None
+        Returns:
+            True if connection is successful, False otherwise
+        """
+        if not self.client:
+            self.logger.error("API client not initialized - no API key available")
+            return False
             
         try:
-            if not self.client:
-                logger.debug("Initializing OpenAI client")
-                self.client = OpenAI(api_key=self.api_key)
-            
-            # Try to list models to verify the connection
-            logger.debug("Attempting to list available models")
+            # Test the connection by listing available models
             models = self.client.models.list()
-            
-            # Return all available models without filtering
-            available_models = [model.id for model in models.data]
-            logger.info(f"Successfully retrieved {len(available_models)} available models")
-            logger.debug(f"Available models: {available_models}")
-            
-            return True, "Connected", available_models
-            
-        except APIError as e:
-            logger.error(f"OpenAI API Error: {str(e)}", exc_info=True)
-            return False, f"API Error: {str(e)}", None
+            self.logger.info(f"Successfully retrieved {len(models.data)} available models")
+            self.api_ready = True
+            return True
         except Exception as e:
-            logger.error(f"Unexpected error during API connection check: {str(e)}", exc_info=True)
-            return False, f"Connection Error: {str(e)}", None
+            error_msg = str(e)
+            if "Incorrect API key" in error_msg:
+                self.logger.error("API key is invalid")
+            elif "Connection error" in error_msg:
+                self.logger.error("Failed to connect to OpenAI API - please check your internet connection")
+            else:
+                self.logger.error(f"API connection check failed: {error_msg}")
+            self.api_ready = False
+            return False
+            
+    def get_available_models(self) -> List[str]:
+        """
+        Get a list of available models from the API.
+        
+        Returns:
+            List of model IDs
+        """
+        if not self.client:
+            self.logger.error("API client not initialized - no API key available")
+            return []
+            
+        try:
+            models = self.client.models.list()
+            return [model.id for model in models.data]
+        except Exception as e:
+            self.logger.error(f"Failed to retrieve available models: {str(e)}")
+            return []
     
-    def generate_message(self, prompt: str) -> Tuple[bool, str]:
+    def generate_message(self, prompt: str, use_web_search: bool = False) -> Tuple[bool, str]:
         """
         Generate a message using the OpenAI API.
+        
+        Args:
+            prompt: The input prompt
+            use_web_search: Whether to use the web search tool
+            
         Returns: (success, message)
         """
-        logger.info("Generating message with OpenAI API")
-        logger.debug(f"Prompt: {prompt}")
+        self.logger.info("Generating message with OpenAI API")
+        self.logger.debug(f"Prompt: {prompt}")
+        self.logger.debug(f"Using web search: {use_web_search}")
         
         if not self.client:
-            logger.error("API client not initialized")
+            self.logger.error("API client not initialized")
             return False, "API client not initialized"
             
         try:
-            logger.debug(f"Using model: {self.model}, temperature: {self.temperature}")
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=self.temperature
-            )
+            self.logger.debug(f"Using model: {self.model}, temperature: {self.temperature}")
+            
+            # Prepare parameters
+            params = {
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": self.temperature
+            }
+            
+            # Add tools parameter if web search is enabled
+            if use_web_search:
+                params["tools"] = [{"type": "web_search_preview"}]
+            
+            # Make the API call
+            response = self.client.chat.completions.create(**params)
             
             message = response.choices[0].message.content
-            logger.info("Successfully generated message")
-            logger.debug(f"Generated message: {message}")
+            self.logger.info("Successfully generated message")
+            self.logger.debug(f"Generated message: {message}")
             
             # Update usage statistics
             prompt_tokens = response.usage.prompt_tokens
@@ -149,16 +207,17 @@ class APIManager:
             return True, message
             
         except Exception as e:
-            logger.error(f"Error generating message: {str(e)}", exc_info=True)
+            self.logger.error(f"Error generating message: {str(e)}", exc_info=True)
             return False, f"Error generating message: {str(e)}"
     
-    def generate_completion(self, system_message: str, user_message: str) -> str:
+    def generate_completion(self, system_message: str, user_message: str, use_web_search: bool = False) -> str:
         """
         Generate a completion using the OpenAI API with system and user messages.
         
         Args:
             system_message: The system message/instructions
             user_message: The user's message/query
+            use_web_search: Whether to use the web search tool
             
         Returns:
             The generated completion text
@@ -166,29 +225,37 @@ class APIManager:
         Raises:
             Exception: If API call fails
         """
-        logger.info("Generating completion with OpenAI API")
-        logger.debug(f"System: {system_message}")
-        logger.debug(f"User: {user_message}")
+        self.logger.info("Generating completion with OpenAI API")
+        self.logger.debug(f"System: {system_message}")
+        self.logger.debug(f"User: {user_message}")
+        self.logger.debug(f"Using web search: {use_web_search}")
         
         if not self.client:
             if not self.api_key:
                 raise ValueError("No API key configured")
             
-            logger.debug("Initializing OpenAI client")
+            self.logger.debug("Initializing OpenAI client")
             self.client = OpenAI(api_key=self.api_key)
             
-        # Make API call
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
+        # Prepare parameters
+        params = {
+            "model": self.model,
+            "messages": [
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message}
             ],
-            temperature=self.temperature
-        )
+            "temperature": self.temperature
+        }
+        
+        # Add tools parameter if web search is enabled
+        if use_web_search:
+            params["tools"] = [{"type": "web_search_preview"}]
+        
+        # Make API call
+        response = self.client.chat.completions.create(**params)
         
         completion = response.choices[0].message.content
-        logger.info("Successfully generated completion")
+        self.logger.info("Successfully generated completion")
         
         # Update usage statistics
         prompt_tokens = response.usage.prompt_tokens
@@ -221,8 +288,8 @@ class APIManager:
                        model: Optional[str] = None,
                        temperature: Optional[float] = None):
         """Update API settings."""
-        logger.info("Updating API settings")
-        logger.debug(f"New settings - API Key: {'*' * 8 if api_key else 'None'}, Model: {model}, Temperature: {temperature}")
+        self.logger.info("Updating API settings")
+        self.logger.debug(f"New settings - API Key: {'*' * 8 if api_key else 'None'}, Model: {model}, Temperature: {temperature}")
         
         try:
             # Get settings manager
@@ -243,19 +310,19 @@ class APIManager:
                 self.api_key = api_key
                 try:
                     self.client = OpenAI(api_key=api_key)
-                    logger.info("Successfully updated API key and initialized new client")
+                    self.logger.info("Successfully updated API key and initialized new client")
                 except Exception as e:
-                    logger.error(f"Failed to initialize new OpenAI client: {str(e)}", exc_info=True)
+                    self.logger.error(f"Failed to initialize new OpenAI client: {str(e)}", exc_info=True)
             
             if model is not None:
                 self.model = model
-                logger.debug(f"Updated model to: {model}")
+                self.logger.debug(f"Updated model to: {model}")
             
             if temperature is not None:
                 self.temperature = temperature
-                logger.debug(f"Updated temperature to: {temperature}")
+                self.logger.debug(f"Updated temperature to: {temperature}")
                 
-            logger.info("Successfully saved updated settings")
+            self.logger.info("Successfully saved updated settings")
                 
         except Exception as e:
-            logger.error(f"Error updating API settings: {str(e)}", exc_info=True) 
+            self.logger.error(f"Error updating API settings: {str(e)}", exc_info=True) 

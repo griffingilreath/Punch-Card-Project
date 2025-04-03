@@ -1030,15 +1030,6 @@ class MainWindow(QMainWindow):
     def show_card_settings(self):
         """Show card dimensions settings tab."""
         # Create a new settings dialog instance each time
-        settings_dialog = SettingsDialog(self)
-        settings_dialog.tab_widget.setCurrentIndex(1)  # "Card Dimensions" tab index
-        if settings_dialog.exec() == QDialog.DialogCode.Accepted:
-            settings = settings_dialog.get_settings()
-            # Apply the settings
-            self.led_delay = settings.get('led_delay', self.led_delay)
-            self.message_display_time = settings.get('message_display_time', self.message_display_time)
-            self.timer.setInterval(self.led_delay)
-            if hasattr(self, 'punch_card'):
                 card_settings = {k: v for k, v in settings.items() if k in [
                     'scale_factor', 'top_margin', 'side_margin', 'row_spacing',
                     'column_spacing', 'hole_width', 'hole_height'
@@ -1048,12 +1039,6 @@ class MainWindow(QMainWindow):
         
     def show_api_settings(self):
         """Show the API settings tab."""
-        self.update_status("Opening API Settings...")
-        # Create and show the settings dialog with API tab selected
-        settings_dialog = SettingsDialog(self)
-        settings_dialog.tab_widget.setCurrentIndex(2)  # OpenAI API tab index
-        settings_dialog.exec()
-        
     def show_about_dialog(self):
         """Show about dialog with application information."""
         self.update_status("Showing About Information...")
@@ -1076,12 +1061,6 @@ class MainWindow(QMainWindow):
     def show_settings_dialog(self):
         """Show the settings dialog."""
         self.update_status("Opening Settings...")
-        # Create and show the settings dialog
-        settings_dialog = SettingsDialog(self)
-        if settings_dialog.exec() == QDialog.DialogCode.Accepted:
-            self.refresh_ui_from_settings()
-
-    def start_sleep_mode(self):
         """Start the sleep mode animation sequence."""
         # Don't start if already sleeping
         if hasattr(self, 'sleeping') and self.sleeping:
@@ -1294,15 +1273,6 @@ class MainWindow(QMainWindow):
         elif event.key() == Qt.Key.Key_A:
             self.api_console.show()
         elif event.key() == Qt.Key.Key_S:
-            # Create and show the settings dialog
-            settings_dialog = SettingsDialog(self)
-            if settings_dialog.exec() == QDialog.DialogCode.Accepted:
-                settings = settings_dialog.get_settings()
-                self.led_delay = settings.get('led_delay', self.led_delay)
-                self.message_display_time = settings.get('message_display_time', self.message_display_time)
-                self.timer.setInterval(self.led_delay)
-                self.console.log(f"Settings updated: {settings}", "INFO")
-                self.console.log(f"Message display time set to {self.message_display_time} seconds", "INFO")
         elif event.key() == Qt.Key.Key_Space and self.showing_splash and not self.hardware_check_complete:
             # Skip hardware detection and use virtual mode
             self.auto_skip_hardware_detection()

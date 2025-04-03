@@ -348,6 +348,7 @@ class InAppMenuBar(QWidget):
         
         # ---- Settings menu ----
         display_settings_action = self.settings_menu_popup.addAction("Display Settings...")
+        openai_settings_action = self.settings_menu_popup.addAction("API Settings...")
         
         # Add Sound submenu
         sound_menu = QMenu("Sound", self.settings_menu_popup)
@@ -404,26 +405,27 @@ class InAppMenuBar(QWidget):
         self.settings_menu_popup.addMenu(sound_menu)
         
         statistics_action = self.settings_menu_popup.addAction("Statistics...")
-        api_settings_action = self.settings_menu_popup.addAction("API Settings...")
         self.settings_menu_popup.addSeparator()
         inline_settings_action = self.settings_menu_popup.addAction("Quick Settings Panel")
         
-        # Connect settings menu signals
-        display_settings_action.triggered.connect(main_window.show_card_settings)
+        # Connect settings menu signals using lambda functions
+        display_settings_action.triggered.connect(lambda: self.show_display_settings_debug(main_window))
+        openai_settings_action.triggered.connect(lambda: self.show_api_settings_debug(main_window))
         volume_slider.valueChanged.connect(lambda v: self.on_volume_changed(v, volume_value, main_window))
         mute_action.triggered.connect(lambda checked: self.on_mute_changed(checked, main_window))
         sound_settings_action.triggered.connect(lambda: main_window.sound_settings_dialog.show())
         statistics_action.triggered.connect(main_window.show_statistics_dialog)
-        api_settings_action.triggered.connect(main_window.show_api_settings)
         inline_settings_action.triggered.connect(main_window.toggle_quick_settings)
         
         # ---- Console menu ----
         system_console_action = self.console_menu_popup.addAction("System Console")
         api_console_action = self.console_menu_popup.addAction("API Console")
+        message_bus_action = self.console_menu_popup.addAction("Message Bus Viewer")
         
         # Connect Console menu signals
         system_console_action.triggered.connect(lambda: main_window.console.show())
         api_console_action.triggered.connect(lambda: main_window.api_console.show())
+        message_bus_action.triggered.connect(lambda: self.show_message_bus_viewer_debug(main_window))
         
         # ---- Notifications menu (for future use) ----
         self.notifications_popup.addAction("No New Notifications")
@@ -550,4 +552,127 @@ class InAppMenuBar(QWidget):
     def on_sound_mute_changed(self, muted):
         """Handle mute state changes from the sound control."""
         if hasattr(self.parent(), 'sound_manager'):
-            self.parent().sound_manager.set_muted(muted) 
+            self.parent().sound_manager.set_muted(muted)
+    
+    def show_message_bus_viewer_debug(self, main_window):
+        """Debug wrapper for showing message bus viewer."""
+        print("DEBUG: Message bus viewer action triggered")
+        try:
+            from src.ui.message_bus_viewer import MessageBusViewer
+            from src.utils.message_bus import get_message_bus, MessagePriority
+            
+            # Create the message bus viewer directly
+            if not hasattr(main_window, 'message_bus_viewer'):
+                print("DEBUG: Creating new MessageBusViewer instance directly")
+                main_window.message_bus_viewer = MessageBusViewer(main_window)
+                
+            # Show the viewer
+            main_window.message_bus_viewer.show()
+            main_window.message_bus_viewer.raise_()
+            
+            # Position manually with direct calculation
+            x = main_window.width() - main_window.message_bus_viewer.width() - 20
+            y = 60  # Below the menu bar
+            print(f"DEBUG: Positioning message bus viewer at ({x}, {y})")
+            main_window.message_bus_viewer.move(x, y)
+            
+            # Get message bus
+            message_bus = get_message_bus()
+            print("DEBUG: Got message bus instance")
+            
+            # Test direct message publication
+            print("DEBUG: Publishing test messages directly...")
+            
+            # Try different message formats
+            message_bus.publish(
+                "test_event_1", 
+                {"message": "Test message 1 - dictionary format"},
+                "TestSource1", 
+                MessagePriority.NORMAL
+            )
+            
+            message_bus.publish(
+                "test_event_2", 
+                "Test message 2 - string format",
+                "TestSource2", 
+                MessagePriority.HIGH
+            )
+            
+            # Properly formatted test messages with direct data access
+            for i in range(3):
+                message_bus.publish(
+                    f"example_event_{i}", 
+                    f"Example message {i} with timestamp {i}",
+                    f"ExampleSource{i}", 
+                    MessagePriority.NORMAL
+                )
+            
+            print("DEBUG: Published test messages to the message bus")
+            
+        except ImportError as e:
+            print(f"DEBUG: Error importing MessageBusViewer: {str(e)}")
+        except Exception as e:
+            print(f"DEBUG: Error showing message bus viewer: {str(e)}")
+            import traceback
+            print(f"DEBUG: Traceback: {traceback.format_exc()}")
+            print("DEBUG: Available methods:", [method for method in dir(main_window) if not method.startswith('_')])
+    
+    def show_display_settings_debug(self, main_window):
+        """Debug wrapper for showing display settings panel."""
+        print("DEBUG: Display settings action triggered")
+        try:
+            # Create the display settings panel if it doesn't exist
+            if not hasattr(main_window, 'display_settings_panel'):
+                print("DEBUG: Creating new DisplaySettingsPanel instance")
+                from src.display.components.display_settings_panel import DisplaySettingsPanel
+                main_window.display_settings_panel = DisplaySettingsPanel(main_window)
+                
+            # Show the panel
+            main_window.display_settings_panel.show()
+            main_window.display_settings_panel.raise_()
+            
+            # Position manually with direct calculation
+            x = main_window.width() - main_window.display_settings_panel.width() - 20
+            y = 60  # Below the menu bar
+            print(f"DEBUG: Positioning display settings panel at ({x}, {y})")
+            main_window.display_settings_panel.move(x, y)
+            
+            # Load settings
+            if hasattr(main_window.display_settings_panel, 'load_settings'):
+                main_window.display_settings_panel.load_settings()
+            
+        except Exception as e:
+            print(f"DEBUG: Error showing display settings panel: {str(e)}")
+            import traceback
+            print(f"DEBUG: Traceback: {traceback.format_exc()}")
+            print("DEBUG: Available methods:", [method for method in dir(main_window) if not method.startswith('_')])
+    
+    def show_api_settings_debug(self, main_window):
+        """Debug wrapper for showing API settings panel."""
+        print("DEBUG: API settings action triggered")
+        try:
+            # Create the API settings panel if it doesn't exist
+            if not hasattr(main_window, 'openai_settings_panel'):
+                print("DEBUG: Creating new OpenAISettingsPanel instance")
+                from src.display.components.openai_settings_panel import OpenAISettingsPanel
+                main_window.openai_settings_panel = OpenAISettingsPanel(main_window)
+                
+            # Show the panel
+            main_window.openai_settings_panel.show()
+            main_window.openai_settings_panel.raise_()
+            
+            # Position manually with direct calculation
+            x = main_window.width() - main_window.openai_settings_panel.width() - 20
+            y = 60  # Below the menu bar
+            print(f"DEBUG: Positioning API settings panel at ({x}, {y})")
+            main_window.openai_settings_panel.move(x, y)
+            
+            # Load settings
+            if hasattr(main_window.openai_settings_panel, 'load_settings'):
+                main_window.openai_settings_panel.load_settings()
+            
+        except Exception as e:
+            print(f"DEBUG: Error showing API settings panel: {str(e)}")
+            import traceback
+            print(f"DEBUG: Traceback: {traceback.format_exc()}")
+            print("DEBUG: Available methods:", [method for method in dir(main_window) if not method.startswith('_')]) 

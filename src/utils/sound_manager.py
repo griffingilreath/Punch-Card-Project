@@ -53,7 +53,7 @@ class SoundManager:
             self.log("Non-macOS platform detected - sound effects may be limited", "WARNING")
         
         if self.sounds_loaded:
-            self.log("Sound manager initialized successfully", "SUCCESS")
+            self.log("Sound manager initialized successfully", "INFO")
         else:
             self.log("Sound manager initialization incomplete - some sounds may not work", "WARNING")
     
@@ -160,7 +160,7 @@ class SoundManager:
             # Set sounds_loaded flag based on availability
             self.sounds_loaded = len(self.mac_sounds) > 0
             if self.sounds_loaded:
-                self.log("Mac system sounds loaded successfully", "SUCCESS")
+                self.log("Mac system sounds loaded successfully", "INFO")
             else:
                 self.log("No Mac system sounds were found", "WARNING")
             
@@ -234,7 +234,7 @@ class SoundManager:
                             self.log(f"Sound file not found: {sound_path}", "ERROR")
                     else:
                         # Try to fall back to a default sound if the mapped sound is not available
-                        if sound_name in self.sound_mappings and "Pop" in self.mac_sounds:
+                        if "Pop" in self.mac_sounds:
                             self.log(f"Sound '{sound_file}' not found, falling back to 'Pop'", "WARNING")
                             sound_path = self.mac_sounds["Pop"]
                             volume_arg = str(self.volume)

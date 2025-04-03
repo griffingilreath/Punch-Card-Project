@@ -120,6 +120,7 @@ class SettingsManager:
             "openai_api_key": "",              # Will be overridden by keychain if available
             "openai_model": "gpt-3.5-turbo",   # Default model
             "temperature": 0.7,                # Default temperature for API calls
+            "use_web_search": False,           # Whether to use web search tools in API calls
             
             # Usage statistics
             "openai_usage": {
@@ -142,7 +143,8 @@ class SettingsManager:
             "last_directory": "",              # Last directory accessed
             "recent_files": [],                # List of recently accessed files
             "auto_save": True,                 # Auto-save settings on exit
-            "debug_mode": False                # Enable debug mode
+            "debug_mode": False,                # Enable debug mode
+            "openai_prompt": "Generate a short, punchy message about computing history."
         }
     
     def save_settings(self) -> bool:
@@ -182,12 +184,24 @@ class SettingsManager:
         """
         # Try to get from keychain first
         if KEYRING_AVAILABLE:
-            key = keyring.get_password(self.KEYCHAIN_SERVICE, self.API_KEY_USERNAME)
-            if key:
-                return key
+            try:
+                key = keyring.get_password(self.KEYCHAIN_SERVICE, self.API_KEY_USERNAME)
+                if key:
+                    logger.info("Successfully retrieved API key from keychain")
+                    return key
+                else:
+                    logger.info("No API key found in keychain")
+            except Exception as e:
+                logger.error(f"Failed to access keychain: {str(e)}")
+                logger.info("Falling back to settings file")
         
         # Fall back to settings file
-        return self.settings.get("openai_api_key", "")
+        key = self.settings.get("openai_api_key", "")
+        if key:
+            logger.info("Retrieved API key from settings file")
+        else:
+            logger.info("No API key found in settings file")
+        return key
     
     def set_api_key(self, api_key: str) -> None:
         """
@@ -255,9 +269,27 @@ class SettingsManager:
         """Set the OpenAI temperature setting."""
         self.settings["temperature"] = max(0.0, min(2.0, temperature))  # Clamp between 0 and 2
     
+    def get_use_web_search(self) -> bool:
+        """Get whether to use web search in OpenAI API calls."""
+        return self.settings.get("use_web_search", False)
+    
+    def set_use_web_search(self, use_web_search: bool) -> None:
+        """Set whether to use web search in OpenAI API calls."""
+        self.settings["use_web_search"] = bool(use_web_search)
+    
+    def get_openai_prompt(self) -> str:
+        """Get the default prompt for OpenAI message generation."""
+        return self.settings.get("openai_prompt", "Generate a short, punchy message about computing history.")
+    
+    def set_openai_prompt(self, prompt: str) -> None:
+        """Set the default prompt for OpenAI message generation."""
+        self.settings["openai_prompt"] = str(prompt)
+    
     def set_openai_settings(self, api_key: Optional[str] = None, 
                            model: Optional[str] = None,
-                           temperature: Optional[float] = None) -> None:
+                           temperature: Optional[float] = None,
+                           use_web_search: Optional[bool] = None,
+                           prompt: Optional[str] = None) -> None:
         """
         Update multiple OpenAI settings at once.
         
@@ -265,6 +297,8 @@ class SettingsManager:
             api_key: Optional API key to update
             model: Optional model name to update
             temperature: Optional temperature value to update
+            use_web_search: Optional web search setting to update
+            prompt: Optional default prompt to update
         """
         if api_key is not None:
             self.set_api_key(api_key)
@@ -274,6 +308,12 @@ class SettingsManager:
         
         if temperature is not None:
             self.set_temperature(temperature)
+            
+        if use_web_search is not None:
+            self.set_use_web_search(use_web_search)
+            
+        if prompt is not None:
+            self.set_openai_prompt(prompt)
     
     # -------------------------------------------------------------------------
     # Usage Statistics

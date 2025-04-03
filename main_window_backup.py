@@ -57,6 +57,7 @@ from src.utils.ui_components import RetroButton, ClassicTitleBar
 from src.utils.sound_manager import SoundManager
 from src.core.punch_card import PunchCardStats
 
+from src.display.settings_dialog import SettingsDialog
 
 # Import components
 from src.display.components.punch_card_widget import PunchCardWidget
@@ -1050,6 +1051,7 @@ class MainWindow(QMainWindow):
         """Show the API settings tab."""
         self.update_status("Opening API Settings...")
         # Create and show the settings dialog with API tab selected
+        from src.display.settings_dialog import SettingsDialog
         settings_dialog = SettingsDialog(self)
         settings_dialog.tab_widget.setCurrentIndex(2)  # OpenAI API tab index
         settings_dialog.exec()

@@ -71,4 +71,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial project structure
 - Basic punch card encoding functionality
-- Command-line interface 
+- Command-line interface
+
+## [0.7.1] - 2024-03-26
+
+### Changed
+- Improved OpenAI settings panel UI layout and spacing
+  - Reduced font sizes to 10px for better compactness
+  - Optimized padding and margins throughout the interface
+  - Improved button layout and alignment
+  - Enhanced status field visibility and placement
+  - Adjusted panel height to prevent overflow
+
+### Fixed
+- Fixed layout issues in OpenAI settings panel where elements could overlap
+- Improved vertical spacing to prevent GUI overflow
+- Better alignment of test connection status and action buttons 
