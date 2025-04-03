@@ -6,42 +6,18 @@
 [![Version](https://img.shields.io/badge/version-0.7.0-blue)](https://github.com/griffingilreath/Punch-Card-Project/releases/tag/v0.7.0)
 [![Wiki](https://img.shields.io/badge/wiki-documentation-informational)](https://github.com/griffingilreath/Punch-Card-Project/wiki)
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗██╗  ██╗     ██████╗ █████╗ ██████╗ ██████╗   │
-│ ██╔══██╗██║   ██║████╗  ██║██╔════╝██║  ██║    ██╔════╝██╔══██╗██╔══██╗██╔══██╗  │
-│ ██████╔╝██║   ██║██╔██╗ ██║██║     ███████║    ██║     ███████║██████╔╝██║  ██║  │
-│ ██╔═══╝ ██║   ██║██║╚██╗██║██║     ██╔══██║    ██║     ██╔══██║██╔══██╗██║  ██║  │ 
-│ ██║     ╚██████╔╝██║ ╚████║╚██████╗██║  ██║    ╚██████╗██║  ██║██║  ██║██████╔╝  │
-│ ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝     ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝   │
-│                                                                                  │
-│ ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗                       │
-│ ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝                       │
-│ ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║                          │
-│ ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║                          │
-│ ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║                          │
-│ ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝                  v0.7.0  │
-└──────────────────────────────────────────────────────────────────────────────────┘
-```
+Current Version: 0.7.1
 
-> **⚠️ IMPORTANT API KEY SECURITY NOTICE ⚠️**
-> 
-> This project now includes enhanced security measures for API keys:
-> 
-> 1. Run the new `update_api_key.py` script to securely store your OpenAI API key
-> 2. Your key will be saved in the `secrets/` directory which is **excluded from Git**
-> 3. All test scripts have been updated to use this secure method
-> 4. **Never commit API keys to GitHub** - the project is configured to help prevent this
->
-> **If you previously had an API key in the codebase:**
-> 1. Consider that key compromised and regenerate a new one
-> 2. Update your key using the `update_api_key.py` script 
-> 3. Only use the secure methods described in the installation section
+A modern interpretation of punch card programming, combining retro aesthetics with contemporary functionality.
 
-**Status**: Beta - The Component Architecture Update implements a modular, component-based architecture while maintaining backward compatibility.
+## Recent Updates
 
-**What's New in v0.7.0**
+### Version 0.7.1
+- Improved OpenAI settings panel UI with optimized layout and spacing
+- Enhanced visual consistency with compact design
+- Better handling of panel height and element placement
 
+### Version 0.7.0
 - **Component Architecture**: Extracted all major UI components into separate modules
 - **Enhanced Maintainability**: Reduced main window module size by over 70%
 - **Energy Usage Tracking**: Added electricity usage monitoring for M4 Mac Mini
@@ -613,113 +589,20 @@ See the `RPiHardwareController` class in `src/hardware_controller.py` for detail
 ## 🗓️ Version History
 
 A summary of version changes is provided below. For more detailed information, see:
-- [Version History Wiki](https://github.com/griffingilreath/Punch-Card-Project/wiki/Version-History) - Comprehensive version history
-- [CHANGELOG.md](docs/versions/CHANGELOG.md) - Technical changelog with detailed changes
-- [Release Notes](docs/versions/release_notes.md) - User-focused update notes
+- [Version History Wiki](https://github.com/griffingilreath/Punch-Card-Project/wiki/Version-History)
+- [CHANGELOG.md](docs/versions/CHANGELOG.md)
+- [Release Notes](docs/versions/release_notes.md)
 
-### v0.6.9 (March 31, 2025) - Enhanced Statistics and Analytics
-- **Enhanced Statistics Panel**: Completely redesigned with improved layout and real-time tracking
-- **Real-time Analytics**: Added automatic refresh of statistics every 5 seconds
-- **Improved UI Elements**: Better text field sizing and alignment in statistics window
-- **Performance Optimization**: Enhanced error handling and statistics tracking
-- **Data Persistence**: Added support for saving and loading statistics between sessions
+### v0.7.1 (March 26, 2024) - UI Enhancement Update
+- **OpenAI Settings Panel Improvements**: Optimized layout with better space efficiency
+- **Visual Consistency**: Unified font sizes (10px) and spacing across interface
+- **Layout Optimization**: Reduced padding and improved element alignment
+- **Bug Fixes**: Resolved overlap issues and GUI overflow problems
+- **Technical Improvements**: Enhanced Qt stylesheet implementation and layout management
 
-### v0.6.8 (March 30, 2025) - Sound Control and Menu Bar Improvements
-- **Sound Control System**: Improved implementation with proper volume slider and mute functionality
-- **Menu Bar Enhancements**: Fixed duplication issues and improved organization
-- **UI Improvements**: Better text alignment, status label positioning, and window resizing
-- **Bug Fixes**: Resolved indentation issues and improved error handling
-- **Technical Improvements**: Enhanced sound manager integration and menu action handling
-
-### v0.6.7 (March 29, 2025) - Settings System Overhaul and Animation Manager Beta
-- **Implemented comprehensive Settings Manager** for centralized configuration
-- **Introduced Animation Manager (Beta)** for coordinated animation control
-- **Enhanced Menu Bar integration** for better feature access
-- **Started work on text positioning (Alpha)** with early layout-based experiments
-- **Added documentation** for Settings Manager and Animation Manager features
-- **Known issues**: Text positioning remains unstable with significant glitches
-
-### v0.6.6 (March 27, 2025) - Secure Settings Management & Keychain Integration
-- **Added keychain integration** for secure API key storage
-- **Centralized settings management** with new SettingsManager class
-- **Improved settings dialog** with tabbed interface and better organization
-- **Enhanced API integration** with better error handling and testing
-- **Added usage statistics** for tracking API usage
-
-### v0.6.5 (March 2025) - Enhanced API Integration
-- **Improved OpenAI API integration** with expanded model selection
-- **Better error handling** for API connections
-- **Enhanced console output** for API operations
-- **Added service status monitoring**
-
-### v0.6.4 (February 2025) - UI Refinements & Performance Improvements
-- **Cleaner user interface** with better spacing and alignment
-- **Improved response time** for card animations
-- **Memory usage optimizations**
-- **Fixed several UI rendering bugs**
-
-### v0.6.3 (March 2024) - GUI Default Interface
-- Made the GUI the default interface when no arguments are provided
-- Added clearer command-line options and documentation
-- Updated usage examples to reflect new default behavior
-- Improved error handling for GUI and terminal modes
-
-### v0.6.2 (March 2024) - Documentation Refinement
-- **Fixed README formatting** and structure
-- **Updated hardware integration documentation** with improved clarity
-- **Corrected file path references** throughout documentation
-- **Improved documentation clarity** with better examples
-- **Enhanced version history organization**
-- **Standardized section headers** for consistency
-- **Fixed duplicate sections** 
-- **Updated component references**
-- **Improved code block formatting**
-- **Enhanced readability** of technical sections
-
-### v0.6.1 (March 2024) - Testing Infrastructure
-- **Restored and reorganized testing documentation**
-- **Added comprehensive test suite** with pytest integration
-- **Updated command-line interface documentation**
-- **Improved test script organization** and clarity
-- **Removed outdated debug mode references**
-- **Added detailed test module descriptions**
-- **Added pytest and pytest-cov dependencies**
-- **Created dedicated test files** for each component
-- **Implemented both pytest and standalone test runners**
-- **Fixed inconsistencies** in command-line arguments
-- **Standardized test command formats**
-- **Enhanced test coverage reporting**
-- **Improved code organization**
-
-### v0.6.0 (March 2024) - Major Project Reorganization
-- **Complete Directory Structure Reorganization**: Implemented a modern, well-organized directory structure
-- **Module-Based Architecture**: Separated code into logical modules (display, api, core, animation, console)
-- **Enhanced Maintainability**: Improved code organization for better maintainability and collaboration
-- **Dedicated Module Directories**: Created specialized directories for each component
-- **API Key Protection**: Implemented secure API key storage in the git-ignored `secrets/` directory
-- **Backup File Management**: Added explicit patterns in `.gitignore` to prevent committing backup files
-- **Documentation**: Added comprehensive security documentation in `SECURITY.md`
-- **Clean Repository History**: Removed sensitive information from repository history
-- **Centralized Configuration**: Moved all configuration files to the `config/` directory
-- **Organized Documentation**: Consolidated documentation in the `docs/` directory
-- **Legacy Code Management**: Preserved legacy code in a dedicated `src/legacy/` directory
-- **Resource Organization**: Centralized resources in the `resources/` directory
-- **Simplified Entry Point**: Created a clean main entry point at the project root (`punch_card.py`)
-- **Organized Backups**: Moved all backup files to the `backups/` directory
-- **Clean Project Root**: Significantly reduced clutter in the project root directory
-- **Preserved Development History**: Maintained development history in an organized structure
-
-### v0.5.9-security (March 2024) - Security Enhancement
-- **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
-- **Enhanced API Key Handling**: Improved documentation and practices for API key management
-
-### v0.5.9 (March 2024) - Security & Bug Fixes
-- **Enhanced Git Security**: Updated `.gitignore` to exclude backup files that might contain API keys
-- **Security Documentation**: Added comprehensive `SECURITY.md` with API key management guidelines
-- **Visual Bug Fix**: Fixed issue with punch card holes not properly clearing
-
-### v0.5.8 (March 2024) - Enhanced Message Display
-- **Message Display Enhancement**: Improved message display timing functionality
-- **Visual Bug Fix**: Fixed issue with punch card holes display - holes now properly clear after display
-- **Code Structure Improvements**: Enhanced code organization and readability
-- **Switched to `repaint()`**: Changed from `update()` for better performance
+### v0.7.0 (March 2024) - Component Architecture Update
+- **Component Architecture**: Extracted all major UI components into separate modules
+- **Enhanced Maintainability**: Reduced main window module size by over 70%
+- **Energy Usage Tracking**: Added electricity usage monitoring for M4 Mac Mini
+- **Improved Organization**: Created a well-structured component directory system
+- **File Reorganization**: Renamed `gui_display.py` to `main_window.py` to better reflect its role
