@@ -590,8 +590,8 @@ See the `RPiHardwareController` class in `src/hardware_controller.py` for detail
 
 A summary of version changes is provided below. For more detailed information, see:
 - [Version History Wiki](https://github.com/griffingilreath/Punch-Card-Project/wiki/Version-History)
-- [CHANGELOG.md](docs/versions/CHANGELOG.md)
-- [Release Notes](docs/versions/release_notes.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [Release Notes](release_notes/)
 
 ### v0.7.1 (March 26, 2024) - UI Enhancement Update
 - **OpenAI Settings Panel Improvements**: Optimized layout with better space efficiency
